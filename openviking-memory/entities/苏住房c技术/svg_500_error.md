@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:51:04+08:00
+verdict_note: 苏住房C 全仓无 SUBPACKAGE_STATIC_IMAGES 常量与 migrate-main-empty-static.mjs，记忆所述白名单机制无法以现状证据证明。
+---
 # 苏住房C小程序SVG加载500
 苏住房C 微信小程序 SVG 图标报 500 有两类根因：分包静态白名单指向未复制文件，以及原生 img 相对路径按组件目录解析。
 

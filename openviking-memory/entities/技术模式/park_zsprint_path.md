@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:13:15+08:00
+verdict_note: 园区公共收益/ZsPrint/index.vue 命中 resolveServerAssetUrl 与 window.open，与打印路径相对化修复一致。
+---
 # ZsPrint打印路径相对化修复
 园区公共收益项目zhi2-web-admin的ZsPrint组件修复了子目录部署下打印打开路径丢失部署前缀的问题。
 

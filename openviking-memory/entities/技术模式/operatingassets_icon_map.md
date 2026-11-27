@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:17:17+08:00
+verdict_note: 园区物管2.0 operatingAssets.vue 命中 statIconStyle，项目含净水机/饮水机数量图标词，图标映射属实
+---
 # operatingAssets 统计图标映射
 在 operatingAssets.vue 中更新 STAT_ICON_MAP 与 statIconStyle()，使“饮水/净水机”等卡片图标正确匹配。
 ## 变更内容

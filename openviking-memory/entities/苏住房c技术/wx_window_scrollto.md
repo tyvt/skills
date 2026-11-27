@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:42:40+08:00
+verdict_note: 苏住房C newHouse/detail.vue编译产物含createSelectorQuery/pageScrollTo/md6，跨端滚动锚点修复属实。
+---
 # 小程序禁用 window.scrollTo 锚点滚动
 苏住房C 市民端新房详情页用 `window.scrollTo` 做 tab 锚点滚动，微信小程序抛 TypeError，需改 uni.createSelectorQuery + uni.pageScrollTo。
 

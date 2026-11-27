@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:51:22+08:00
+verdict_note: 苏住房G命中 resetAreaCascadeOnRegionChange/syncAreaCascadeBaseline/areaCascadeFormKeys/mixins/area，三级联动清空方案属实。
+---
 # 区划街道社区三级联动清空（mixin 基线比较 + shouldReset 双参）
 苏住房G 后台在新增/编辑详情页的「行政区域→所属街道→所属社区」三级联动中，用 area mixin 的基线比较与 shouldReset 双参区分「回显」与「用户切换」。
 

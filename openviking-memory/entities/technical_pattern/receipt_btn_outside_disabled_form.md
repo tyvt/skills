@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:56:02+08:00
+verdict_note: pubBankReceiptApply/detail.vue 与 detailTable.vue 存在，收据按钮移出禁用表单描述属实
+---
 # Receipt Button Outside Disabled Form
 In SuzhouHousingG `pubBankReceiptApply` detail page, buttons inside disabled form were unclickable in view mode.
 ## Root Cause
@@ -15,7 +20,6 @@ In SuzhouHousingG `pubBankReceiptApply` detail page, buttons inside disabled for
 - 所属项目：苏住房G
 - 验证证据：extracted source=cursor project=苏住房G
 - 来源会话：765750a0-13d8-4789-8d78-9bb82bdf1e1f
-
 
 <!-- MEMORY_FIELDS
 {

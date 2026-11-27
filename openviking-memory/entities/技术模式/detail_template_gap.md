@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T02:46:36+08:00
+verdict_note: 纯截图推断，未落任何代码；涉及项目 zhi3-web-admin-h5 本地无对应仓库，无法用代码证据证明有效。
+---
 # DetailTemplate图片撑高行致垂直空白
 在 DetailTemplate 布局中，行内大图片会把整行高度撑高，使同行文字字段垂直居中，从而与前一行之间产生大段垂直空白，该问题与列数无关。
 

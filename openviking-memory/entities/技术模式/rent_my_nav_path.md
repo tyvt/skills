@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:52:44+08:00
+verdict_note: 描述与现状不符：iHome小程序 pages/rent/my/index.vue 仍用 @tap="item.tap"(93/135) 与 pageUrlList 数字下标(162-278)，无 onNavItemTap、无 path 字段；所述显式 path 跳转改造未落地。
+---
 # rent我的页导航改用显式path跳转
 在 @src/pages/rent/my/index.vue 将菜单列表跳转由 pageUrlList 数字下标改为显式 path 字段。
 

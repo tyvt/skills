@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:42:05+08:00
+verdict_note: 苏州V3 zs-search-form.vue 命中 zs-search-form__field-row/gutter/form-content-col，Padding 修复属实
+---
 # 搜索表单 Padding 嵌套与重叠修复
 苏州市房地产监测V3 中 `zs-search-form` 组件存在 padding 多重嵌套和重叠问题，已修复并处理好折叠区内全局 `el-row` 规则与搜索 gutter 的冲突。
 

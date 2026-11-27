@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T03:19:32+08:00
+verdict_note: 园区公共收益 pubUseMoneyApply/detail.vue 命中 subdistrictFormatter/communityFormatter，区域字典格式化属实
+---
 # UseMoney Apply Dialog Area Columns Need Dictionary Formatter
 pubUseMoneyApply/detail.vue showPropertyProjectDialog binds street/community columns directly to code fields without using the area mixin formatter to show Chinese names.
 
@@ -18,7 +22,6 @@ pubUseMoneyApply/detail.vue showPropertyProjectDialog binds street/community col
 - 所属项目：园区公共收益
 - 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：414b600e-25ec-4a22-8966-2b35fffacd1d
-
 
 <!-- MEMORY_FIELDS
 {

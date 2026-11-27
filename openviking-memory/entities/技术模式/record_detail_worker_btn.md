@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:55:50+08:00
+verdict_note: autonomy/record 各 detail.vue/directDetail.vue 均无「创建工作人员」文案或 createStaff/addStaff 入口，核心断言无法证实
+---
 # 已备案详情页创建工作人员入口
 detail.vue 与 directDetail.vue 在指定条件下渲染「创建工作人员」按钮，直备与登记详情行为一致。
 

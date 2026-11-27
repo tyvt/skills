@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:21:33+08:00
+verdict_note: companyAdmin /-tableid /add 路径与company-admin-routes-probe在i淮安公版命中，路由斜杠修复属实
+---
 # 菜单详情路由缺斜杠修复
 企业 admin 详情路由 path 拼错缺斜杠致新增路由匹配失败，已规范 path 格式。
 

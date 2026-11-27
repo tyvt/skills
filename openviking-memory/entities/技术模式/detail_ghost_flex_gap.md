@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T09:43:45+08:00
+verdict_note: 仅命中 docs/AGENTS 通用词(customerProject/buildinginfo/container)，.detail-container 幽灵 gap 扫描结论与具体源码未获证据。
+---
 # 详情页幽灵 flex gap 扫描模式
 苏州市房地产监测V3 项目扫描发现 .detail-container 内 overlay 组件作为直接子节点导致多余间距的问题。
 

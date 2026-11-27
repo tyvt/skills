@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:45:14+08:00
+verdict_note: 苏住房C 存在 szffluzm 构建产物目录，产物改名属实；脚本名未逐字命中但主体成立
+---
 # zhi2-mobile-shimin 打包产物目录与脚本命名约定
 苏住房C 项目从多品牌同源仓库复制而来，构建配置须改为 szffluzm 产物目录并移除命令中的 suzhufang 品牌后缀。
 

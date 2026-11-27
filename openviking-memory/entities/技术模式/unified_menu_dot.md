@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:13:49+08:00
+verdict_note: UnifiedLogin.vue 确有 menu-sub-item 及 --before，印证『圆点由伪元素绘制』的核心结论。
+---
 # UnifiedLogin 菜单子项圆点伪元素
 统一登录页四列菜单子项文字前的圆点由 ::before 伪元素绘制，而非列表符号。
 

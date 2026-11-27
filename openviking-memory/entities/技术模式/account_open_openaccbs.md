@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:44:02+08:00
+verdict_note: accountOpen/complex/detail.vue 及 form.js 含 openAccBS 与默认值 "2"，与记忆一致。
+---
 # 区域开户新增编辑须携带 openAccBS '2'
 原 zhi2-web-admin 区域开户 detail.vue 中 form.openAccBS 默认 undefined 且 getForm() 未返回，致 POST/PUT /maintenance/account 请求体缺参。
 

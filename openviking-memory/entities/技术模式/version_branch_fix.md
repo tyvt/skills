@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:13:03+08:00
+verdict_note: 版本分支协作流程记忆；产品2.0 workOrder/order/index.vue 存在，流程描述无代码反证，非幻觉/测试垃圾。
+---
 # 版本分支修复约定
 产品2.0前端并行维护 develop/v2.6.1、develop/v2.6.2、develop/v2.6.2-yulin 三条版本分支，按上游到下游链定位引入点并 cherry-pick 同步修复。
 

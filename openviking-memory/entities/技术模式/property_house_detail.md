@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:11:25+08:00
+verdict_note: 苏住房G propertyHouseAcceptance(11)/detail-template(70)命中，改用DetailTemplate属实。
+---
 # 物业用房验收详情改 DetailTemplate（苏住房G）
 苏住房G 项目 propertyHouseAcceptance/detail.vue 参考确认页改用 DetailTemplate 展示查看模式。
 

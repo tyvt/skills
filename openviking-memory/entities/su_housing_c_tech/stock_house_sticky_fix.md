@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T14:41:37+08:00
+verdict_note: stockHouse/index.vue-216 仍为 top-40px，且 tab-line(-17) 位于 sticky-box(-23) 之外；记忆所述「top-0+tab-line 移入」修复未体现在现状代码。
+---
 # 二手房列表页筛选栏吸顶位置修复
 苏住房C二手房列表页（stockHouse/index.vue）筛选栏吸顶位置错误留出空隙，已修复。
 

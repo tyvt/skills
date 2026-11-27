@@ -7,8 +7,10 @@ valid_until: null
 source_of_truth: unknown
 gov_checked_at: 2026-11-18
 gov_note: 存量无 frontmatter；召回即验证，未采信为当前事实；无新证据不改正文
+audit_status: valid
+last_checked: 2026-11-27T05:45:31+08:00
+verdict_note: AccountDetailTable.vue 命中 getQueryParams 与 bizState-2，备案过滤修复在。
 ---
-
 # 房屋质量保证金明细未备案记录过滤
 产品2.0 项目中房屋质量保证金账户详情页子表组件查询缴存/支用明细时未传 bizState，导致未备案记录错误展示，已在 getQueryParams() 增加 bizState: '2' 修复。
 

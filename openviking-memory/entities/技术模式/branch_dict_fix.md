@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:44:01+08:00
+verdict_note: zs-table-column.vue 存在 bizStateColumnOptions，AgencyBranchList.vue 使用 bizState，列级字典优先级改动可核对。
+---
 # 经纪机构分支列表备案状态字典不一致修复
 修复苏州市房地产监测V3中经纪机构分支列表页与详情页业务状态字典不一致导致备案状态显示错误的问题。
 ## 问题根因

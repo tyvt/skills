@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:47:46+08:00
+verdict_note: 苏住房C ZsButton.vue 用 defineProps 声明 disabled 且有 .zs-button[disabled] 样式，与记忆所述禁用契约一致。
+---
 # ZsButton未声明disabled致点击穿透
 在苏住房C小程序中，ZsButton组件未声明disabled prop也未透传到原生button，导致须知页倒计时期间按钮灰显却可点击跳转。
 ## 根因

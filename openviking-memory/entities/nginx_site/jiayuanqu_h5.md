@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T04:14:24+08:00
+verdict_note: 家园区一网通办 wechatapph5命中(4)，且D-/nginx/conf/sites-enabled/家园区一网通办H5.conf实际存在，nginx运维配置属实。
+---
 # Jiayuanqu H5
 H5 site for 家园区一网通办 (wechatapph5, public-opinion survey system), served via nginx; wechatapph5 is the current project.
 ## Description
@@ -13,7 +17,6 @@ H5 site for 家园区一网通办 (wechatapph5, public-opinion survey system), s
 ## Relations
 - Accessed locally at http://localhost:8093/ (302 redirect to /wechatapph5/); config maintained via nginx UI panel.
 - Production config reload done via nginx panel to avoid panel/disk drift.
-
 
 <!-- MEMORY_FIELDS
 {

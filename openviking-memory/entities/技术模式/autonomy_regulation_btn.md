@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:50:39+08:00
+verdict_note: 苏住房G autonomy/regulation 命中 regulationName()/getKeyByValue/REGULATION_TYPE/已备案${regulationName}，备案按钮动态文案属实。
+---
 # 规约备案按钮文案动态化
 苏住房G(zhi2-web-admin)规约管理备案列表页修复硬编码按钮文案，随菜单动态显示规约名。
 

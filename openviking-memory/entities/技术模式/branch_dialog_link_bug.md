@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:48:20+08:00
+verdict_note: 苏州V3 命中 defalutStr(2)、BranchOneDialog(14)、YhwdDialog(5)，与网点弹窗链接修复一致。
+---
 # 银行网点弹窗列未配链接且缺编码无法选
 苏州市房地产监测V3的银行网点弹窗中，BranchOneDialog.vue 与 YhwdDialog.vue 列配置使用 :index 而非 type="link"，且 onOpen 未先设 defalutStr 导致无法选择。
 

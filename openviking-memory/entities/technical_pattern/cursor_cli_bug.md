@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:22:07+08:00
+verdict_note: cli.js/daemon-install.js/feishu-config.json 均不在仓库，.cursor-feedback 仅命中记忆归档文件，无实机证据
+---
 # 飞书拉起cursor会话秒退因守护进程未运行
 苏州市房地产监测V3 相关环境中，飞书 `/new` 拉起 cursor 会话曾异常秒退，根因为 CLI 守护进程未运行及 `CURSOR_API_KEY` 未配置。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:34:08+08:00
+verdict_note: 苏住房C 源码中 src/utils/sfb.js 与 pages.js 均不存在（sfb 仅在 watermark.js）；「移除登录入口统一苏服办」前端改动无代码证据。
+---
 # 移除登录入口统一苏服办登录
 苏住房C 移除独立登录入口，统一改为苏服办(sfb)登录。
 

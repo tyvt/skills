@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:57:04+08:00
+verdict_note: personnelCertificate/detail.vue 与 certificatesDialog.vue 存在，phone 非必填校验属实
+---
 # 经纪机构证书联系电话非必填仅格式校验
 personnelCertificate/detail.vue 中 phone 校验移除必填，仅保留格式校验，实现非必填且留空放行。
 

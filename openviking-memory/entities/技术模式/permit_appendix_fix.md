@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:47:44+08:00
+verdict_note: 苏州市房地产监测V3 实存 AnnexUpload、meta.busCode 显式传参、detail 监听修复，描述一致。
+---
 # 预售方案受理详情附件查询修复
 苏州市房地产监测V3 中预售方案受理等详情子路由因 busCode 为空导致附件查不到，新增统一解析与显式传参机制。
 

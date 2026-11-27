@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:16:23+08:00
+verdict_note: 门户项目存在 publicPortal/pages/RentalPages.vue 租赁页，与描述一致
+---
 # 门户 RentalPages 租赁类别列纯文本化
 RentalPages.vue 的"租赁类别"列由无效按钮改为纯文本，消除无效悬停与点击态。
 

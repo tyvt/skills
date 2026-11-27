@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:50:23+08:00
+verdict_note: priceParameters/detail.vue 含「是否停用」选项，字典缺失修复描述属实
+---
 # 价格参数是否停用选项修复
 苏州市房地产监测V3 中修复了价格参数「是否停用」单选按钮因字典缺失而不显示的问题。
 

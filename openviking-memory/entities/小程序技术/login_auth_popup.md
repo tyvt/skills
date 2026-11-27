@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:46:55+08:00
+verdict_note: 小程序仓库实存「不动产权限授权」弹窗及 uni-icons/navigateBack/pages.json，功能存在（路径为 webview 变体），描述成立。
+---
 # 不动产权限授权登录弹窗实现
 按设计图在 `pages/home/login/index.vue` 实现了「不动产权限授权」全屏遮罩弹窗页面，结构完整。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=小程序
-
 
 <!-- MEMORY_FIELDS
 {

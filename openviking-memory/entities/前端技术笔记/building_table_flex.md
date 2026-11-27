@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:13:54+08:00
+verdict_note: 园区公共收益 BuildingTable.vue 中 flex-shrink-0、unit-label、cell-width 全部命中，防压扁修复属实。
+---
 # 楼盘表组件窄弹窗防压扁
 zs-select-dialog 开启 building-table-mode 后共享 BuildingTable 在右侧宽度不足时楼层/单元标签与户室格被 flex 压缩。
 

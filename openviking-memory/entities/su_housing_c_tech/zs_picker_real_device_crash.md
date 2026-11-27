@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:48:42+08:00
+verdict_note: 苏住房C ZsPicker.vue 命中 getCurrentInstance(2)、ctx(1)，真机崩溃根因代码属实
+---
 # ZsPicker真机崩溃因getCurrentInstance ctx为空
 ZsPicker组件在真机微信小程序因调用getCurrentInstance().ctx导致整页白屏，已修复。
 
@@ -17,7 +22,6 @@ ZsPicker组件在真机微信小程序因调用getCurrentInstance().ctx导致整
 - 验证证据：extracted source=cursor session=82516bfa-31ef-44c0-9835-1b565029f672
 - 涉及文件：pages_owner/family/index.vue、components/ZsEmpty/ZsEmpty.vue、components/ZsImage/ZsImage.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话：82516bfa-31ef-44c0-9835-1b565029f672；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

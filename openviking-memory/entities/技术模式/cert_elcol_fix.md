@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:21:40+08:00
+verdict_note: 苏州市房地产监测V3 命中 CertTypeField.vue 与 detail-form.scss 的 el-col-md-12，与断点覆盖修复一致。
+---
 # CertTypeField证书列el-col断点覆盖修复
 苏州市房地产监测V3 项目 zhi2-web-admin 中，项目管理子表证书新增的证书类型列因全局 ElCol 补丁导致单设 span 被覆盖，已在 CertTypeField.vue 修复。
 

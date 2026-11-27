@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:16:07+08:00
+verdict_note: 小程序 externalWebview/home 命中 fetchOwnerDecisionVoteH5Url/portalPostAction，入口链路属实
+---
 # 业主决策入口完整交互流程
 wygl小程序「业主决策」菜单从点击到进入表决H5的完整交互链路，涵盖登录校验、实名门禁、二次确认与灵犀选屋。
 

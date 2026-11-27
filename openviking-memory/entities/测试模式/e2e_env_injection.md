@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:21:44+08:00
+verdict_note: 测试模式经验记忆，E2E_LOGIN_USER/PASSWORD环境变量注入，涉及spec可归属，无幻觉/隐私(仅变量名)
+---
 # E2E登录账号.env.e2e注入
 zhi2-web-admin 的 Playwright E2E 用例通过读取同目录 .env.e2e 向 process.env 注入登录账号，避免密码入仓。
 ## 配置方式

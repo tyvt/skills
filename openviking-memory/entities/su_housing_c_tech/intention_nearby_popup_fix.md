@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:19:14+08:00
+verdict_note: 苏住房C intention/popup.vue 含 -fixed="false"(L15)、-use-page-scroll="false"(L16)，z-paging 布局修复核心属实。
+---
 # 求购附近小区弹窗布局修复
 苏住房C小程序「添加求购信息」页点击「附近小区」弹窗的布局重叠问题已修复。
 

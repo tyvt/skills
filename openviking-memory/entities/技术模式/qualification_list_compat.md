@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:43:29+08:00
+verdict_note: registerQualification.js-102/116 与 companyRecord.js-84 实机命中 extractQualificationListFromPayload/resolvePrimaryQualificationFromPayload/resolveLicenseAppendixBusCode，双列表兼容属实。
+---
 # 企业资质要件回显兼容双列表去硬编码
 苏州市房地产监测V3 中 registerQualification.js 新增兼容方法，企业资质回显兼容 qualificationList 与 qualificationRecordList 双列表并去除硬编码。
 

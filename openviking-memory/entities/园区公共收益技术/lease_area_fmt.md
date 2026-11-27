@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:51:01+08:00
+verdict_note: 园区公共收益 命中 subdistrictFormatter/communityFormatter、resourcesLeaseContractFiling，与街道社区编码格式化一致。
+---
 # 经营资源租赁合同街道社区编码格式化修复
 园区公共收益项目为经营资源租赁合同新增页选择物业管理区域弹窗的街道、社区列增加格式化器，显示名称而非编码。
 

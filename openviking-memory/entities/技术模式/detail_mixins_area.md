@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:49:47+08:00
+verdict_note: detailMixins.js 与 building/project/detail.vue 存在，mixins 内含 form/area 描述属实
+---
 # detailMixins 内含 form+area 避免重复引入
 产品2.0 中 detail 模板页只需 mixins:[detailMixins]，因 detailMixins 已内部 mixins:[form, area]，页面再引 area 会重复合并同名选项。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

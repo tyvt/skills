@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:45:30+08:00
+verdict_note: 苏住房C 源码 src/utils/system-info.js 与 src/polyfills/mp-weixin-system-info.js 均缺失；仅编译bundle含getWindowInfo，polyfill落地描述无法证明。
+---
 # getSystemInfoSync 弃用 polyfill
 苏住房C 开发者工具反复警告 wx.getSystemInfoSync is deprecated，需靠 main.ts 首行 polyfill 重定向，仅改业务代码无效。
 

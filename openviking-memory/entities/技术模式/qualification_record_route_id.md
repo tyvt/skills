@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:45:00+08:00
+verdict_note: qualificationRecord/detail.vue 实存 resolveCompanyRecordIdFromRoute、getOwnCompany、暂无资质空态；qualificationRecord.js 传 companyRecordId，与记忆一致。
+---
 # 企业资质信息页路由 ID 解析修复
 苏州市房地产监测V3 中「企业资质信息」页（`toB/qualificationRecord/detail.vue`）调用 `getByCompanyRecordId` 前误用 `getId()` 导致显示「暂无资质」，已修复。
 

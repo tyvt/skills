@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:46:32+08:00
+verdict_note: 苏住房C命中 resolveMediaUrl/IMAGE_BASE/ZsImage，小程序端拼接 IMAGE_BASE 的修复在代码中可证。
+---
 # ZsImage 图片 URL 错误拼接修复
 苏住房C 小程序端 `ZsImage` 组件错误拼接图片 URL，导致渲染层报 `Failed to load` 与 500 错误，已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:44:37+08:00
+verdict_note: 门户publicPortal/portal.scss含portal-table-toolbar，PortalSkeleton存在，60px标题栏修复属实。
+---
 # 门户表格标题栏高度统一 60px
 portal.scss 将 .portal-table-toolbar 高度由 46px 改为 60px，使标题文字垂直居中且布局零位移。
 

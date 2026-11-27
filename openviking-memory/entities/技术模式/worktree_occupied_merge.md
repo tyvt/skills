@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:45:53+08:00
+verdict_note: 描述2026-11-09一次worktree合并事件与方法论，涉及commit 733d674/zhi2-web-admin；无可实时核对的代码现状证据，无法证明有效。
+---
 # 主工作树占用develop的临时分支合并
 当 develop/v3.0.0 被主工作树占用时，不能在任务 worktree 中 checkout 它，需在任务 worktree 建临时合并分支、合入 fix 分支、再 FF 推送到 develop。
 

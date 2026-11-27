@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:49:19+08:00
+verdict_note: 园区物管2.0 bProjectDialog.vue-17 使用 v-loading="loading || dataLoading"，记忆所述 dataLoading 防闪烁改动存在，一致。
+---
 # 首次打开弹窗闪烁修复
 园区物管2.0 中 bProjectDialog 首次打开出现遮罩闪烁与空状态跳动，根因为重复挂载、数据未就绪打开、打开重复初始化。
 
@@ -20,7 +25,6 @@
 - 验证证据：src=园区物管2.0
 - 涉及文件：zhi2-web-admin/src/layout/index.vue、zhi2-web-admin/src/layout/components/Navbar.vue、zhi2-web-admin/src/views/home/bProjectDialog.vue、zhi2-web-admin/src/mixins/dialogMixins.js
 - 所属项目：园区物管2.0；代码基线 none；来源会话 99e0bdb9-a041-402c-9293-6e332ef231d4
-
 
 <!-- MEMORY_FIELDS
 {

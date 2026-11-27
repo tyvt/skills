@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:10:43+08:00
+verdict_note: 苏住房C/zhi2-mobile-shimin/src/api/v1Instance.js 命中 supportNoReject-true，httpInstance.js 命中 supportNoReject 参数，与修复描述一致。
+---
 # 房源核验网络错误提示修复
 苏住房C小程序二手房房源发布校验时接口成功但页面误报"网络错误，请稍后再试"，已修复 HTTP 拦截器配置。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

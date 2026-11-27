@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:15:23+08:00
+verdict_note: mixins/form.js 存在 getDetailRequiredParams/validateDetailRequiredParams，与描述一致
+---
 # getDetailRequiredParams 按页收窄必需参数
 企业端公司信息页复用详情组件但不需要路由 id，因公共 mixin 强校验 id 致请求被跳全页空白，须重写该方法只返本页入参。
 

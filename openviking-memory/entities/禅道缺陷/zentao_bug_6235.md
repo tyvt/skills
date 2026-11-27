@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:46:03+08:00
+verdict_note: 苏州V3 命中 paginateRows/pageRows/check-page-rows.mjs/queryHousesByBuildCode/applyOriginPage，与 bug 6235 分页修复一致。
+---
 # 禅道 Bug 6235
 苏州市房地产监测V3 / zhi2-web-admin 预售合同签订「新增合同」弹窗户室号翻页失效缺陷，真实根因为后端按楼幢一次返回全量户室并忽略 pageNum。
 

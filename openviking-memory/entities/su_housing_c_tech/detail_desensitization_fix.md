@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T04:13:41+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin源码中"申请页detail.vue"脱敏所需formIdNo/idCardNo/maskName均0命中，仅api/autonomy.js有desensit、propose-new/utils.js有脱敏，无法证明该具体修复。
+---
 # 申请页姓名证件号脱敏修复
 苏住房C(zhi2-mobile-shimin)申请页`detail.vue`修复姓名、证件号未脱敏问题，改用`formatter.js`脱敏方法。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:14:49+08:00
+verdict_note: 太仓G VoteRangeDialog.vue 源码命中 validate 校验调用，下一步必填校验修复属实。
+---
 # 表决范围弹框下一步未校验必填修复
 太仓G端业委会选举表决与共用决策组件的「下一步」未校验表单必填项，点击直接进入下一步。
 

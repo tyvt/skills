@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:13:58+08:00
+verdict_note: AgencyPersonnelBasicInfoFormFields.vue/changeObjectMixins.js 命中；changeBadge/changeBadgeValue/normalizeChangeCompareValue/beforeForm 均命中，委托 mixin 修复属实。
+---
 # ZenTao Bug 6464
 禅道缺陷 6464：经纪机构从业人员变更流程中，发起变更后尚未修改任何字段，页面即提前显示「变更标识/变更标记」。
 

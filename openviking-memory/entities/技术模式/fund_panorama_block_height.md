@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:25:55+08:00
+verdict_note: 园区物管2.0 命中 fundPanorama/panorama-top/composition-stack，高度撑满修复文件存在。
+---
 # 资金全景板块高度撑满修复
 园区物管2.0 的 fundPanorama 中右列板块高度已通过 align-items 调整撑满容器。
 

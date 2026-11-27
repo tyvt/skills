@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:12:01+08:00
+verdict_note: 投资推送仓库无对应README合并痕迹，fund下无README.md，无法证明已落地
+---
 # 根README统一指数定投与红利子策略
 多 README 易与实现漂移时，将主体、子目录业务与共享数据基础设施合并为单一根 README 并做一致性核对。
 

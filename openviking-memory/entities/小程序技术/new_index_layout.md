@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T06:49:59+08:00
+verdict_note: 小程序仓无 pages/home/new/index.vue，home-wrapper 类名全仓 0 命中，所述首页新版布局文件不存在，无法证明。
+---
 # 首页新版布局像素级还原
 pages/home/new/index.vue 回拉过度压缩的布局，贴近设计稿。
 

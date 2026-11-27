@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T06:14:19+08:00
+verdict_note: menuRouteMap.js 等命中 1_0_0、userStore.project 等路由修复点，与记忆描述一致。
+---
 # 慧物业 Tab 小区信息页 URL 生成错误修复
 苏住房C慧物业 Tab 进入页面时小区信息 URL 生成错误（id 为空），已修复 userStore 读取字段与菜单 fallback 配置。
 
@@ -16,7 +20,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：menus.fallback.js、menuRouteMap.js、app.suzhufang.config、pages_owner/repair/submit.vue、api/property.ts、api/property.js、pages_owner/authentication/owner/index.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：9f4ea5c1-0697-4185-b730-1f8bb8246a06；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

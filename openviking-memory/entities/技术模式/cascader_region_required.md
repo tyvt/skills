@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:51:15+08:00
+verdict_note: 苏州V3 location-cascader.vue有defaultValue(21/45)与resolveRegionCode(77)，无required，移除必填与兼容描述属实。
+---
 # 级联组件region非必填避免Vue告警
 苏州市房地产监测V3 中 `location-cascader.vue` 的 `region` 设 `required: true` 致未传 prop 时 Vue 告警，已移除并新增 `defaultValue` 兼容。
 

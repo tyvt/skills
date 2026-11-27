@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:13:22+08:00
+verdict_note: 苏住房C 命中 ZsDatePicker、filter 样式路径及 white-space-nowrap/word-break-keep-all，折行修复属实
+---
 # ZsDatePicker 日期文本折行挤压bug
 苏住房C 小程序筛选弹窗日期区间控件 ZsDatePicker 渲染 2026-08-01 时连字符处断行，01 掉第二行溢出输入框。
 

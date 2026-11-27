@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:15:35+08:00
+verdict_note: 苏州V3 personnelRecord.js 有 personnelRecordChangeId，personnelChange 存在，变更详情修复属实
+---
 # 从业人员变更详情页核对与修复
 苏州市房地产监测V3 中从业人员变更详情页已存在，核对文档后发现并修复 1 处不符（缺失 personnelRecordChangeId）。
 

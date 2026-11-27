@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:45:03+08:00
+verdict_note: LAST_HANDLE_COLUMNS 全仓无命中（已移除）；「上步处理结果」列仅在 todoTask.js（待办）命中，finished/process 不再引用，属实。
+---
 # 流程列表上步处理列调整（flowable）
 园区公共收益项目已从「已办」和「我发起的」列表移除上步处理相关 3 列，「待办」保持不变。
 

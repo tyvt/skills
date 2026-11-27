@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:42:55+08:00
+verdict_note: resourcesLeaseContractFiling/index.vue 及 subVenueTable/subAdvertiseTable 含 prop-addr，列丢失-补回结论与现状一致。
+---
 # 合并冲突 git checkout --theirs 静默丢失列表列配置
 经营资源租赁合同列表曾因合并冲突整文件执行 `git checkout --theirs` 导致「位置」列定义被覆盖丢失，非编译或接口问题。
 

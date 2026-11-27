@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:13:12+08:00
+verdict_note: 产品2.0 源码命中 selectable 与 --after 边框绘制，银行列表固定列修复属实。
+---
 # Bank List Fixed Column Border and Padding
 Bank lists had missing fixed column bottom border and left whitespace from list-card padding; fixed by CSS pseudo-element and padding adjustment.
 
@@ -25,7 +30,6 @@ Bank lists had missing fixed column bottom border and left whitespace from list-
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：e57a5985-4ed9-4121-a10c-c0665c930b19
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:29:14+08:00
+verdict_note: 产品2.0 property/bill下all/components及service/public/lift入口文件存在，与「最接近物业费账单feeBills」的搜索结论一致。
+---
 # 物业费账单模块搜索结论
 产品2.0 中未找到与用户描述完全一致的账单 UI，最接近的模块是物业费账单（feeBills）。
 

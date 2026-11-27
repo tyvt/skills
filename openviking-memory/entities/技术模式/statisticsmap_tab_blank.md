@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:11:41+08:00
+verdict_note: 苏住房G worktree 源码命中 terminalTypeReady、resolvedProjectId，地图弹窗 Tab 修复属实。
+---
 # 共管小区统计地图弹窗Tab空白缺陷
 苏住房G效益统计地图点共管小区marker后，弹窗内7个Tab内容整块空白，但单独页面正常。
 ## 根因

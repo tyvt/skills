@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:48:46+08:00
+verdict_note: 苏州V3 PersonnelPhotoField.vue-56 import personnel-photo-sample.png、-99 sampleImage||default默认示例图，接入描述属实。
+---
 # 从业人员证件照示例图接入
 苏州市房地产监测V3 项目中，证件照示例图已接入从业人员表单的「示例图」区域。
 

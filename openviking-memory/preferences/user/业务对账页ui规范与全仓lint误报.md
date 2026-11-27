@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:33:37+08:00
+verdict_note: 靖江物管 src/views/repairFunds/finance/rec/index.vue、detail.vue 存在，ListTemplate mixin 在同类项目存在；业务对账页 UI 规范描述与代码一致。
+---
 - `repairFunds/finance/rec/index.vue` 落地业务对账 UI 规范：字典筛选、实心蓝/红按钮、双表与提示样式
 - `npm run lint` 执行全仓 `eslint src/**/*.{vue,js}` 扫描，输出含其他页面既有告警，不代表本次改动引入新 lint 错误
 - 验证应直接查看「预售资金监管→账务管理→业务对账」页面，而非依赖全仓 lint 输出
@@ -8,7 +13,6 @@
 ## 验证与归属
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

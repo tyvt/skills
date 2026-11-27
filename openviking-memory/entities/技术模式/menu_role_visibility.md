@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:46:50+08:00
+verdict_note: 苏找房web personCenter/components/navLeft.vue 存在且 role 判断命中，菜单可见性逻辑属实
+---
 # 房源分配菜单显隐由用户信息接口 role 决定
 苏找房web 个人中心「房源分配」菜单的显示与隐藏由登录后用户信息接口返回的 role 字段控制。
 

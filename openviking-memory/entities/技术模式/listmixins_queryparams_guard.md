@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:11:18+08:00
+verdict_note: 园区公共收益命中 src/mixins/listMixins.js 与 queryParams 防护相关代码，VenueAssetDialog 空值防护机制属实。
+---
 # listMixins queryParams 空值防护
 在 listMixins 的 computed query 中对未定义 queryParams 的组件做空值防护，避免 created 阶段 Object.assign 报错。
 
@@ -17,7 +22,6 @@
 - 验证证据：会话 e7f13f04（VenueAssetDialog 因缺 queryParams 报错，listMixins 增加防护）。
 - 涉及文件：src/mixins/listMixins.js、src/views/benefit/statisticsMap/components/VenueAssetDialog.vue、src/views/benefit/statisticsMap/operatingAssets.vue、packages/tabs/src/tab-pane.vue。
 - 来源会话ID：e7f13f04-7af6-4354-8122-d5aee1779dac；代码基线：none。
-
 
 <!-- MEMORY_FIELDS
 {

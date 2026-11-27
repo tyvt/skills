@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:30:46+08:00
+verdict_note: 苏住房G 存在 develop/v2.6.2-suzhufang 分支及 .gitmodules，reset+force-with-lease 回退 SOP 与仓库拓扑一致，属实。
+---
 # 子模块误合并回退流程
 苏住房G 同源父仓库与 zhi2-web-admin 子模块拓扑下，专属分支被误合入通用线提交时用 reset+force-with-lease 回退，区分「撤销分支包含」与「删除提交」。
 

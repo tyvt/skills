@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:48:19+08:00
+verdict_note: 苏住房C命中 decisionRangeId/DecisionResult/getDecisionRecordDetail/rangeId，跳转补传与详情展示属实。
+---
 # 我的选举进行中内容展示修复
 苏住房C小程序「我的选举」页因跳转缺rangeId、最近选举区空白、记录仅显示时间而内容缺失，已修复。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

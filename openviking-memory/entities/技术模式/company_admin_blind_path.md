@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:11:19+08:00
+verdict_note: 苏州市房地产监测V3 utils/ruoyi.js 源码命中 isRoutablePath，统一导航解析描述属实。
+---
 # 企业Admin详情路由盲拼路径致404
 苏州市房地产监测V3 的 zhi2-web-admin 中 companyAdmin/detail.vue 未复用统一导航解析，盲拼路径致跳转404。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:47:19+08:00
+verdict_note: 命中 AssetLeaseInfoTable/dictFormatter/pubAssetLease/statisticsMap，dictFormatter 格式化方案属实。
+---
 # asset_table_dictformatter
 statisticsMap 资产表业务状态列需加 dictFormatter 以统一字典格式化显示。
 

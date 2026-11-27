@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T18:48:13+08:00
+verdict_note: 泰兴小程序 src/staff/pages/profile/change-password.vue 实存 encryptPassword 与 passwordEncrypt，AES加密修复描述属实。
+---
 # 修改密码AES加密修复
 泰兴小程序修改密码页补上明文密码的 AES 加密步骤，解决后端 BCryptPasswordEncoder 报 rawPassword cannot be null。
 
@@ -15,7 +19,6 @@
 - 验证：extracted source=cursor session=10888bdc-54d2-4048-989f-b70f9519c3dc
 - 涉及文件：d:/repository/泰兴小程序/src/staff/pages/profile/change-password.vue、src/staff/api/security.js、src/staff/api/index.js、src/staff/utils/passwordEncrypt.js、d:/repository/泰兴G/zhi2-web-admin/src/views/system/user/profile/resetPwd.vue
 - 所属项目：泰兴小程序；来源会话：10888bdc-54d2-4048-989f-b70f9519c3dc；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

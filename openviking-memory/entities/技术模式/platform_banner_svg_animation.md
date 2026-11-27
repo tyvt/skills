@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:14:11+08:00
+verdict_note: 门户含platform-banner-desc-enter-mobile与UnifiedLogin，SVG动画时序与无障碍属实。
+---
 # platform-banner 文案区 SVG 动画与无障碍
 UnifiedLogin 平台横幅将文字与图片拆成多行 SVG 时需同步桌面/移动端入场 animation-delay。
 

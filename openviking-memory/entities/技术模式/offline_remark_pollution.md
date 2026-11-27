@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:47:55+08:00
+verdict_note: 太仓G 三处 VoteRangeDialog.vue 含「表决意见」/remark 字段，线下录入 remark 污染修复场景属实
+---
 # 线下投票录入Object.assign致remark污染表决意见
 太仓G端一般/业主/选项表决的VoteRangeDialog打开线下录入时若整行Object.assign会带入remark到表决意见。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:50:33+08:00
+verdict_note: 园区物管2.0 命中 refreshAfterProjectSwitch(2)、refreshView、delCachedView，与 TagsView 软刷新复用一致。
+---
 # 切项目软刷新复用 TagsView
 园区物管2.0 中 Navbar 切换物业管理区域后改用 TagsView 软刷新，避免 window.location.reload() 整页白屏。
 

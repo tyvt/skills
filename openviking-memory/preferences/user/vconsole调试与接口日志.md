@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:13:34+08:00
+verdict_note: 所属项目 repository 无对应仓库；特征日志串 [API Response] 全仓 0 命中，vconsole 仅见于园区V0H5，无法证明有效
+---
 - 项目 repository 安装 `vconsole@^3.15.1`，因与 `@dcloudio/types` 的 peer 冲突，安装时使用 `--legacy-peer-deps`
 - 在 `main.js` 通过 `#ifdef H5` 条件编译启用 vconsole，仅 `import.meta.env.DEV` 为真时初始化，避免生产构建出现调试面板
 - 在接口拦截器统一打印响应：`src/request/index.js` 成功打印 `[API Response]`（url、method、data），失败且非取消请求打印 `[API Response Error]`

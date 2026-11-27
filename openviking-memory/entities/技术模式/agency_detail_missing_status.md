@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:45:26+08:00
+verdict_note: 核对苏州市房地产监测V3：agencyApplyOverview.js 命中 shouldShowApplyConditionMet、getCompanyApplyOverview，方案与描述一致。
+---
 # 机构详情页遗漏注册状态和条件
 
 在苏州市房地产监测V3项目中，`AgencyBasicInfoDetail.vue` 未展示机构注册状态及已满足的条件，与列表规则不一致。

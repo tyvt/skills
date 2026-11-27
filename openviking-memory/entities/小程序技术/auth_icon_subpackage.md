@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:45:37+08:00
+verdict_note: phone-auth-icon.png、mainStaticPaths.js 全仓 0 命中，图标入主包并登记的描述无法核实
+---
 # 登录弹窗手机号授权图标须入主包static并登记mainStaticPaths
 苏住房C小程序登录页「手机号授权」弹窗顶部图标在安卓真机不显示（iOS正常），根因是图标原放pages_main分包未打入构建产物且跨分包引用受安卓严格限制。
 

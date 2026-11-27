@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:52:02+08:00
+verdict_note: 苏住房G/e2e/flood 存在 lib/(flood-lib.cjs)、cases/ 下 batch1/batch2/video 及 run-all.cjs，E2E 脚本分层与清理约定属实（文件名前缀略有差异）。
+---
 # 防汛 E2E 脚本分层分批规范
 防汛 E2E 扩到8模块后清理27个临时调试脚本，保留分层主脚本与探针，交付前删净 e2e-debug-*。
 

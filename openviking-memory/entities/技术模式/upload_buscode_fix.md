@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:43:42+08:00
+verdict_note: 泰兴G bulkImportDialog.vue-197 仍为 busCode-this.bus||this.$route.meta.busCode 且带 path，未改为固定 3010，与记忆不符
+---
 # 附件上传导入 busCode 不匹配致失败
 泰兴G 费用申报批量导入时，上传组件使用 route.meta.busCode 作为导入 busCode，导致部分页面匹配不到后端业务配置而失败。
 

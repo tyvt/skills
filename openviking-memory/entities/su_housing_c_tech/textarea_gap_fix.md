@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:14:58+08:00
+verdict_note: 苏住房C小程序命中 ref8443.css、.ui-ref8443、.ref-textarea，textarea 间距修复属实
+---
 # 大文本域间距修复
 苏住房防汛C端 H5 ref8443 页面修复普通卡片内大文本域（textarea）与相邻块贴边无间距问题，2026-11-06 完成。
 

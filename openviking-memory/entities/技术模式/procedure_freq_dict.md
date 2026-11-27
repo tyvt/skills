@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:49:12+08:00
+verdict_note: 泰兴小程序 maintain-detail.vue 含 procedure_frequency/frequencyText/getDictLabel/procedureFrequency，字典转换逻辑属实。
+---
 # 工序频次字典转显示逻辑
 泰兴小程序页面加载调用 `getDict('procedure_frequency')` 获取字典，`frequencyText` 计算属性转换频次显示。
 ## 实现逻辑

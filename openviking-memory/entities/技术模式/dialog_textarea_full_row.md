@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:25:10+08:00
+verdict_note: detail-form.scss/zs-dialog.vue/variables.css/mixin.scss 均在并命中 detail-form/@include/zs-dialog
+---
 # 弹窗两列布局中文本域经样式覆盖保持整行
 苏州市房地产监测V3弹窗两列布局通过样式覆盖确保文本域不被压缩宽度，始终占满整行。
 

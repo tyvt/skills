@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:43:39+08:00
+verdict_note: companyBasicInfoShared.js 实存 buildCompanyRecordChangeSavePayload 且使用 administrativeArea，与记忆一致。
+---
 # 企业变更接口须传行政区划字段
 苏州市房地产监测V3 中企业变更接口要求传 administrativeArea 且禁传 provinceCityArea，原 getForm 删除后者未补前者致行政区划为空。
 

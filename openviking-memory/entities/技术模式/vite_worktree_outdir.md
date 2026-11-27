@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:46:23+08:00
+verdict_note: 工具/偏好/知识类记忆，核心符号在 skills 与 OpenViking 仓源码/配置全部命中，描述与现状一致，判有效。
+---
 # Vite Build Worktree OutDir & Tee-Object Masking
 The zhi2-web-admin vite build writes dist outside the worktree, and PowerShell Tee-Object can mask npm's real exit code.
 

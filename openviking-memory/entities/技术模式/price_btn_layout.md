@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:50:47+08:00
+verdict_note: 产品2.0 index.scss-286 .detail-container 仍为 flex-direction-column-reverse，未见记忆所述改为 column + .operation-btn-group order--1，描述与现状不符。
+---
 # 价格备案详情页按钮置顶布局修复
 价格备案等模块详情页按钮组因全局样式问题未置顶，已通过修改全局样式修复。
 

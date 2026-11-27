@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:49:06+08:00
+verdict_note: 核对门户：portalHomeMock、homeDataMixin、homeLayout 命中，mock 接口全链路拆除描述一致。
+---
 # 后端接口不存在时的前端全链路拆除
 后端接口确认不存在时，前端需将api层、组件、配置、布局引用与e2e fixture一起拆除，并grep确认无悬挂引用。
 ## 背景

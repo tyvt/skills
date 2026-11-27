@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:48:06+08:00
+verdict_note: 在苏州市房地产监测V3仓源码命中核心符号(7/7)changepassworddialog,header,layout,logindialog，涉及文件存在，描述与现状一致，判有效。
+---
 # OrgTypeDialog标题栏修复
 苏州市房地产监测V3 的 `zhi2-web-admin/src/views/components/OrgTypeDialog.vue` 修复了标题栏显示异常问题。
 

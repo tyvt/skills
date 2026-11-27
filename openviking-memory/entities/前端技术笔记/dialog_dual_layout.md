@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:42:04+08:00
+verdict_note: 在园区物管2.0仓源码命中核心符号(6/6)building,container,houseimport,housetable，涉及文件存在，描述与现状一致，判有效。
+---
 # 弹窗内复用详情页容器类导致样式错乱：选择类弹窗按数据量分双形态
 园区物管2.0 中弹窗表格区复用详情页 sub-container 容器类会导致样式错乱与加载闪烁，约定按数据量分双形态。
 

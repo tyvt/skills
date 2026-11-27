@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:20:24+08:00
+verdict_note: .openviking 下 watch-openviking.ps1、start-server-bat-hidden.vbs、OpenViking-Watchdog 命中，看门狗记忆属实。
+---
 # OpenViking看门狗
 OpenViking 自启动看门狗机制，由 DeepSeek Harness 于 2026-11-09 创建，用于填补 dsh web 已启动但 OpenViking 未启动的缺口。
 

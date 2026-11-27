@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:48:45+08:00
+verdict_note: 产品2.0 CandidateDialog.vue photo/appointmentStartDate 无 required 校验(required 仅在其它字段)，符合'移除必填'描述
+---
 # 物管会业委会备案委员字段非必填
 产品2.0 的 CandidateDialog 委员信息弹窗中头像上传与任职起止日期原为必填，后改为非必填以适配物管会/业委会备案与变更。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

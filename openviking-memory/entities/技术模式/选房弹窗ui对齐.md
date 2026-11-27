@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:30:59+08:00
+verdict_note: 苏州V3 chooseHouseDialog.vue 存在 treeRefreshKey/onLeftTreeSearch/contract-choose-house-dialog，UI 对齐改动在源。
+---
 # 选房弹窗UI对齐
 苏州市房地产监测V3 中 chooseHouseDialog.vue 侧边栏与筛选区 UI 对齐调整已完成。
 

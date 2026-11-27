@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:11:07+08:00
+verdict_note: companyRegister与companyManagement的bankTable.vue均含createDefaultForm，Vue2响应式修复属实。
+---
 # 企业注册银行账户弹窗Vue2响应式修复
 产品2.0项目中companyRegister/components/bankTable.vue新增银行账户弹窗因Vue2响应式缺陷导致选择开户银行无法即时反显的问题已修复。
 
@@ -20,7 +25,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

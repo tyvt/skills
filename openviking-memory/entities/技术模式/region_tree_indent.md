@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:20:26+08:00
+verdict_note: 苏住房G regionBankAuth/index.vue 命中 visibility-hidden，树缩进调整属实
+---
 # 区域银行授权树缩进调整（苏住房G）
 苏住房G 项目 system/regionBankAuth 左侧树中街道节点缩进调整以明确层级。
 ## 修改要点

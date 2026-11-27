@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:15:10+08:00
+verdict_note: 苏州市房地产监测V3 中 resolveAgencyBranchRecordBusCode/resolveAgencyBranchChangeBusCode、busCode 命中，busCode 对齐属实。
+---
 # 经纪机构分支机构busCode对齐
 苏州市房地产监测V3 按约定对齐经纪机构分支机构的 `busCode` 使用方式，避免菜单配置不一致导致要件或流程编码错误。
 

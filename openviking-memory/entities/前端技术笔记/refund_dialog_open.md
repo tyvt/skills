@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:11:08+08:00
+verdict_note: 工作区无「惠山G」目录，refundDetailTable.vue/dialogForm 全仓源码 0 命中，无法证明有效。
+---
 # 退款弹窗挂载即开致表单为空
 refundDetailTable.vue 加 :key 使弹窗首次创建时 visible 已 true，el-dialog 挂载即开不触发 @open 致 onOpen 未执行、form 为空。
 

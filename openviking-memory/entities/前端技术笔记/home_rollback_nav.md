@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:13:36+08:00
+verdict_note: resolveTodoTaskNavigation 全局命中16处（ruoyi.js），导航移植属实。
+---
 # 首页迁移回滚未提交改动并移植导航
 苏住房G工作区未提交改动从惠山撤掉，恢复 home-v2 文件 HEAD，删除部分面板，并将导航解析逻辑移植至惠山版本。
 

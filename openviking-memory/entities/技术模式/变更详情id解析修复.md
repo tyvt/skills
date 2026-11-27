@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:55:28+08:00
+verdict_note: companyRecordChangeId、companyRecordAgency、detailCallback 在 V3 前后端代码中可查，与变更详情ID解析描述一致。
+---
 # 变更详情ID解析修复
 苏州市房地产监测V3 修复企业项目变更详情页通过路径进入时详情接口拿不到 companyRecordChangeId 的问题。
 

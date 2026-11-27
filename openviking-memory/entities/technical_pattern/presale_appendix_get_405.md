@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:25:50+08:00
+verdict_note: PresaleProgressDialog.vue 已用 $post 调 /file/appendix/... 且无 $get，与记忆修复一致
+---
 # Whitelist $get sends GET causing 405 on POST interface
 In Suzhou Real Estate Monitoring V3, `/file/appendix/` sits in the encryption whitelist so `$get` sends a real GET request, while `listByAppendixConfigIdAndBusIdAndBusCode` only supports POST, causing a 405 error.
 
@@ -18,7 +23,6 @@ In Suzhou Real Estate Monitoring V3, `/file/appendix/` sits in the encryption wh
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：fb0248ef-0ab1-4952-b167-0d4b0ecc5257
-
 
 <!-- MEMORY_FIELDS
 {

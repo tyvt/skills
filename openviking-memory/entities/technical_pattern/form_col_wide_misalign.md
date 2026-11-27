@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T17:49:31+08:00
+verdict_note: 苏州市房地产监测V3 institution/agencyPersonnel/components/AgencyPersonnelDetail.vue 存在且查看态用 <DetailTemplate -column="2">，与两列栅格场景一致。
+---
 # 两列栅格中FORM_COL_WIDE未归一化致错位
 苏州市房地产监测V3 中 AgencyPersonnelDetail.vue 查看态因 FORM_COL_WIDE 未归一化导致两列栅格错位。
 
@@ -14,7 +18,6 @@
 - 验证证据：src=苏州市房地产监测V3/302.md
 - 涉及文件：AgencyPersonnelDetail.vue、LeasePersonnelDetail.vue、PersonnelBasicInfoLayout.vue、detailLayout.js、detail-template.vue、agencyBasicInfoContent.js、companyManagement/detail.vue 等
 - 所属项目：苏州市房地产监测V3；来源会话：df6caac4-1d69-43b0-b9fe-7fd0af3007ab；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

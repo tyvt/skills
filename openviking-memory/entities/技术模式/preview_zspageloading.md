@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:46:36+08:00
+verdict_note: preview.vue(-3/-32) 实际渲染并 import '@/components/ZsPageLoading/ZsPageLoading.vue'，组件存在于惠山二期H5当前项目，与记忆一致。
+---
 # preview.vue 引用了不存在的 ZsPageLoading
 `preview.vue` 引用了 `@/components/ZsPageLoading/ZsPageLoading.vue`，该文件在当前项目中不存在；通过从无锡市区项目复制组件解决。
 

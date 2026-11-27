@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:47:00+08:00
+verdict_note: 苏州V3 e2e/institution/agency-branch-flow.spec.js 缺失，injectRouteMeta 全仓无命中，分支E2E修复描述无法证明。
+---
 # 分支机构E2E用例修复
 苏州市房地产监测V3 中修复 agency-branch-flow 相关 E2E 失败用例，当前 11 用例 10 通过 1 跳过。
 

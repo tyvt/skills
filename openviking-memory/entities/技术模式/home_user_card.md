@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:43:52+08:00
+verdict_note: HomeUserCard.vue-47 命中 aspect-ratio-488/220；SIDEBAR_QUICK_FUNCTIONS 命中 homeLayout 配置，欢迎卡与常用功能对齐属实。
+---
 # 经纪侧栏欢迎卡与常用功能对齐
 broker 侧栏欢迎卡（HomeUserCard.vue）及右侧常用功能已对齐设计稿。
 

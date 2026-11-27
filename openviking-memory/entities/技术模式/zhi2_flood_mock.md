@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:16:02+08:00
+verdict_note: 描述项目为苏住房C端H5，但 VITE_FLOOD_MOCK 仅见于苏住房防汛C端测试；isFloodMockEnabled、zhi2_evaluation_mock 全仓 0 命中，无法证明
+---
 # 苏住房防汛C端防台防汛mock配置
 苏住房防汛C端H5(zhi2-mobile-query-h5-c-unlimited)按 Lead 要求先做防台防汛 mock；物业自查(evaluation)模块 mock 详见 zhi2_evaluation_mock。
 

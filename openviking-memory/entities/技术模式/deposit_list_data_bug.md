@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:42:29+08:00
+verdict_note: 苏州V3 deposit/notice/index.vue 实存 extractListData、normalizeNoticeRow，notice.js 含 selectDepositNoticeList，data字段兼容修复属实。
+---
 # 定金列表因接口data未被解析而不显示
 苏州市房地产监测V3的定金通知列表中，通用 listCallback 仅读取 response.rows，而 V3 接口数据置于 data 字段下导致表格空。
 

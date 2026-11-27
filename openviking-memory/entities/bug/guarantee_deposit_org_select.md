@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-28T01:43:30+08:00
+verdict_note: 榆林G guaranteeDepositAgreement/detail.vue 实存；organType/propertyContract/getByComplexId/complexId 命中，按合同带出物业企业修复属实。
 ---
 # 房屋质量保证金协议-物业服务企业选择弹窗修复
 榆林G 项目 zhi2-web-admin 中房屋质量保证金协议新增页，物业服务企业选择弹窗曾因机构类型错误无法选择，已修复并实现按合同自动带出。

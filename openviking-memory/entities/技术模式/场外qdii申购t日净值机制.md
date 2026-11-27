@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:40:54+08:00
+verdict_note: fund/us_index_data.py 与 README.md 存在且含 QDII/净值/nav 内容，US 指数数据项目与记忆归属一致，机制结论无矛盾。
+---
 # 场外QDII申购T日净值机制
 跟踪美股的场外QDII基金在T日15:00前申购按T日基金净值确认份额，价格成分半已知。
 

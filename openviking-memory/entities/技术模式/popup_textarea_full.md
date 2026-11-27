@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:41:54+08:00
+verdict_note: 苏州V3 detail-form.scss 命中 detail-collapse-col-full-row/el-textarea/zs-textarea，文本域整行规则属实
+---
 # 弹窗两列布局中文本域整行规则
 苏州市房地产监测V3 项目在弹窗内将表单全局改为两列，但文本域（备注等）仍保持整行一列，未被压成半宽。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

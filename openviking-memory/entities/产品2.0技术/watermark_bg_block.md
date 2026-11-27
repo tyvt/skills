@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:18:46+08:00
+verdict_note: 产品2.0 命中 ListTemplate、水印样式路径，背景块改造属实
+---
 # 页面白底盖住水印背景
 水印挂在 #app-main 背景层，中间链路不透明 background:#fff 卡片会整块盖死水印，需逐层把容器背景改 transparent。
 

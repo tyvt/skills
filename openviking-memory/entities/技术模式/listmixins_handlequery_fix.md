@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:09:58+08:00
+verdict_note: 宜兴公共收益 pubBankDetailDay/index.vue-90 确有 import listMixins，模板 @query 调用 handleQuery，描述属实
+---
 # 未引listMixins致handleQuery缺失
 宜兴公共收益项目中 pubBankDetailDay 页面补注册 listMixins 以修复 handleQuery 缺失的修复套路。
 

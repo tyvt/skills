@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:17:29+08:00
+verdict_note: 门户 命中 terminalUser/terminalType/homeLayout，空值处理属实
+---
 # 门户 GetInfo terminalType 为 null 时推断 B 端选 developer 首页
 门户企业账号登录后首页误走 admin 工作台，因 GetInfo 返回 terminalType null 且未推断端别，修复后在落库前用 inferTerminalType 按 roleKey 前缀判 B 端并写入 store，再按板块权限选 developer 皮肤。
 

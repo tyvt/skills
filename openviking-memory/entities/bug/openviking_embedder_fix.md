@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-27T15:50:22+08:00
+verdict_note: OpenViking 现有 retry_embedder.py 且 embedder/__init__.py 导入 RetryEmbedder，印证记忆 2026-11-14 状态（0.5.5 内置重试、旧补丁失效）。frontmatter suspect 不作为判据。
 ---
 # OpenViking Embedder 客户端关闭修复
 OpenViking 在 litellm_embedders.py 的本地补丁曾因每次调用后关闭共享 httpx 客户端，导致嵌入失败。

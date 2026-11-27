@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:42:17+08:00
+verdict_note: fund 仓 stock_daily/parquet/duckdb/get_fundamentals 命中真实脚本(data_sources/duckdb_market/factor_builder)，Parquet 优先约定属实
+---
 # 多因子数据管道 Parquet 优先约定
 红利低波等多因子重构约定：本地 Parquet 字段优先，远程字段先落本地 DuckDB 再算，禁止边跑策略边直连远程 API。
 

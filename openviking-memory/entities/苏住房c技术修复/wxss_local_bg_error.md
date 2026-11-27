@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:01:23+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin house/index.vue 实存 Bg-szf.png，CDN 域名 szf.szzfcjj.cn 亦在代码中，与条件编译方案一致。
+---
 # 小程序端WXSS本地背景图导致渲染层报错
 苏住房C(zhi2-mobile-shimin)中pages_owner/house/index.vue的WXSS背景图本地路径致微信小程序渲染层错误，采用条件编译。
 

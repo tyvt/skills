@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:41:06+08:00
+verdict_note: 苏住房G 子模块 git log 实含 7cfeb00ee/5d7ef8921/ffdcdedf0/1385，父仓含 2dec77d/f6018fb；common-errors.md 记 reviewContent 修复，合并链属实。
+---
 # Submodule zhi2-web-admin suzhufang-li Merge
 Completed rebase and merge of suzhufang-li into suzhufang with a reviewContent validation fix and parent gitlink update, resolving ZenTao bug 6402 code issue.
 

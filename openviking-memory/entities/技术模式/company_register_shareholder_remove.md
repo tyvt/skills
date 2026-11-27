@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:13:02+08:00
+verdict_note: 苏州V3 detail.vue/company-register.spec.js 等命中，移除股东信息属实。
+---
 # 企业入网确认详情页移除股东信息
 苏州市房地产监测V3 的企业入网确认详情页已移除「股东信息」区块，仅保留法人信息。
 

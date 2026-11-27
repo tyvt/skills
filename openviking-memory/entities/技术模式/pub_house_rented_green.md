@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:11:40+08:00
+verdict_note: 园区物管2.0 pubHouseTable.vue 命中 getRowStyle/rentStatus/#d1efcb/#f7cbcb，按租赁状态映射行背景属实
+---
 # 经营用房已出租行绿色背景
 园区物管2.0 经营用房详情页按 `rentStatus` 映射行背景色，已出租显示绿色。
 

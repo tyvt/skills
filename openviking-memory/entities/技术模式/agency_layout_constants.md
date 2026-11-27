@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:13:12+08:00
+verdict_note: 苏州V3 agencyBasicInfoContent.js 导出 HALF_LAYOUT/FULL_LAYOUT，detail.vue 引用，共享布局常量属实
+---
 # 经纪机构详情页缺共享布局常量致不统一
 苏州市房地产监测V3 经纪机构管理菜单下详情页查看模式布局不一致，缺乏共享布局定义。
 

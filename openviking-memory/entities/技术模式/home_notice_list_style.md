@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T01:13:24+08:00
+verdict_note: 记忆称公示公告在 index-new.vue 用 notice-text→notice-footer 两行结构；现状该类内容在 HomeNoticeList.vue，仅 notice-meta、dashed 命中，notice-footer 不存在且 index-new.vue 文件不存在，文件名与类名均与现状不符。
+---
 # 首页公示公告列表样式调整
 门户首页「公示公告」列表已按设计稿改为两行结构，调整圆点、标签、分隔线等样式以匹配设计。
 

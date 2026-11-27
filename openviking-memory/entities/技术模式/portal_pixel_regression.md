@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:57:46+08:00
+verdict_note: 门户 tests/e2e 含 PORTAL_DESIGNS 与 portal-visual-reference.py，像素回归门槛属实
+---
 # public-portal 像素回归验收
 房产综合服务平台对外门户（src/views/home/publicPortal/）视觉验收以 npm run test:e2e:public-portal 为准（Playwright + Pillow + pixelmatch）。
 

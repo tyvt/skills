@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:47:21+08:00
+verdict_note: 实机核对：产品2.0 zhi2-web-admin/src/layout/components/Navbar.vue 与 styles/variables.scss(12) 均存在 --sidebar-expanded-width，--sidebar-width 保留于 layout/index.vue；与记忆所述修复一致。
+---
 # 顶栏标题区误用 --sidebar-width 致收起侧栏被裁切
 Web 后台侧栏收起后顶栏标题被裁切，根因是标题区宽度误用了随收起变 0 的 --sidebar-width 变量。
 

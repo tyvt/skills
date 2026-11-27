@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:18:56+08:00
+verdict_note: 苏住房防汛C端 命中 callPhone/立即受理/rescue-workorder/detail.vue，操作按钮修复属实
+---
 # ZenTao Bug 6968 求援工单详情页操作按钮缺失
 禅道缺陷 6968：求援工单详情页缺少主管部门操作按钮（立即受理/上报/进度反馈/完结）；根因为分页拆分回归，2026-11-25 已完成修复、构建、实机验证、禅道带图回写（resolved/fixed）与产物清零，链路终止。
 

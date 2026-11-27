@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T19:48:19+08:00
+verdict_note: 产品2.0 main.js-194 仍为 size=mini，small 为 0；记忆称已改为 small，描述与代码现状不符
+---
 # Element 全局 size 配置为 mini 导致告警修复
 产品2.0 中全局组件尺寸被配置为 Element UI 时代的 "mini"，而 Element Plus 的 size 仅接受 ["", "default", "small", "large"]，渲染时触发告警，已改为 "small"。
 

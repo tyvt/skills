@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:19:10+08:00
+verdict_note: 苏住房C vite.config.ts/swiperImage.vue/ZsImage.vue/index.js 命中，图片域名修复属实。
+---
 # resolveMediaUrl对/zs-fym走独立图片域名致生产图片404
 苏住房C小程序/H5 生产环境图片整块不显示，因 src/utils/index.js 的 resolveMediaUrl 对 /zs-fym 开头路径拼了错误的独立图片域名，未跟随 VITE_APP_API_PROXY。
 

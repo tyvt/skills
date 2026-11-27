@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:17:28+08:00
+verdict_note: company-register.spec.js 全库仅在记忆/归档命中，产品2.0无该文件，E2E合并无法证明
+---
 # 产品2.0 开发企业注册 E2E 测试视频合并优化
 产品2.0 开发企业注册的 E2E 测试用例视频已从 12 段约 2.5 分钟合并为 2 段约 58 秒，测试覆盖不变。
 

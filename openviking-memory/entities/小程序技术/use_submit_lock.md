@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:48:32+08:00
+verdict_note: 苏住房C src/hooks 无 useSubmitLock.js / runSubmit 命中，所述提交锁基础设施未在源码体现。
+---
 # 小程序提交锁loading防重复提交基础设施
 苏住房C小程序zhi2-mobile-shimin跨6个分包批量治理「会调接口的提交按钮」loading防重复提交，靠统一基础设施而非各页各写。
 

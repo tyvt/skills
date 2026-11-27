@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:57:46+08:00
+verdict_note: operationColumnWidth 已清零、applyOperateColumnWidth 在多项目 maintenanceApplyTable.vue 存在，computed 改名描述属实
+---
 # Vue2中data与computed同名属性致告警
 subTableMixins 的 table.js 在 data 声明 operationColumnWidth，本组件 computed 同名，Vue2 禁止该行为致警告。
 

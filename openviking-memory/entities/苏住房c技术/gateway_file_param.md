@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:51:13+08:00
+verdict_note: gateway.js 含 isFileUpload、szffluzm-wjsc 上传专用配置，描述属实
+---
 # 苏服办网关上传参数须传{file}
 苏住房C市民端在苏服办H5内上传签字图片时因调用方传{files:[...]}导致网关静默退化成普通POST，签名图片被丢弃且无报错。
 

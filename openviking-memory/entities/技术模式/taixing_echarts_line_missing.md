@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:19:59+08:00
+verdict_note: 核对 泰兴小程序 echarts.min.js：series.line 出现2次、line 出现29次，与记忆“series.line 完全不存在致折线图空白”的核心断言矛盾。
+---
 # 泰兴小程序 echarts 裁剪包缺失 line 系列
 工单趋势图空白的真正原因是图表库定制裁剪包缺了 line 系列，而非业务代码。
 

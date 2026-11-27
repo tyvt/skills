@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:59:11+08:00
+verdict_note: DecisionResult.vue 实存 decisionOptionResponseAllList、decisionPlayerName，改用列表构建方案与描述一致。
+---
 # 决策记录决策者姓名缺失修复
 苏住房C `DecisionResult.vue` 决策记录因数据覆盖未显示决策者姓名，已改用接口返回列表直接构建修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:13:54+08:00
+verdict_note: 苏州市房地产监测V3 命中 PermitPlanPanel.vue、PresalePlanFillForm.vue 与 narrative-text，预售方案 UI 对齐修复属实。
+---
 # 预售方案维护页 UI 对齐修复
 苏州市房地产监测V3 中修复预售方案维护页 UI，叙事行不再拉散、输入框固定宽度。
 

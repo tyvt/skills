@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:14:56+08:00
+verdict_note: 苏州V3 ProjectCertificateTabs.vue 命中，slot right(26) 存在，按钮插槽属实。
+---
 # 证书管理新增按钮移入 Headline 右侧插槽
 苏州市房地产监测V3 中 `ProjectCertificateTabs.vue` 的「证书管理-新增」按钮由 Headline 默认插槽移至 `right` 具名插槽，对齐宗地信息区块布局。
 

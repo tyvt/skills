@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:12:13+08:00
+verdict_note: 苏住房G building/project/index.vue 含 isSelectable/bizState 覆写，勾选门禁隔离草稿态的修复存在。
+---
 # 楼盘项目列表勾选门禁连坐
 在苏住房G项目(zhi2-web-admin)楼盘项目列表(building/project)，通用listMixins/table.js的isSelectable仅放行草稿态，导致已备案行无法勾选执行导出/授权等只读动作。
 ## 根因

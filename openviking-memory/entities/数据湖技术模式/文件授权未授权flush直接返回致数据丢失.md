@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:53:16+08:00
+verdict_note: 内容围绕 File System Access 与 node _selftest.js 自测脚本，仓库无 _selftest 文件及相关业务代码，属测试垃圾/无实机证据
+---
 # File System Access 未授权时 flush 直接返回致数据丢失
 持仓面板用 File System Access API 保存时，刷新后未授权致 flush 直接 return，内存改动丢失。
 
@@ -28,7 +32,6 @@
 
 ## 验证与归属
 - 来源会话：session-12c5a5c9-6a1b-48dd-a554-1fba34f5640e；代码基线 none
-
 
 <!-- MEMORY_FIELDS
 {

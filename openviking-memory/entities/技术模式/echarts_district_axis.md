@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:13:04+08:00
+verdict_note: 苏住房G 命中 buildDistrictManageOption 与 containLabel- true，ECharts 区县横轴防裁切修复属实。
+---
 # ECharts 横轴区县名清晰显示
 苏住房G 地图/面板类 ECharts 柱图横轴区县名被裁/重叠时，需 containLabel + 动态 grid 底部 + 按数量切倾斜。
 

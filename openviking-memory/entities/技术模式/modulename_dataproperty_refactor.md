@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:14:53+08:00
+verdict_note: facilityTable.vue 命中 dataProperty 与 maintenance，与模块名重构描述一致。
+---
 # 产品2.0接口模块名重构：maintenance改为dataProperty
 产品2.0前端全局排查并修改接口 moduleName，将 `maintenance` 相关改为 `dataProperty`。
 

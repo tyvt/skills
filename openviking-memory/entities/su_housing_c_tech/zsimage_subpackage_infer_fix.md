@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:44:25+08:00
+verdict_note: utils/index.js-128 resolveStaticUrl(src, subpackage) 带分包参数，与 ZsImage 分包路径处理一致（函数名细节有差异，机制属实）。
+---
 # ZsImage分包路径自动推断修复
 苏住房C小程序中因静态资源主包路径解析错误导致图片加载500，已通过路由自动推断分包修复。
 

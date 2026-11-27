@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:51:43+08:00
+verdict_note: examineList.vue 命中 tabDisabled 与 useLoadMore，tab 刷新修复在。
+---
 # tabDisabled 与生命周期错位致不请求
 昆山市民审批列表等页面因 tabDisabled 拦截与 useLoadMore 定义顺序错位导致切换 tab 不刷新数据，需移除拦截并前置定义。
 

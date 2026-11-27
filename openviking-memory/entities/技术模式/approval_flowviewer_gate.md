@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:18:31+08:00
+verdict_note: 园区公共收益含 flowViewer/getKey/busCode/bizState/companyRegister，flowViewer 三道闸属实。
+---
 # 企业注册审核按钮权限与flowViewer挂载三道闸
 园区公共收益项目中，company:companyRegister:approval 仅约束 zs-button 渲染，不会触发 flowViewer；flowViewer 调用受 bizState、busCode、dataId 三道闸拦截。
 

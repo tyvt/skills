@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:13:10+08:00
+verdict_note: 门户 portal-detail-header(9)/PortalDetailHeader(8)/portal.scss(8)命中，弹窗标题居中全局样式存在。
+---
 # 门户叠层详情弹窗标题居中
 门户在公共样式中统一将首页二级页叠层详情弹窗标题水平居中，并移除重复局部样式。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:18:20+08:00
+verdict_note: skills/dsh 中 op-full、execution、task-watchdog.ps1 命中，编排器工具记忆属实。
+---
 # DSH 编排器与 task-watchdog
 DSH 工作区用于执行任务与构建测试的编排程序及看门狗脚本。
 

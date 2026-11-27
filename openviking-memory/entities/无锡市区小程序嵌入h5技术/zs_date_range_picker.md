@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:52:14+08:00
+verdict_note: 无锡市区小程序嵌入H5命中 ZsDateRangePicker/DetailsTab/sharedFunds，快捷区间须确认且手动查询约定属实。
+---
 # ZsDateRangePicker快捷区间须确认且查询手动触发
 共有资金等页的 ZsDateRangePicker 快捷项仅更新预选区间，须点「确定」关弹层回传，且父组件显式调用查询不用 watch。
 

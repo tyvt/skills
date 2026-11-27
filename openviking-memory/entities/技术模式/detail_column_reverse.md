@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:51:21+08:00
+verdict_note: monthlyReportTemplate/index.vue 命中 template-header，column-reverse 布局约定在。
+---
 # 详情页标题按钮因column-reverse跑到页面底部
 套用全局 .detail-container 的详情/配置页若把操作区写在 DOM 前面，会因 flex-direction:column-reverse 被反序推到页面底部。
 

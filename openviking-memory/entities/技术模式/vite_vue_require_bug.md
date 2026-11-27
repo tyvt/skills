@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:54:54+08:00
+verdict_note: transferDiscount/DeveloperBasicInfoForm/cardData 及 import.meta.url 写法在代码中可查，require() 规避方案属实（报错文案非代码，故不计）。
+---
 # Vite+Vue3模板require报错规避
 Vite+Vue3模板里写require()会在运行时报ReferenceError: require is not defined。
 ## 根因

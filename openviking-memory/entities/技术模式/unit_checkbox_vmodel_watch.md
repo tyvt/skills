@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:16:37+08:00
+verdict_note: 产品2.0全仓无unitCheckState/syncUnitCheckState，描述的表头复选框v-model+watch修复不存在。
+---
 # 产品2.0单元表头选中状态修复：v-model+watch同步
 产品2.0前端 BuildingTable.vue 中，单元全选时表头复选框不显示选中，已修复。
 

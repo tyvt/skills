@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:15:39+08:00
+verdict_note: 门户 market-monitor.standalone.html 与 docs/market-monitor-alignment.md 存在，离线单文件交付物属实
+---
 # market-monitor.standalone.html
 苏州市房地产市场数据分析平台的离线单文件交付物，由已对齐的 Vue 源码一次性内联生成，运行时零依赖。
 

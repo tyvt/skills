@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T22:53:18+08:00
+verdict_note: 产品2.0/zhi2-web-admin/src 无 CompanyBasicInfoForm.vue，全仓无 localForm 实现，所述子组件解 prop 修复无实机代码
+---
 # CompanyBasicInfoForm 子组件直改prop触发Vue警告
 `CompanyBasicInfoForm` 对接收的 `:form="form"` prop 直接 `v-model` 绑定改写，触发 Vue 单向数据流警告。
 

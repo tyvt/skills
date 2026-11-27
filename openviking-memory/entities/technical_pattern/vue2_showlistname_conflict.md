@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T21:16:20+08:00
+verdict_note: V3 仓 projectEmbeddedCertificateList.js（customerProject/mixins）含 showListName(L22)/isEmbedded(L14)/watch(L18)，mixin 冲突修复描述属实。
+---
 # Vue2 Mixin showListName Conflict
 The listMixins table.js declares data.showListName while StateTable/PlanTable/LicTable redeclare the same computed, triggering a Vue 2 warning.
 
@@ -19,7 +23,6 @@ The listMixins table.js declares data.showListName while StateTable/PlanTable/Li
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：82c57f89-5320-4ad9-a2ed-1c48587b738a
-
 
 <!-- MEMORY_FIELDS
 {

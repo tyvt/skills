@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:47:03+08:00
+verdict_note: zs-search-form 下 SearchFormDictSelect.vue、normalizeSearchDateAttrs.js、SearchFormItem.vue 均实机存在，全局修复属实。
+---
 # 搜索表单日期与字典组件全局修复
 苏州市房地产监测V3 搜索表单的字典下拉与日期范围属性已全局修复对齐。
 

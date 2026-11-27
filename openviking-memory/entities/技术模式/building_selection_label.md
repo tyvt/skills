@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:14:38+08:00
+verdict_note: 产品2.0 ScopeSelectDialog.vue 命中 sumLabel/fullHouseData/cardValue，文案修复属实
+---
 # 楼盘表视图勾选房屋数文案修复
 修复 ScopeSelectDialog 在楼盘表视图勾选时 sumLabel 显示"已选房屋0户"的文案错误。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T10:11:34+08:00
+verdict_note: 物业手持B端 ZsDatePicker.vue 仍为原生 <picker mode="date">（count=2），无 picker-view/uni-popup，记忆所述移除原生 picker 改造与现状不符。
+---
 # 巡检记录筛选日期弹窗悬浮显示异常修复
 物业手持B端工作台巡检/维保/年检/报废记录筛选的日期类条件因原生 picker 与顶部筛选弹层嵌套冲突导致悬浮显示异常。
 

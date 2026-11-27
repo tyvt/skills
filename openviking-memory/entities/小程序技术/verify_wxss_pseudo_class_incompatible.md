@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:41:29+08:00
+verdict_note: 记忆所述 pages/face/verify.wxss 在苏住房C 项目找不到，-deep/伪类第62行说法无代码证据
+---
 # verify.wxss 伪类微信编译链不兼容
 pages/face/verify.wxss 第62行附近 :deep 或伪类写法在微信编译链中不兼容导致 WXSS 编译报错。
 

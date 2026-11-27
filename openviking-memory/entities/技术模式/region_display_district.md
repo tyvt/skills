@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:54:57+08:00
+verdict_note: V3 formatters 实存 formatAdministrativeRegion/formatListRegionCode/fullRegionPathFormatter，仅区级显示属实。
+---
 # 行政区划显示仅区级统一
 行政区划展示统一仅区级不展示省市路径，已通过调整 formatter 实现。
 

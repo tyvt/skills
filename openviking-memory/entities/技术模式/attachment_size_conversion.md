@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:13:30+08:00
+verdict_note: 园区公共收益 bytesToMb/mbToBytes在utils/index.js与tool/fjflpz/components/FjDialog.vue命中，与描述逐字一致。
+---
 # 附件大小字节与MB换算约定
 园区公共收益项目附件大小字段后端API始终为字节（B），仅 fjflpz 配置弹窗做 MB 展示与提交换算。
 

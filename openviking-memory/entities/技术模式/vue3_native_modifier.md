@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:19:51+08:00
+verdict_note: 多仓命中 @click.native/@input.native/@tap.native，Vue3 迁移移除 native 修饰符描述属实
+---
 # Vue3 迁移移除 .native 修饰符
 Vue3 已移除 `.native` 修饰符，模板里的 `@click.native`/`@input.native`/`@tap.native` 会静默不生效，须全局检索改法。
 

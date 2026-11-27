@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:44:03+08:00
+verdict_note: 产品2.0 Navbar.vue-689/731 使用 --sidebar-expanded-width，标题区与侧栏宽度解耦
+---
 # 侧边栏收起导致系统标题裁切修复
 产品2.0 的 develop/v2.6.2 分支点击侧栏收起按钮时系统标题与顶部菜单被裁切消失，根因为标题区误用随收起变化的 `--sidebar-width` 变量。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:16:31+08:00
+verdict_note: 产品2.0 operatorAuth/所属企业/staffManagement 命中，人员授权筛选描述属实
+---
 # 人员授权列表缺失所属企业筛选条件
 园区物管2.0 人员授权列表页因 `queryParams` 与 `formItems` 未含所属企业字段，缺少按企业筛选能力。
 

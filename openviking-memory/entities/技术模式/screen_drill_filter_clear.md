@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:09:05+08:00
+verdict_note: applyScreenQuery重写+currentState清空+RepairFundRight的buildScreenQuery({bizState-2},region)在榆林G同名文件全部命中，memory自带分支develop/v2.6.2-yulin印证，修复属实(首行项目名笔误)。
+---
 # 大屏穿透默认筛选未清除修复模式
 园区物管2.0 大屏穿透到列表页时，若目标页有默认筛选项且大屏未传该参数，需清除默认筛选，否则列表数量与大屏不一致。
 

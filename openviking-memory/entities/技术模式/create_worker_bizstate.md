@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:47:55+08:00
+verdict_note: 在园区公共收益仓源码命中核心符号(5/6)autonomy,bizstate,committeeversionid,directdetail，涉及文件存在，描述与现状一致，判有效。
+---
 # 备案登记详情创建工作人员按钮可见性约束
 物管会直接登记与业委会等备案详情中，「创建工作人员」按钮仅已在备案 bizState=2 时显示，避免与「提交」等同屏矛盾。
 

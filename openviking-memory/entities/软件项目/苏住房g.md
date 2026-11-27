@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:42:53+08:00
+verdict_note: 在园区公共收益仓源码命中核心符号(23/35)accountcancel,accountopen,accountquery,accrefund，涉及文件存在，描述与现状一致，判有效。
+---
 # 苏住房G
 苏住房G 是一个前端 Web 管理后台代码仓库（zhi2-web-admin）。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:15:44+08:00
+verdict_note: 苏州市房地产监测V3 contractType(31)/范本(30)命中，范本类型路由传参修复目标存在。
+---
 # 范本跳转合同页传递合同类型修复
 禅道#6328 修复范本「范本内容」误进现售签订的问题，通过在范本跳转路由 query 中显式传递 contractType 区分预售与现售。
 

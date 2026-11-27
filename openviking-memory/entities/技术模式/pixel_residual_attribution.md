@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:19:14+08:00
+verdict_note: 苏住房防汛C端 命中 theme.css/flows.spec.ts/pixelmatch，残差三档归因属实
+---
 # 像素级还原验收残差三档归因
 逐像素还原后差异比对非零时，按亚像素抗锯齿、平台原生控件、演示数据差异三档归因；小程序端不可能与 H5 逐像素一致。
 

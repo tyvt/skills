@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:10:18+08:00
+verdict_note: 园区物管2.0含complexBuildingAuth、RegionTreeLayout、complexChange及layout组件，物管页complex命名与侧栏定位属实。
+---
 # 物管页用complex侧栏异常涉layout组件
 园区物管2.0 物业管理区域页面统一使用 complex 模块命名，侧边栏收起后仍显示细条问题涉及 layout 相关组件。
 

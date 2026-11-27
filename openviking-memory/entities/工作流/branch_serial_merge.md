@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:34:38+08:00
+verdict_note: 园区物管2.0 zhi2-web-admin存在knowledgeBase/index.vue与styles/index.scss，多分支串行合并约定记录无矛盾证据。
+---
 # 多分支修复-确认-串行合并约定
 园区物管2.0 存在多级发布分支，修 bug 须从最早受影响分支修起并逐级向下串行合并。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:45:38+08:00
+verdict_note: 核对苏州市房地产监测V3：AppendixPackageSection、AnnexUpload、agencyBranch 命中，el-upload 禁用条件修复属实。
+---
 # 容量满时 el-upload 完全禁用的问题
 在项目 苏州市房地产监测V3 中，容量满时 `el-upload` 被完全禁用导致无法从列表中删除，并且 `loadPackage` 在更新受控的 `:file-list` 时触发了进入动画。
 

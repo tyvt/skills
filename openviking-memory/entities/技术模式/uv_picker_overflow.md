@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:54:08+08:00
+verdict_note: 家园区一网通办命中 uv-picker/visibleItemCount/HousePicker/utilityCard，可见项过多溢出修复属实。
+---
 # uv-picker可见项过多致弹窗超高按钮溢出
 家园区一网通办中 uv-picker 因可见项过多导致弹窗超高、底部按钮溢出视口。
 

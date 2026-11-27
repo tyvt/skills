@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:14:24+08:00
+verdict_note: skills orchestrator 命中 stallMs/warnCapMs/orchestrate/timeout/callPython，插件配置属实
+---
 # dsh orchestrator 插件
 dsh（DeepSeek Harness）的编排插件，提供 callPython 能力并管理 Python 调用的超时、停滞与预警。
 ## 配置项

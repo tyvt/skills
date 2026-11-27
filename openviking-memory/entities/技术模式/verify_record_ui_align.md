@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:25:28+08:00
+verdict_note: i淮安H5 verifyRecord/reconciliationStatus相关组件命中，验收记录UI对齐描述属实
+---
 # 账务对账页 UI 对齐业务对账
 苏州市房地产监测V3 完成账务对账页（repairFunds/verifyRecord）UI 对齐业务对账（finance/rec）。
 

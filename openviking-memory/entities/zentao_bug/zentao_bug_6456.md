@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:17:06+08:00
+verdict_note: 防汛C端 portal.ts/data/index.vue 命中 getKeyData/getBenefitData/region/list，禅道6456属实
+---
 # 禅道 Bug 6456
 禅道缺陷 6456 为苏住房防汛C端移动查询H5「数智页」接入G端首页统计接口并修复区域显示不全问题，2026-11-11 由助手实现、提交推送并回写禅道为已解决。
 

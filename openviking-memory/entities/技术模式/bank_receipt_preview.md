@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:20:52+08:00
+verdict_note: BankReceiptDetailDialog.vue 命中 publicReceiptDetailItems/voucherFileUrl，凭证预览展示调整属实
+---
 # bank_receipt_preview
 产品2.0 的银行回单模块 (`BankReceiptDetailDialog.vue` 等) 调整查看态与编辑态的凭证预览展示。
 
@@ -15,7 +20,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

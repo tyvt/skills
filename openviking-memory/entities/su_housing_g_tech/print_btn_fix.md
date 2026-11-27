@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:24:07+08:00
+verdict_note: 苏住房G fjflpz/index.vue 与 print/index.vue 存在并命中 fjflpz/handleAdd
+---
 # 打印配置页新增按钮不显示修复
 苏住房G 打印配置页因合并恢复业务代码时丢失 `table-container` 包裹层，导致「新增」按钮被挤出可视区域，已恢复布局结构并增加校验修复。
 

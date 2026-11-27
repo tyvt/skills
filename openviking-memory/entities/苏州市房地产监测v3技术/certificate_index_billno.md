@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:15:29+08:00
+verdict_note: 苏州V3 index.vue/listMixins.js 命中，账单号展示代码存在。
+---
 # 证书列表序号列误绑billNo致空白
 personnelCertificate/index.vue 序号列 prop 误绑接口不存在的 billNo 字段致列表序号空白。
 

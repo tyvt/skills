@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:19:37+08:00
+verdict_note: 园区物管2.0 statisticsMap/index.vue 精确命中 spreadOverlappingMarkers 与 OVERLAP_SPREAD_RADIUS_DEG。
+---
 # 地图打点两类坐标问题分流
 统计地图按街道打点时，气泡数量少于街道数或点位完全重合，需分两类根因处理。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

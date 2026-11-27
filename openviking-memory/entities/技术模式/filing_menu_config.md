@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:42:38+08:00
+verdict_note: 苏住房G publicQuery 命中 pubRevenueContractAdvSpace 与 filePath 跳转，备案入口改动方案属实
+---
 # 公共查询备案入口菜单报错
 苏住房G公共查询页四个备案入口报「没有授权相关菜单」，实际是空状态链接复用旧filePath跳转配置导致路径解析失败，并非权限不足。
 

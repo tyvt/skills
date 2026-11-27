@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:45:46+08:00
+verdict_note: presale/permit/components/PermitInfoPanel.vue、detail.vue 与 DetailAppendixPanel 中 layout-sync 逻辑存在，限高滚动修复可核对。
+---
 # Headline collapse-content 溢出撑破右栏修复
 苏州市房地产监测V3 的 zhi2-web-admin 中，Headline 组件 collapse-content 默认 overflow:visible，导致要件列表加载后撑破右栏容器，已通过限高滚动修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:11:28+08:00
+verdict_note: byteUtil.js 存在且含 longToByte/intToByte，混合缩进修复对象真实存在。
+---
 # byteUtil.js ESLint混合缩进修复
 苏住房C 项目中 zhi2-mobile-shimin 的 byteUtil.js 因混用空格与 Tab 触发 ESLint 的 no-mixed-spaces-and-tabs 规则，已修复并可重新提交。
 

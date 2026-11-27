@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:44:29+08:00
+verdict_note: iHomePC/iHome小程序 locale jpn.json 实存 削除 等删除翻译，四语言补全描述属实（文件前缀 rent 略陈旧但证据成立）。
+---
 # 删除按钮多语言翻译补全
 修复个人中心基本信息删除按钮多语言显示问题（原显示 common.delete 键名），补全四语言包翻译。
 

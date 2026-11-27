@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T11:15:07+08:00
+verdict_note: 苏州V3 3文件命中，isSupervisionBank/listRecBankDetail 存在，环境分支清理属实。
+---
 # 残留的苏州环境分支清理完成
 苏州市房地产监测V3 项目中，在 6 个文件中完成清理，全部移除 `isSuzhouzhizai` 与 `currentEnvironment` 分支，统一保留通用逻辑。
 
@@ -17,7 +21,6 @@
 
 ## 验证与归属
 - 所属项目：苏州市房地产监测V3；来源会话：bf97360e-6cc0-4224-aef3-edf155a68b8e；验证证据：extracted source=cursor project=苏州市房地产监测V3；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

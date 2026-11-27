@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:44:13+08:00
+verdict_note: hooks/usePageLoading.js 含 showLoading/hideLoading/loaded/runWithLoading，decision/index.vue 有 v-if="loaded"，统一 loading 方案属实。
+---
 # 业主决策模块页面加载统一处理
 苏住房C「慧物业」业主决策模块相关页面已统一改为先显示 loading、所有接口返回后再渲染，避免 if/else 分支闪烁。
 

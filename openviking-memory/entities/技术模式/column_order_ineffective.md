@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:10:43+08:00
+verdict_note: 淮安物管 mixins/table.js、ListTemplate.js 源码命中 tableColumnsKey、loadTableConfigFromStore，方案属实。
+---
 # 自定义列顺序调整失效修复
 淮安物管后台自定义列显示调整顺序后未生效，已通过重建表格与本地配置恢复修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:11:12+08:00
+verdict_note: 苏住房C 存在 listRecommendProject API 与 newHouse/indexMore.vue 的 halfYearAgo 处理，与描述一致
+---
 # 页面URL的type误当接口枚举致列表空数据
 苏住房C移动端「最新楼盘」页把路由type直接当halfYearAgo枚举传参，实际按「在售」查询返回空列表。
 

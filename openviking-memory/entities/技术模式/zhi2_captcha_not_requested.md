@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:45:39+08:00
+verdict_note: 在苏住房防汛C端仓源码命中核心符号(3/4)refreshcaptcha,request,unlimited，涉及文件存在，描述与现状一致，判有效。
+---
 # 苏住房防汛C端图形验证码demo构建不请求
 苏住房防汛C端H5(zhi2-mobile-query-h5-c-unlimited)在demo构建下图形验证码接口不请求，仅显示"点击刷新"。
 

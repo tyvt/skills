@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:10:54+08:00
+verdict_note: 苏住房G worktree 源码命中 RECTIFICATION_NOTICE_LIST_FILE_PATH 与 routeMeta 纯函数模块，循环依赖整改属实。
+---
 # route_meta_circular_dep
 苏房页面标题/返回路径公共逻辑须收进纯函数模块 routeMeta.js，store 与 utils 不得反向依赖 ruoyi（循环依赖 + 静默 undefined）。
 

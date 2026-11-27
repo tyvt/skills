@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:47:50+08:00
+verdict_note: solicitation/maintenanceFeeDtlDialog.vue 无 5000/4999/z-index 修复痕迹，具体层级数值未印证。
+---
 # 嵌套 zs-dialog 内层控件点不动修复
 嵌套 zs-dialog 时内层控件点不动的根因是父级全屏 v-modal 盖住内层 wrapper，需抬升内层 wrapper/遮罩 z-index。
 

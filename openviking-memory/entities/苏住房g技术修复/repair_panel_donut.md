@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:46:19+08:00
+verdict_note: 苏住房G RepairPanel.vue 命中 donutOption(4)，环形图零数据渲染修复属实
+---
 # RepairPanel环形图零数据渲染修复（苏住房G）
 苏住房G 项目首页报事报修卡片在合计为0时环形图不渲染的问题已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:46:31+08:00
+verdict_note: 园区物管2.0 命中 OperationBtnGroup、zs-operate-column、columnWidth，与 z-index/列宽修复一致。
+---
 # 吸顶操作栏被固定列遮挡与按钮裁切
 园区物管2.0 维修资金立项配置详情页吸顶按钮组被表格固定列遮挡、子表操作列按钮裁切的叠加根因与修复。
 

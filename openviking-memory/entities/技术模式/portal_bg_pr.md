@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:23:30+08:00
+verdict_note: 门户 命中 portal_page_bg.jpg、public-portal、portal.scss，背景图同PR提交约定对应文件存在。
+---
 # 门户 publicPortal 背景 JPG 与 SCSS 同 PR 提交
 `.public-portal` 通过 SCSS 引用 `/assets/images/homeNew/portal_page_bg.jpg` 时，JPG 必须与样式同 PR 纳入版本库。
 

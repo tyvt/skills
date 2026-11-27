@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:21:02+08:00
+verdict_note: 门户 menuVisibility.js 命中 isRouteHidden/buildNavbarChildrenMenus，父级hidden追溯相关文件存在。
+---
 # 侧栏父级隐藏未追溯导致子菜单误显
 当父级 Layout 设置 hidden: true 时，侧栏子项仍错误显示，因为可见性判断未追溯祖先隐藏状态。
 

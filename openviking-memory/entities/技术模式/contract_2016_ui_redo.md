@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:47:18+08:00
+verdict_note: 苏州市房地产监测V3 contract/index.vue 引用 sz-contract.scss 且使用 s16-contract/s16-side/s16-row/s16-field，2016 版式可核对。
+---
 # 2016版合同页UI重做保留买卖表格
 2016 版合同页按设计图重做版式，左侧目录+右侧白卡片，买卖双方信息仍保留表格。
 

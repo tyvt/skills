@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T22:42:47+08:00
+verdict_note: 苏住房G/昆山G 均无 AccountFreezeFields.vue，去 allow-create 的修复无代码踪迹（accountFreeze.js 仅 freezeReason 枚举）
+---
 # el-select 开启 allow-create 把历史脏值预置为下拉第一项
 [苏房G] 账号冻结原因等「预设枚举 + 历史手填」的 el-select 开 allow-create 后，历史自定义值被 Element 自动追加到下拉首项。
 

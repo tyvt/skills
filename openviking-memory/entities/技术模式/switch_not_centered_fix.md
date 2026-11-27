@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:17:23+08:00
+verdict_note: detail-form.scss 命中 .el-form-item-has(.el-switch) 内容区 align-items-center + min-height-38px（第57-61、211-215行），开关居中修复属实。
+---
 # 启用状态开关未垂直居中因表单样式冲突
 全局 el-form-item__content 设 min-height 但 el-switch 未居中，通过样式覆盖修复开关垂直居中。
 

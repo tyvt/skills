@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:48:02+08:00
+verdict_note: 苏住房C guideList.vue-5 跳转仍为 guideDetail??id= (双问号)，未改为单问号，修复未落地与记忆不符
+---
 # 增梯指引详情页服务器异常修复
 苏住房C(zhi2-mobile-shimin)「加装电梯 → 增梯指引」详情页报「服务器异常」，已修正跳转URL拼写与空值校验修复。
 

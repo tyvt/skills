@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:12:42+08:00
+verdict_note: 惠山二期H5 vite.config.ts-139 为 drop_console- runMode === 'production'，VITE_APP_VCONSOLE 在 main.ts/api/index.js 存在，仅生产启用描述属实。
+---
 # drop_console 仅生产环境启用
 为保证测试日志可见，drop_console 仅在生产环境启用，测试环境用 vconsole 调试。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:25:39+08:00
+verdict_note: data.data.waiver、vote.js、OptionStepChoose、election.ts 在无锡锡山业主决策H5命中，豁免读取bug属实
+---
 # 弃权选项读取位置错误致表决项为空
 太仓一网通办H5 的弃权选项 `waiver` 位于响应顶层而非 `data.data`，重构后读取位置错误导致 `optionList` 为空，已修复。
 

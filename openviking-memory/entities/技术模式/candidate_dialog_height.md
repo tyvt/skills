@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T10:11:23+08:00
+verdict_note: 园区公共收益 CandidateDialog.vue 实含 table-tr、pageSize、doLayout、view-change，与高度塌陷修复描述一致。
+---
 # CandidateDialog 户室选择列表高度塌陷修复
 园区公共收益项目修复切换回列表视图后弹窗高度过小问题。
 
@@ -13,7 +17,6 @@
 ## Relations
 - 来源会话：0c03606c-2172-4607-9beb-eb92aee5b6d4（extracted source=cursor）
 - 所属项目：园区公共收益；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

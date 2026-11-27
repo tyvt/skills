@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:44:59+08:00
+verdict_note: 同源多分支交付/子模块指针/revert+tag 规范为流程偏好，与仓库多 worktree 拓扑一致，无矛盾。
+---
 # 苏住房G 同源多分支交付规范
 苏住房G 与惠山等是同源复制多分支，需求只进指定分支，另一分支用 revert 反向剔除，tag 用年月日时分纯数字。
 ## 交付规则

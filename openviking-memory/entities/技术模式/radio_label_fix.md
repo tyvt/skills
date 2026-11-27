@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:18:42+08:00
+verdict_note: 园区物管2.0命中 el-radio/-value，label改value修复属实
+---
 # Element Plus el-radio label 弃用告警修复
 Element Plus 中 `el-radio` / `el-radio-button` 使用 `label` 作为选中值的写法将在 3.0 废弃，需改为 `value`，已修复多处文件。
 

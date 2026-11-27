@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:54:01+08:00
+verdict_note: 门户 login.vue-277 读取 route.query.redirect、-403 按 redirect 回跳，与记忆所述登录回跳修复一致。
+---
 # 菜单登录后路径跳转与 SSO 绑定
 门户菜单配了登录后内部路径却跳登录页，需登录成功按 redirect 回跳，客户环境还需后台绑定 SSO 应用。
 

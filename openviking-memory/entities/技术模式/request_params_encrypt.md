@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:18:56+08:00
+verdict_note: 苏州市房地产监测V3 中 moveUrlQueryToBody、security、queryHousesByBuildCode 命中，请求参数处理改造属实。
+---
 # request.js 非白名单接口分页参数进加密 body
 苏州市房地产监测V3 / zhi2-web-admin 前端请求层对非白名单接口将 params 并入加密 body，翻页失效排查应先确认后端是否真分页。
 

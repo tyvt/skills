@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:10:55+08:00
+verdict_note: 涉及文件均存在，HomeNavItem/MidModuleGrid 含 iconPath/bgPath/isShow，配置对比结论与代码结构吻合。
+---
 # 地图找房远程配置对比分析
 苏住房C 对比「苏找房」与「我要买房」中「地图找房」远程配置，结论为两处接口 path 与四个字段完全一致，差异仅在配置结构与前端用法。
 

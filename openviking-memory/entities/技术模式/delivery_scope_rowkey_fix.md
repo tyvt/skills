@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:12:46+08:00
+verdict_note: DeliveryScopeSection.vue 命中；getRowKey/row-key/deliveryScopeId/zs-select-column 均命中，row-key 修复描述与源码一致。
+---
 # 交付范围表格多选列缺 row-key 警告修复
 苏州市房地产监测V3 的 DeliveryScopeSection 中 zs-table 使用多选列未提供 row-key，数据更新时报 [Vue warn] 错，已修复。
 
@@ -16,7 +21,6 @@
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：supervision/projectDelivery/components/DeliveryScopeSection.vue、src/components/zs-table、src/components/zs-table/zs-table.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：a11f72ad-6551-4d69-a2d0-e12bb33736a2
-
 
 <!-- MEMORY_FIELDS
 {

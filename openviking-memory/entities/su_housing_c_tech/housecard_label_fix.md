@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:10:29+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin 命中 showTypePrefix/show-type-prefix/addressText 于 houseCard.vue 与 Project_Suzhufang.vue，类型标识修复属实。
+---
 # 苏找房推荐房源类型标识缺失修复
 苏住房C 推荐列表房源图片底部缺少「新房/二手房」标志的问题已修复，根因为 `houseCard.vue` 未实现传入的 `show-type-prefix` 属性。
 

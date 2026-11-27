@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:52:26+08:00
+verdict_note: pubRegulatoryAgreement 存在，getDicts(BIZ_STATE)→biz_state 字典大小写修复属实
+---
 # 协议签署单据状态查询错位修复
 苏住房G 项目协议签署与协议终止列表的「单据状态」字典检索因大小写不匹配导致查询错位，已修复。
 

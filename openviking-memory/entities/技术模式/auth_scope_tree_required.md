@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:43:00+08:00
+verdict_note: 园区物管2.0 system/user/detail.vue 含 getCheckedKeys 与「授权范围」必填提示，树勾选校验属实
+---
 # 用户详情授权范围树勾选必填校验
 园区物管2.0 中 system/user/detail.vue 通过 beforeSaveHook 与 getForm 空树保护实现 el-tree 授权范围至少勾选一个节点。
 

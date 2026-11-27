@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:27:06+08:00
+verdict_note: RecursiveMenu.vue 命中 active-menu/active-parent/menu-title--icon/primary-color，主题色样式属实
+---
 # 侧边栏菜单图标激活态主题色
 园区物管2.0 侧边菜单在激活态时图标与文字同色，使用主题色 var(--primary-color)。
 

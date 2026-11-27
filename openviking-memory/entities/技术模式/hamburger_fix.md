@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:47:20+08:00
+verdict_note: 核对产品2.0：Hamburger.vue 命中 menu-fold.svg 静态引用与 isActive，修复描述一致。
+---
 # Hamburger 图标不显示修复
 产品2.0 页签栏汉堡菜单图标（`Hamburger.vue`）因 SVG sprite 注册路径问题不显示，已修复为直接引用静态文件。
 

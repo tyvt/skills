@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:33:05+08:00
+verdict_note: 苏住房C 子模块 zhi2-mobile-shimin、main-v2.1/pages_tab 分支与 build-mp-weixin 编译脚本在源，合并模型属实。
+---
 # 苏住房C 分支合并模型
 苏服办(sfb/main-v2.1) 与微信小程序(mp) 是同一子模块两条并行分支，互合需排除网关文档保留 mp 结构再编译验证。
 

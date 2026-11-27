@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:49:10+08:00
+verdict_note: noticeValidity.js 含 getNoticeValidityDays，refund/detail.vue 含 REFUND_NOTICE_VALIDITY，描述属实
+---
 # 退款详情中缺失字典的安全查找
 Suzhou Real Estate Monitoring V3 系统：当字典项缺失时直接访问 `.dictValue` 会导致错误；已添加带警告的安全查找。
 

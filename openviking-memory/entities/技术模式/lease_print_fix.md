@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:20:40+08:00
+verdict_note: detail.vue 命中 recordCertSite/lease-contract-print-cert-btn/handlePrintRecordCert，组件与工具函数均在
+---
 # 住房租赁合同备案详情缺打印按钮
 苏州市房地产监测V3 中住房租赁合同备案详情页因 OperationBtnGroup 默认走公共配置未消费详情接口字段，导致打印按钮不渲染，须传入详情接口返回字段补充渲染。
 

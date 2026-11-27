@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:50:43+08:00
+verdict_note: 园区物管2.0 mapOverview/index.vue 命中 buildMapGeoCarouselRegions(2)、highlightName(3)，全市轮播高亮修复属实
+---
 # mapOverview 全市轮播高亮修复
 无锡地图 SVG 轮播在「全市」分支需为全部区县推入 geo regions 高亮项，否则视觉上全部不亮。
 

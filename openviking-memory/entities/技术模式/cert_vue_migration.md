@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:58:51+08:00
+verdict_note: certificate 目录 SearchLand.vue/LicSearch.vue/conLandLic 在多仓实存，operation-btn-group 迁移模式与描述一致。
+---
 # 证书目录Vue文件迁移改造
 certificate 目录下共 28 个 Vue 文件，已完成 20 个迁移改造，8 个 index.vue 包装页无需改动。
 
@@ -16,7 +21,6 @@ certificate 目录下共 28 个 Vue 文件，已完成 20 个迁移改造，8 �
 - 验证证据：extracted source=cursor project=产品2.0
 - 涉及文件：certificate 目录下 index.vue、detail.vue 及多个子组件
 - 来源会话：5a8c8d9e-bdb0-4660-b439-a10862f22116；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

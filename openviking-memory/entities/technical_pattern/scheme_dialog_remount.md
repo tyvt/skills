@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T22:15:55+08:00
+verdict_note: 苏州V3 命中 schemeDialogOpen/loadPage，v-if 重挂载属实
+---
 # Service Scheme Dialog Removes Interception and Remounts with v-if
 In Suzhou Real Estate Monitoring V3, the service scheme dialog removed pre-load interception and uses v-if remount to ensure event execution.
 
@@ -27,7 +31,6 @@ In Suzhou Real Estate Monitoring V3, the service scheme dialog removed pre-load 
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：fe8e14a9-62e2-477a-bd32-f3f069ed26fd
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:53:35+08:00
+verdict_note: autonomy.js 含 getAppRecordDetail 与 getDecisionRecordDetail 两详情接口，描述属实
+---
 # 记录详情补姓名接口选择
 苏住房C 选举记录列表补选举人姓名应优先 getAppRecordDetail，而非 getDecisionRecordDetail（可能不返回 decisionPlayerName）。
 

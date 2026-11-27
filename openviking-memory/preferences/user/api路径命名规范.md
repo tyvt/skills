@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:18:25+08:00
+verdict_note: 用户 API 路径命名偏好，为编码规范约定，无隐私违规/测试垃圾。
+---
 - 非增删改查（非 CRUD）业务接口末尾禁止误加 `/detail` 或 `/add` 后缀，保持路径规范
 - 已在 `src/api` 30 个文件中移除 57 处误加后缀，保留 `module/entity` 前缀与 body 参数（如 `getVendeeListByContractNo/detail` 改为 `getVendeeListByContractNo`）
 - 命名需对齐既有规范文件如 `contractRequest.js`、`account.js`

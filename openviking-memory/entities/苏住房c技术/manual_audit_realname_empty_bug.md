@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T10:12:39+08:00
+verdict_note: FormManual/FormLocal/FormNonLocal 中 verifyInfo=0、getRepeatByIdTypeAndIdNumber=0，所述 onLoad 快照 verifyInfo 修复在现状源码不存在。
+---
 # 人工审核实名提交证件类型为空bug
 提交人工审核实名时请求体为空导致后端报「证件类型不能为空」，根因是提交时读userStore被onShow清空。
 

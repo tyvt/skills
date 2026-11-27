@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:46:15+08:00
+verdict_note: i淮安公版仓库无src/pages/index/home.vue，handleUserEntry/detectMiniProgramEnv全仓0命中，记忆所述文件与函数均不存在。
+---
 # i淮安公版 home.vue 点击无响应修复
 i淮安公版 H5 首页用户卡片点击无响应体验问题的修复记录。
 
@@ -13,7 +18,6 @@ i淮安公版 H5 首页用户卡片点击无响应体验问题的修复记录。
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=i淮安公版
-
 
 <!-- MEMORY_FIELDS
 {

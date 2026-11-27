@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:45:11+08:00
+verdict_note: 惠山G refund 命中 RefundDetail/refundDetailDialog/listMixins，冗余代码清理属实
+---
 # refund 目录冗余代码清理
 惠山G 项目 zhi1-web-admin 中 refund 目录下 commonTable.vue 与 refundDetailTable.vue 完成冗余代码清理，功能逻辑保持不变。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:46:00+08:00
+verdict_note: sharedFunds/index.vue-31/36/77 命中 OverviewTab、@scroll-to-bank、scrollIntoView="bank-section"，锚点滚动修复属实。
+---
 # 查询明细展开银行流水区外层滚动失效
 OverviewTab.vue 展开银行流水区时，index.vue 外层 scroll-view 未自动滚动，导致页面看似无变化，已通过锚点滚动修复。
 

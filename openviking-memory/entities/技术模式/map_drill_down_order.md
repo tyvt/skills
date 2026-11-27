@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:50:18+08:00
+verdict_note: 园区物管2.0命中 wuxi.svg、DISTRICT_COLOR、selectOptionalComplexList 及 region/order  ordering 逻辑，SVG 顺序耦合与下钻等待接口数据约定可证；常量名 WUXI_SVG_GROUP_REGIONS 已重构但实质一致。
+---
 # 地图下钻两条约定：SVG 顺序耦合与下钻视野等待
 园区物管2.0 GIS 地图（无锡区县/街道下钻）两个坑：SVG 区块数组与 svg <g> 文档顺序强耦合不可重排；下钻视野必须等接口数据就绪再移动。
 

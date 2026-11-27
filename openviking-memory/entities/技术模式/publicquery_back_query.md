@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:41:53+08:00
+verdict_note: 淮安物管 zhi2-web-admin/src/main.js-94-97 实测 router.push(backUrl) 保留完整 query
+---
 # 公共查询备案返回保留query
 淮安物管公共查询小区详情从业委会/物管会备案返回时，需保留原详情页 query 以免页面空白的技术修复模式。
 

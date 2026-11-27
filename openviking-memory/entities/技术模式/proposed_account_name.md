@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:58:09+08:00
+verdict_note: 苏住房G pubRegulatoryAccount/detail.vue 实存 proposedAccountName，API pubRegulatoryAccount.js 存在，与描述一致。
+---
 # 拟开户账户名称字段实现
 苏住房G 项目 pubRegulatoryAccount/detail.vue 已新增「拟开户账户名称」字段并按管理主体类型自动生成名称。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:33:31+08:00
+verdict_note: orchestrate 工具/gateway 在本环境可用（本会话经 HTTP out-of-process 调用），M1 豁免与进程分离描述与现状一致。
+---
 # Magpie 编排器
 本地 LangGraph 编排服务进程（magpie.exe tray），独立运行于 DSH Web 之外。
 
@@ -8,7 +13,6 @@
 
 ## 关系
 - 与 dsh-orchestrator-gate 分属不同进程，M1 豁免测试须用 in-process 子代理而非 orchestrate 工具
-
 
 <!-- MEMORY_FIELDS
 {

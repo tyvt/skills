@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:52:00+08:00
+verdict_note: 产品2.0 dictFormatter 与 hasSubAccountOptions/depositNotice 均在，缺失选项致列空白修复属实。
+---
 # missing_subaccount_options
 全局 dictFormatter 按列查找 {prop}Options；缺失的详情页导致列空白。
 
@@ -26,7 +31,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：7e4c18c0-5ce0-41ce-b4dd-d28988df5d00
-
 
 <!-- MEMORY_FIELDS
 {

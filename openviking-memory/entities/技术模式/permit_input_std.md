@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:17:43+08:00
+verdict_note: 苏州V3 detail.vue 命中，预售证输入标准涉及主文件存在。
+---
 # 预售选证输入框标准化为 zs-input
 苏州市房地产监测V3 的 presale 模块将两个 detail.vue 及对话框的 el-input 改为项目标准 zs-input。
 
@@ -14,7 +19,6 @@
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：permitExtend/detail.vue、permitCancel/detail.vue、对应 PermitSelectDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话：d6b4b8eb-01cf-400b-bf07-683831f325f0；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:48:54+08:00
+verdict_note: 园区物管2.0 assetLeaseApply/components/houseTable.vue 实存 sub-container 包裹与 slot-width=120，与记忆一致。
+---
 # 修复因缺少 sub-container 导致的资产表格无竖线问题
 表格的全局竖线仅出现在位于 `.sub-container` 内且 `border` 激活的表格中；模块 benefit/assetLeaseApply 的 `houseTable.vue` 已调整为使用 sub-container。
 

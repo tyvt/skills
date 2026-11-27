@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:46:42+08:00
+verdict_note: 苏住房G 命中 parkingSpaceContractFiling、resourcesLeaseContractFiling、existingFlag，与跳转对齐改动面一致。
+---
 # 跳转对齐类需求改动面
 苏住房G 公共查询楼盘详情中「把 A 跳转改成和 B 一致」类需求需同时改顶部导航、表格空数据链接、目标页 URL 预置默认值。
 ## 可复用套路

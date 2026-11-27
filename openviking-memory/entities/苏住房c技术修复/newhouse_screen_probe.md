@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T09:45:03+08:00
+verdict_note: 核对苏住房C：newHouse/detail、commonNew/bottomBtn、houseMap 路径与穿屏修复 z-index/safe-area 描述命中。
+---
 # 新房详情底部穿屏问题排查与修复
 苏住房C小程序新房详情页底部固定栏穿屏问题已排查相关文件、路由与跳转路径，并完成滑动穿屏修复。
 
@@ -26,7 +30,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：newHouse/detail.vue、pages.json、bottomBtn.vue、houseMap.vue、NewHouse.vue、houseTypeDetail.vue
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：067afb84-7618-476c-a86e-f6d62928652f、fb9e853d-85c6-4d97-a6e2-4ca11832d84c；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

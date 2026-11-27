@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:48:40+08:00
+verdict_note: 泰兴G autonomy/election 命中 rules/election/apply/preparatoryApplyCode 与多个 detail.vue，选举编码必填校验有据。
+---
 # 选举申请共用组件缺失筹建编号必填校验
 election/components/apply/detail.vue 作为业委会/监委会选举申请共用组件，原丢失 preparatoryApplyCode 必填规则，致保存时未填「筹建申请编号」无提示。
 ## 问题根因

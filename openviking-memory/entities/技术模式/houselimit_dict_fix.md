@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:44:36+08:00
+verdict_note: houseLimitAudit/index.vue 含 HOUSE_LIMIT_BUSINESS_TYPE_DICT/house_limit_business_type/dictUrl，字典回退修复属实。
+---
 # 业务类型字典回退修复
 苏州市房地产监测V3 的 `houseLimitAudit/index.vue` 修复了「业务类型」列显示原始数字（如 1）而非字典中文的问题。
 

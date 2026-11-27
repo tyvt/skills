@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:13:27+08:00
+verdict_note: 苏住房G含buildStatTableRows/buildHierarchyCells/unitName，月报单位列对齐属实。
+---
 # 月报统计单位列对齐
 苏住房G 项目月报统计详情页单位展示已与月报对齐，移除独立单位列。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

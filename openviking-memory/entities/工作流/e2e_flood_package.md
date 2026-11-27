@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:25:58+08:00
+verdict_note: 苏住房G/e2e/flood/存在package.json(name=e2e-flood)、flood-lib.cjs含data-testid/playwright、README，独立E2E包属实（实际路径e2e/flood）。
+---
 # 测试人员用 E2E 独立 npm 包目录规范
 防汛等测试用例需内聚为独立目录、不依赖前端代码、统一用 data-testid 定位元素。
 
@@ -21,7 +26,6 @@
 - 验证：会话 session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6（基线 6156653）交付清单含上述文件且 `node --check` 通过
 - 涉及文件：e2e-flood/package.json、run-all.cjs、lib/flood-lib.cjs、README.md 等
 - 来源会话ID：session-41beb375-55a3-4b4f-8f11-d8ecdaa2daa6；代码基线：6156653
-
 
 <!-- MEMORY_FIELDS
 {

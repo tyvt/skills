@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:18:53+08:00
+verdict_note: 太仓一网通办H5 ResultStatistics 命中 calculationChart，字段映射属实
+---
 # 选项表决字段归属与接口映射
 太仓一网通办H5 的选项表决详情误用业委会选举接口字段，根因是迁移时写错而非太仓遗留逻辑。
 

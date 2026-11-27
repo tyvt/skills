@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T22:16:15+08:00
+verdict_note: buildApiRequestHeaders/auth-helpers/fetchLastChangeId 全库仅记忆归档命中，产品2.0 实际代码无此文件
+---
 # 接口鉴权请求头缺失修复
 产品2.0 项目修复因请求未携带 Token 导致后端返回「服务器异常」的问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:00:48+08:00
+verdict_note: 苏住房C utils/app.js 实存 SZDJSBridge/webkit/android/backInfo 残留与 appLogin，与记忆所述待清退现状一致（属清理计划非完成声明）。
+---
 # 苏住房C SZDJSBridge遗留逻辑清退
 苏住房C小程序由早期H5嵌入原生APP改造而来，需移除残留的SZDJSBridge及webkit/android分支，统一走appLogin。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:12:21+08:00
+verdict_note: 园区物管2.0 propertyContract/components/detail.vue 含 handleOpenPersonnelDialog、companyRecordId、clearCompanyLeader，一致。
+---
 # 负责人选择弹窗复用SelectDialog按企业过滤
 园区物管2.0 中负责人选择弹窗复用 SelectDialog 按企业过滤人员。
 

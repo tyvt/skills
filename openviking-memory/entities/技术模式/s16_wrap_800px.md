@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:22:54+08:00
+verdict_note: 苏州市房地产监测V3 sz-contract.scss、SzContent.vue、validation.js 命中，800px包裹方案属实
+---
 # 800px版心宽表未限宽致穿屏
 苏州市房地产监测V3中800px版心下买受人及出卖人宽表未限宽且操作列fixed="right"致穿屏与列重叠。
 

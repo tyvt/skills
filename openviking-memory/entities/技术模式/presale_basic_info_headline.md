@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:23:55+08:00
+verdict_note: 苏州市房地产监测V3 presale/permit/components/PermitInfoPanel.vue 命中 hideHeadline/basic-info-section，Headline化属实
+---
 # 预售许可申请页基本信息Headline化
 苏州市房地产监测V3 的 zhi2-web-admin 中将预售许可申请页「基本信息」改为与其他分区一致的 Headline 展示。
 

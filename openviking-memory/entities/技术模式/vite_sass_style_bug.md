@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T09:46:05+08:00
+verdict_note: 仅命中 recordProcess/dataProperty 目录名，关键组件 SelectRecordProcedureDialog.vue 未找到，sass/style bug 修复无法证实。
+---
 # SFC 漏写 </style> 导致 Vite sass 报错
 在 Vue SFC 中多个 style 块时，前一个漏写 </style> 会导致 Vite 报 [sass] expected selector，实为标签闭合错乱。
 

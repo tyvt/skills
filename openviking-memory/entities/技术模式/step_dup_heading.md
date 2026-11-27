@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T09:42:20+08:00
+verdict_note: 核对苏州市房地产监测V3：institutionRegister/companyRegister 仅命中 docs，关键产物 Step2AdminInfo.vue 全仓未找到，步骤2改动无法证实。
+---
 # 步骤组件不应重复块标题
 在苏州市房地产监测V3项目中，`institutionRegister/index.vue` 移除了步骤2中冗余的 `<h2>管理员信息</h2>`，并直接渲染 `Step2AdminInfo`，避免与步骤条上的标题重复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:46:29+08:00
+verdict_note: 产品2.0 main.js 中 MessageBox=0，虽有 createInstance，但补充 MessageBox 导入未落地，描述与现状不符
+---
 # main.js漏导MessageBox致加密引用错误
 createInstance加密初始化失败时调用MessageBox.alert，但main.js未导入MessageBox导致ReferenceError。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:54:57+08:00
+verdict_note: /d/repository 下（含最深 4 层、排除 node_modules）无 turtle_quant 目录或 stockdb_rd.py 文件，记忆所述第144行 bool("0") 缺陷无法证明。
+---
 # Python bool字符串真值歧义致停牌状态误判
 turtle_quant 项目 stockdb_rd.py 中因 `bool("0")` 返回 True 导致非停牌 bar 被错误标记 paused=True 的 bug 记录与修复方案。
 

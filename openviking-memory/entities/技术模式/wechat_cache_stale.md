@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T02:29:56+08:00
+verdict_note: isOffline 在苏住房C 源码无命中（仅后端 paymentChannel 无关命中），清缓存重导为环境性处置，无可核验代码产物，无法证明有效。
+---
 # 旧编译缓存致已移除变量引用报错
 微信开发者工具热更新缓存旧编译产物，执行已移除 isOffline 等引用的旧 index.js，需清缓存重导。
 

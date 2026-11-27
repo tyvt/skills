@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:17:08+08:00
+verdict_note: 苏州V3 unionBank.js/yhlhhgl.js/yhwdgl.js 命中，接口统一迁移属实。
+---
 # 联行号接口全局统一迁移
 苏州市房地产监测V3 联行号接口已全局统一迁移至 /system/unionBank/page。
 

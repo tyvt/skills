@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:44:14+08:00
+verdict_note: e2e 下 institution-register-flow / real-api-flow / lease-institution-register-organ-type / institution-register-extract 四个 spec 均实机存在，测试记录属实。
+---
 # 经纪/租赁机构一步注册改造测试
 苏州市房地产监测V3 经纪/租赁机构一步注册改造后执行 13 条 Playwright 用例（production-readonly 项目）的测试结果。
 ## 测试结果

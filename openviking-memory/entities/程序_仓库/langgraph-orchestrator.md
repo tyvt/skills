@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:47:13+08:00
+verdict_note: skills/dsh/langgraph-orchestrator 含 langgraph/security_guard/node_verify/code_edit_with_signal，架构描述与代码一致。
+---
 # langgraph-orchestrator
 LangGraph+Magpie 多模型编排器，位于 D:\repository\skills\dsh\langgraph-orchestrator，宿主做决策与最终审阅，编排器分摊定位、检索、读文件、改代码、跑命令、判读输出。
 

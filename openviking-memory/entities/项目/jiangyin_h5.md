@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:30:46+08:00
+verdict_note: 江阴H5 src/pages/login.vue-9,11 有 VITE_ENABLE_DEBUG_LOGIN==='true' 门控，pages/login 路由存在，描述属实。
+---
 # 江阴智慧物业 C 端 H5（江阴H5）
 江阴公共收益项目的 C 端（客户端）H5 前端仓库，与当前 B 端 admin 工作区相互独立的兄弟仓库。
 

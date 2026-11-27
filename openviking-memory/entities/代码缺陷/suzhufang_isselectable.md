@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:26:02+08:00
+verdict_note: iHomePC details.vue/index.vue 含bizState，isSelectable预警禁选描述属实
+---
 # 苏住房G表格行勾选门禁连坐忽略预警
 在苏住房G项目(zhi2-web-admin)经营用房租赁合同列表，mixins/table.js默认isSelectable仅放行草稿行，导致已备案预警行无法勾选执行「忽略预警」。
 ## 根因

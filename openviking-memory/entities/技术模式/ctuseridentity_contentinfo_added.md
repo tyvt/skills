@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:11:27+08:00
+verdict_note: 多仓 property/ctUserIdentityApply/detail.vue 均含 contentInfo5/certificatePhoto/identityPhoto，补齐并对齐 contentInfo 属实。
+---
 # ctUserIdentityApply详情页补齐contentInfo
 在 `zhi2-web-admin/src/views/property/ctUserIdentityApply/detail.vue` 补齐并对齐缺失的 `contentInfo`，使查看模式不再缺失。
 

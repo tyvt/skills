@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:28:40+08:00
+verdict_note: AgencyEntryNetworkDetail.vue/Sections.vue/agencyBasicInfoContent.js/companyRecord.js均含companyAlias与industryAssociation，与可选字段对接一致。
+---
 # 经纪机构入网认证新增可选字段对接
 苏州市房地产监测V3 中 `/company/companyRecord/entryNetwork/save` 在经纪机构入网认证侧对接了两个非必填字段。
 

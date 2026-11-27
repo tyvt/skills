@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:46:13+08:00
+verdict_note: skills/dsh/AGENTS.md 存在且命中 GIT_EDITOR、build(10)、编排器(10) 等规则，与记忆所述编码/收尾约束一致。
+---
 # D:\repository\skills\dsh\AGENTS.md
 dsh 技能的代理行为说明文档，规定代码与系统运维工作的默认原则与约束。
 

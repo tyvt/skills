@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:46:22+08:00
+verdict_note: vite.config.js 与 deploy/nginx.conf 均无 /zhlz 代理（仅 /zhi2*）；记忆所述 /zhlz、/zhlz-dev 代理未在现有代码体现。
+---
 # 登记证明地址代理与类型修复
 苏州市房地产监测V3 修复登记证明地址 `/zhlz/...` 前端无法加载 PDF 及附件类型误判问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:47:34+08:00
+verdict_note: 苏州市房地产监测V3 存在 OrgTypeDialog.vue(2)，机构类别弹窗组件属实，去灰标属 UI 细节
+---
 # 机构类别弹窗去灰标仅留图标与全称
 OrgTypeDialog.vue 删除灰色类别标签及样式，选项仅保留图标与标准全称。
 

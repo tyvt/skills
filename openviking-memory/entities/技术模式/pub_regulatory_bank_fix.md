@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:49:39+08:00
+verdict_note: 苏住房G pubRegulatoryAccount/detail.vue含isPubRegulatoryAccount/showBankDialog，银行弹窗参数修复属实。
+---
 # 公示监管账户银行弹窗参数修复
 苏住房G项目zhi2-web-admin的pubRegulatoryAccount模块修复showBankDialog中isPubRegulatoryAccount参数传递逻辑。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T19:18:08+08:00
+verdict_note: 核心接口 addConEngConsLicAndBuilding/addConEngPlanLicAndBuilding 在业务源码中 0 命中，仅出现在 memory-migration-archive 等记忆归档副本，属循环引用、无法证明有效。
+---
 # 新增证书弹窗主子表接口调用修复
 苏州市房地产监测V3 中项目备案证书新增弹窗改为始终调用主子表接口，避免无楼幢时打到旧单表接口导致空白。
 ## 问题根因

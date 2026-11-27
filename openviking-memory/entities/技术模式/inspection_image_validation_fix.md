@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:13:55+08:00
+verdict_note: 泰兴小程序 add.vue-434 有 .map(el=>el.rawUrl||el.fileID||el.url)，正是记忆描述的保存逻辑；“未上传成功”MISS 符合移除误拦
+---
 # 巡检步骤图片校验误拦修复
 泰兴小程序新增巡检步骤时图片已上传却被校验「未上传成功」的误拦逻辑已移除，与工单完成弹窗等页面逻辑对齐。
 

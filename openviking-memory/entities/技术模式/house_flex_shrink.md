@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:16:09+08:00
+verdict_note: house/detail.vue 含 house-page、align-items-center、20rpx，flex 收缩修复属实。
+---
 # display:flex 居中导致小程序中子组件收缩
 
 在项目 苏住房C (zhi2-mobile-shimin) 中，使用居中 flex 的 `.house-page` 使子组件收缩而非填充。

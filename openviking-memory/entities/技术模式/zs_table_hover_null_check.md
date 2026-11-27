@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:44:25+08:00
+verdict_note: 产品2.0 zs-table.vue 命中 handleCellMouseEnter/handleCellMouseLeave/parentElement，空值检查修复属实
+---
 # zs-table 悬停时的空值检查
 在 zs-table.vue 中，悬停处理程序在没有检查的情况下访问了 cell.parentElement，当 cell 为 undefined 时导致错误。
 
@@ -16,7 +21,6 @@
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：2e92212a-8c81-44e4-9cc6-e2feecfe6e5e
-
 
 <!-- MEMORY_FIELDS
 {

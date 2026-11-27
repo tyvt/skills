@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:18:23+08:00
+verdict_note: 园区物管2.0 mapOverview 下 chartOptions.js 中 labelLine、label、>0 命中，环图标签修复属实。
+---
 # ECharts 环图标签与引导线异常
 园区物管2.0 的 ECharts 环图在单扇区 100% 与 0 值扇区场景下，外侧标签错位、残留引导线，需关闭外侧标签改由图例承担。
 
@@ -21,7 +26,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

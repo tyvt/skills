@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:50:36+08:00
+verdict_note: 苏住房G index-v2.vue 含 getTaskCount({})、loadTodoPanelList、loadTodoPanel，待办按用户维度解耦（去 regionCode）属实。
+---
 # 首页待办面板与关键数据区域解耦
 在苏住房G项目(zhi2-web-admin)首页v2，待办面板接口被区域切换耦合请求，需解耦为按用户维度不带regionCode。
 ## 规则

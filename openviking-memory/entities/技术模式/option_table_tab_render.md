@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:43:10+08:00
+verdict_note: 太仓G optionDecision 命中 rowSelectable/fixed/doLayout，切换 Tab 表格空白修复属实
+---
 # 选项表决切换Tab表格空白修复
 太仓G端选项表决详情从「基本信息」切到「投票信息」Tab时，表格内容为空但分页显示有数据，需移除动态固定列并修正选择函数。
 

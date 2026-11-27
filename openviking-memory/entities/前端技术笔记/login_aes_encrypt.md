@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:46:36+08:00
+verdict_note: 扬州存量房 ROOT/login.html-76-77 引入 crypto-js.js/secure-login.js，-138 AES 密文注释，与记忆一致
+---
 # 登录账号密码前端AES加密并禁用表单提交
 登录接口存在账号密码明文传输风险，且表单默认提交可能绕过 JS 加密逻辑，需在 Vue 初始化前引入加密脚本并对关键接口字段做 AES-128-CBC 加密。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:57:34+08:00
+verdict_note: presale/permitExtend 与 presalePermitExtendId 存在，项目名文本/编号链接跳转属实
+---
 # 预售延期列表项目名文本编号link跳转
 苏州市房地产监测V3 预售延期列表的项目名称设为文本、延期编号设为链接跳转详情。
 

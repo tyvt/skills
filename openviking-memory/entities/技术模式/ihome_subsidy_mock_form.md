@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:17:55+08:00
+verdict_note: iHome小程序 subsidy.vue 命中 wd-popup/pages-iHome/pages-rent，mock表单属实
+---
 # iHome补贴页参照rent版接入底部mock表单
 iHome 补贴页在 pages-iHome/subsidy.vue 参照 pages-rent/subsidy.vue 实现底部 wd-popup mock 表单。
 

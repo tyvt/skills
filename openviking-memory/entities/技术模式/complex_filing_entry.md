@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T04:15:55+08:00
+verdict_note: 淮安物管 备案(182)/filing(6)/complex(431)命中，公共查询备案入口常驻约定存在。
+---
 # 公共查询小区详情备案入口常驻
 淮安物管公共查询小区详情页下各子块备案入口无论是否有数据均须常驻显示的约定。
 
@@ -22,7 +26,6 @@
 - 验证：会话 4a4ea16a 用户要求有数据时仍显示前往备案按钮；改 committeeTable、managementOrgPanel、regulatoryAccountPanel。
 - 所属项目：淮安物管；来源会话：4a4ea16a-5909-4259-b187-a74d02887a92；代码基线：dc21427
 - 验证方式：刷新页面即可验证。
-
 
 <!-- MEMORY_FIELDS
 {

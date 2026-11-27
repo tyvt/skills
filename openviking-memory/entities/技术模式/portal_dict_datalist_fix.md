@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:15:26+08:00
+verdict_note: 门户 dict/index.vue 命中 dictDataList，与空值保护 (row.dictDataList||[]) 修复主题一致。
+---
 # 门户字典列表空值保护修复
 门户接口 GET /portal/dict/type/page 不返回 dictDataList，导致模板报错，已加空值保护。
 ## 问题原因

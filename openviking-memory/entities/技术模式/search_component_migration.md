@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:18:59+08:00
+verdict_note: 产品2.0 中 formItems、zs-search-form 命中，搜索组件统一 formItems 机制存在；certificate 旧路径已变迁。
+---
 # 搜索组件迁移与未使用文件清理
 产品2.0 项目完成了证书相关搜索组件迁移至统一 `formItems` 计算属性，并删除未引用文件与修复按钮组。
 

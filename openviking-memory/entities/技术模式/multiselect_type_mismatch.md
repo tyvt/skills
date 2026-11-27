@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:30:58+08:00
+verdict_note: 苏州市房地产监测V3 zs-select/MultiSelect.vue含normalizeValues宽松比较逻辑，与多选回显修复一致。
+---
 # 多选组件回显值类型不等致标签不显
 苏州市房地产监测V3 的 `zs-select` 多选使用数字 `roleId` 为值，回显字符串数组与数字 `value` 严格比较失败致标签不显，已宽松比较修复。
 

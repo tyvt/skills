@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:11:39+08:00
+verdict_note: statisticsMap/index.vue 与 map.vue 含 markListLayerLevel、mapBubbleTone/areaDrillStack，配色绑定数据层级属实。
+---
 # 地图气泡配色绑定数据层级
 园区物管2.0 地图下钻/上钻时气泡颜色错乱，根因是配色绑定缩放目标层级而非数据层级。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

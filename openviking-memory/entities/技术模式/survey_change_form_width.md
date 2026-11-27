@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:54:43+08:00
+verdict_note: 描述与现状不符：surveyChange/detail.vue 用 zs-form(25) 但无 label-width="180px"（全文件无命中）；所述 label-width=180px 修复未落地。
+---
 # 测绘变更详情页表单项宽度修复
 修复了苏州市房地产监测V3中测绘变更详情页表单项过窄的问题。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

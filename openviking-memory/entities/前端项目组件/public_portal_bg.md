@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:49:53+08:00
+verdict_note: publicPortal/README 命中 portal_page_bg.jpg，PortalDialogHost.vue-33 命中 portal.scss，HomeQuickLinks.vue 存在，背景约定属实。
+---
 # 门户全屏对外二级页背景
 门户从 /#/UnifiedLogin 菜单打开的全屏对外二级页（publicPortal）背景统一使用 portal_page_bg.jpg，样式在 portal.scss。
 ## 提交规则

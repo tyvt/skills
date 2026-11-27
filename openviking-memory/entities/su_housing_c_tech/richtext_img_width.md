@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:11:47+08:00
+verdict_note: 苏住房C formatRichTextContent 命中3次，ZsRichText.vue/uni.scss/index.js 均在，富文本图片限制属实。
+---
 # 富文本图片宽度限制修复
 苏住房C 小程序端富文本图片因 `rich-text` 无法被外部 CSS 约束而溢出屏幕，已通过内联样式与组件容器修复。
 

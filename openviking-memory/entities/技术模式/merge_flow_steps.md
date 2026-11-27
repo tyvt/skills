@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:15:16+08:00
+verdict_note: homeLayout.js 中 rentalAgencyOpen 含 label/functionCode，符合『改本地 label 即改文案』。
+---
 # homeLayout 合并流程步骤保留本地 label
 首页业务流程步骤文案以 homeLayout.js 默认配置为准，mergeFlowSteps 合并接口配置时保留 defaultStep.label。
 

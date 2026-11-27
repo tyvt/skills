@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:52:42+08:00
+verdict_note: refund/detail.vue 中 el-col 带 v-show 控制只读列，栅格占位修复属实
+---
 # 合同退款页只读字段栅格占位修复
 苏州市房地产监测V3 中合同退款新增/编辑页（`detail.vue`）将只读字段的 `v-show` 从 `el-form-item` 移到 `el-col` 以修正布局错位。
 

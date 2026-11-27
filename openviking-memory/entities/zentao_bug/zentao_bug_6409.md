@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:46:41+08:00
+verdict_note: 苏住房G homeStatNav.js 含 BENEFIT_STAT_NAV 及 bizState 字段，#6409 历史累计跳转按 mode 组参修复属实。
+---
 # 禅道Bug 6409 首页公共收益「历史累计」跳转条件错误
 禅道缺陷 6409：首页公共收益「历史累计」跳转错误携带当月备案时间，列表条数与卡片统计不符。
 

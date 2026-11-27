@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:46:29+08:00
+verdict_note: 园区物管2.0 statisticsMap/index.vue 无 getDonutSeriesData、无「暂无数据」、无 value-1 占位逻辑，描述的环形图全0渲染修复无法证实。
+---
 # 环形图接口数据全 0 时的渲染策略
 园区物管2.0 统计看板多列环形图在接口返回全 0 时，需占位值画环且展示真实 0 值，而非显示「暂无数据」。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

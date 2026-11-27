@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:49:57+08:00
+verdict_note: 苏州市房地产监测V3 命中 company_personnel_certificate_type(11)、personnelCertificate/index.vue，字典类型修正属实
+---
 # 经纪机构专业资格证书类型字典接入
 已在经纪机构管理 → 专业资格证书管理列表页为「资格证书类型」列接入字典 company_personnel_certificate_type 转译。
 ## 修改说明

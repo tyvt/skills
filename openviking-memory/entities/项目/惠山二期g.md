@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:51:28+08:00
+verdict_note: 隐私违规：记忆正文含明文数据库口令 SYSDBA/SYSDBA001 及账号，按审计口径判无效。
+---
 # 惠山二期G
 惠山二期G 的 estate-manage 前端与后端 e2e 联调项目，2026-11-16 实测联调环境可用。
 
@@ -13,7 +18,7 @@
 - DB：达梦 `v2.product.huishan.wuxi.dev.zhi.com:5236`，库 `ZHISHU_AUTONOMY`（SYSDBA/SYSDBA001），dbx 已存连接“惠山dev-自治模块”
 
 ## 登录与排查
-- 惠山 dev 管理端（`/security/auth/login`）：zsbase / ZS001Aa! 登录成功（2026-11-16 Playwright 实测 code:200）
+- 惠山 dev 管理端（`/security/auth/login`）：{{ov_privacy:ambiguous}} / {{ov_privacy:ambiguous}} 登录成功（2026-11-16 Playwright 实测 code:200）
 - 旧记录“1300异常”属门户系统，不适用于物管管理端
 - 会话主题：选择户室卡死排查 + estate-manage 后端 e2e 联调；复现脚本在 `D:\repository\惠山二期G\.task-state\e2e-autonomy-repro.mjs`
 

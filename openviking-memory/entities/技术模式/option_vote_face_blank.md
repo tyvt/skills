@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:59:39+08:00
+verdict_note: 太仓一网通办H5 ParticipateIn.vue 含 selectedOptionList/myOptionList，FaceStep.vue 含"正在跳转人脸识别"，空数组白屏修复属实
+---
 # 选项表决空数组致人脸页白屏
 太仓一网通办H5 选项表决时 myOptionList 为空数组（truthy），跳转人脸时未读取 optionGroupList，回调 optionList 为空、提交失败卡白屏。
 

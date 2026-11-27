@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:50:24+08:00
+verdict_note: attachmentDraw.vue-164 top-var(--navbar-height,88px)，-167 height-calc(100% - var(--navbar-height,88px))，修复落地，一致。
+---
 # 审批流程抽屉高度裁切修复模式
 详情页「流程信息」审批抽屉因 top 偏移未同步调整 height，导致底部被裁切、时间线无法滚动。
 

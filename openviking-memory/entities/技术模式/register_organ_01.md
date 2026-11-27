@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:33:50+08:00
+verdict_note: 产品2.0 registerValidate.js 与 register-helpers.js 存在 organType-'01'，saveCompanyRegister 后端接口可查，描述属实。
+---
 # 外网注册开发企业organType改为01
 产品2.0 的外网企业注册功能已将机构类型 organType 统一为 01（开发企业）。
 

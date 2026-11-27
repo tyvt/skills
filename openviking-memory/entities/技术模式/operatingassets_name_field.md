@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:13:26+08:00
+verdict_note: operatingAssets.vue 命中 assetLeaseName/advertiseSpaceName/spaceNumber 分类型取值，属实
+---
 # operatingAssets 资产名称取值
 operatingAssets.vue 按资产类型分别优先使用各自名称字段，并以 assetLeaseName 兜底防空白。
 

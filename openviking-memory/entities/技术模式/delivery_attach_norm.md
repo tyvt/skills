@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:08:35+08:00
+verdict_note: 苏州市房地产监测V3/AppendixPackageSection/index.vue 命中 approvalAttachment；归档亦记录 normalizeProjectDeliveryDetail 归一化，描述与现状一致。
+---
 # 项目交付审批附件应具有规范化的相对路径
 在 Suzhou Real Estate Monitoring V3 项目中，项目交付的 `detail`/`approval` 接口增加了附件逻辑；`projectDeliveryConstants.js` 对 `approvalAttachment` 进行规范化。
 

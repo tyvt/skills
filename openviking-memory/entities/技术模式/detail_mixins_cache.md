@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:54:20+08:00
+verdict_note: 园区公共收益命中 detailMixins/skipFormCache/syncOriginFormAfterLoad/plot/detail，假缓存跳过 getDetail 修复属实。
+---
 # 编辑态F5不拉详情修复（detailMixins误写sessionStorage假缓存）
 编辑态详情依赖detailMixins的sessionStorage缓存，程序化改form被误判为用户编辑写入缓存，刷新后跳过getDetail。
 

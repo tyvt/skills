@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:55:30+08:00
+verdict_note: 淮安物管 实存 getChangeTooltip/beforeForm/isChange/detailMixins，变更角标限定修复属实。
+---
 # 详情页新增误显变更角标因未限定isChange
 详情页新增时因未限定 isChange 导致变更角标误显，已修复为仅 isChange 为 true 时提示。
 

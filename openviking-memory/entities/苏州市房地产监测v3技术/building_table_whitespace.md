@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:08:46+08:00
+verdict_note: 核对 zhi2-web-admin/src/styles/index.scss 与 views/projectManagement/buildingTable/index.vue 命中 building-container 整页滚动修复，描述属实。
+---
 # 楼盘表上方留白修复
 苏州市房地产监测V3楼盘表因Tab卡片撑满视口留白过大，已通过整页滚动与样式收紧修复。
 

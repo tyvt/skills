@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T20:13:38+08:00
+verdict_note: 园区物管2.0含syncSubdistrictCommunityFromCodes/getSubdistrictNameByCode，默认小区街道社区补全属实。
+---
 # 默认小区缺失街道社区数据修复
 园区物管2.0 的 B 端新增页在带默认小区时，因竞态与提前返回导致街道、社区名称未写入表单的 bug 与修复。
 
@@ -16,7 +20,6 @@
 - 验证：B 端进入新增页、带默认小区时街道社区能正确写入表单并随保存提交
 - 涉及文件：pubParkingRate/detail.vue、assetLeaseApply/detail.vue、mixins/area.js 等
 - 所属项目：园区物管2.0；来源会话：6e97f2b9-b0d9-4363-889e-533667c5bbef；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

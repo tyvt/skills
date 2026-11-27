@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:17:59+08:00
+verdict_note: 苏州市房地产监测V3 含 AppropriateTable.vue 与 unblock/usemoney/detail 路由，tab key 冲突修复所涉主要文件存在。
+---
 # tab_key_fix
 标签页键冲突导致苏州市房地产监测V3项目中的互斥失效及子表数据为空。
 ## 问题根因
@@ -15,7 +20,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：66577926-e9f6-4492-b968-4c342f004cbe
-
 
 <!-- MEMORY_FIELDS
 {

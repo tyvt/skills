@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:11:18+08:00
+verdict_note: 实读.husky/pre-commit：cd子项目+REPO_ROOT+node直接执行lint-staged.js，绕开npx属实。
+---
 # pre-commit 改用 node 直接执行 lint-staged
 产品2.0 前端在 npm workspaces 下修正 pre-commit 钩子，绕开 npx 对 lint-staged 的错误路径解析。
 

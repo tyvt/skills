@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:19:06+08:00
+verdict_note: 苏住房C 命中 decisionPlayerName、DecisionRecord、DecisionResult、styleIsolation，详情空白修复属实
+---
 # 决策详情空白三层根因
 苏住房C 中 pages_vote/decision/optional/detail 页只显示标题、内容全空，因分包组件渲染不稳、数据解构不全、缓存串单三层叠加。
 

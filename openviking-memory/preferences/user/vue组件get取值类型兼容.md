@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:13:45+08:00
+verdict_note: 全仓源码 0 命中 group-multi-select.vue 组件与 split 类型兼容改造，仅归档报告提及，无法证明有效。
+---
 - `src/views/property/complex/components/group-multi-select.vue` 的 get() 中直接 `this.$attrs.value.split(',')` 会在值为非字符串时渲染报错。
 - 修复采用与 MultiSelect 一致的类型兼容方式改造，避免单点修复后他处复现。
 - 验证证据：src=2-0/021.md；涉及文件：src/views/property/complex/components/group-multi-select.vue；来源会话：96cc05d6-f240-484b-bd44-cb2ed62f1ebc
@@ -5,7 +10,6 @@
 ## 验证与归属
 - 所属项目：2-0
 - 验证证据：extracted source=cursor project=2-0
-
 
 <!-- MEMORY_FIELDS
 {

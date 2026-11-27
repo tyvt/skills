@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:47:06+08:00
+verdict_note: 苏住房C needToKnow 页 api-key=jyq.elect.agreement，AgreementPage 用 useCountDown(5)+-disabled=isCounting，按钮倒计时禁用属实。
+---
 # 选举须知页按钮倒计时禁用说明
 苏住房C小程序选举须知页（pages_vote/elect/needToKnow）在苏住房环境下因包裹AgreementPage且开启倒计时，按钮初始处于禁用态。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

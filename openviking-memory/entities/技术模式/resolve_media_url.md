@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:31:23+08:00
+verdict_note: 苏住房C 存在 resolveMediaUrl 使用 szfweb.szzfcjj.cn-8887 代理及 218.4.168.198 内网地址，资源前缀重写逻辑属实。
+---
 # 图片地址按资源路径段重写生产域名
 苏住房C的zhi2-mobile-shimin打包部署到苏服办H5后，配置里带内网IP的绝对URL须按资源路径段重写到生产域名。
 

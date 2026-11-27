@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:27:20+08:00
+verdict_note: 园区物管2.0 ratingRule/table.vue含bizState/isSelectable，detail.vue与dialog.vue用DetailTemplate，与描述一致。
+---
 # 评级详情复选框缺bizState致隐藏
 
 `table.vue` 中复选框列因父页未传 `bizState` 始终隐藏，改为未传时也显示并绑定 `isSelectable`。`detail.vue` 查看模式基本信息改用 `DetailTemplate` 蓝框并置顶，`dialog.vue` 查看模式同用蓝框、标题按模式显示、宽度 `mini`、分值区间等宽且格式化展示。

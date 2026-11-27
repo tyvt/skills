@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:10:06+08:00
+verdict_note: 门户sso.js含portal/sso/jump，login.js与user.js含tokenValue，home页有portal/sso对接，SSO登录登出对接属实。
+---
 # 应用管理功能改造模式
 应用管理新做及改造功能沿用既有对接模式，全量核对接口文档并对接 SSO 登录登出。
 

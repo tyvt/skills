@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:48:56+08:00
+verdict_note: 苏住房C 现有 ListIndex.vue（pages/news、publicNotice 等）仍使用 grid-template-columns-auto 1fr，未见记忆所述改为 flex/width-100% 的修复，描述与现状不符。
+---
 # ListIndex.vue auto 列致列表宽度不一
 苏住房C 移动端 `ListIndex.vue` 无预览图时使用 `grid-template-columns: auto 1fr`，文字落入 `auto` 列使卡片宽度随标题变化。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:44:14+08:00
+verdict_note: 园区物管2.0 zs-operate-column.vue 命中 operate-column-button-container/justify-content，单按钮居中修复属实
+---
 # zs-operate-column单按钮不居中
 园区物管2.0 列表操作列只剩一个按钮时，因动态列宽下容器默认起点对齐，按钮在较宽列里靠左不居中。
 

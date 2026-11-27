@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:42:03+08:00
+verdict_note: 门户homeLayout.js含BIZ_ICON_BY_CODE/DEFAULT_BUSINESS_FLOWS/homeNew切图映射，functionIcon接口优先逻辑在。
+---
 # 门户首页业务步骤默认图标
 在 `/portal/home/functions` 尚未提供步骤图标或需设计稿占位时，zhi2-web-admin 首页业务中心用本地切图 SVG 作为缺省图标。
 

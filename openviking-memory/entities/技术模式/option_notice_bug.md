@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:16:29+08:00
+verdict_note: OptionStepChoose.vue 命中 notice-content x1；ZsPopup.vue 命中 decision-bg.png x4，字段名与蓝色背景图修复属实。
+---
 # C端选项说明字段名不对齐与弹窗背景修复
 太仓一网通办H5 的 C 端选项表决详情「选项说明」弹窗存在字段名错位和标题背景图不符两处问题，均已修复。
 

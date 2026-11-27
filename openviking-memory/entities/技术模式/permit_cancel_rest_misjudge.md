@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:16:51+08:00
+verdict_note: 苏州市房地产监测V3 apiV3Normalize.js 含 normalizeTrailingPathParams 与 REST_ACTIONS，cancel 误判修复所涉函数存在。
+---
 # 预售许可注销接口cancel被误判为REST动作
 苏州市房地产监测V3 中 `apiV3Normalize.js` 的请求拦截器将 `cancel` 误判为 REST 动作，导致分页接口 400，已在 `normalizeTrailingPathParams` 修复。
 

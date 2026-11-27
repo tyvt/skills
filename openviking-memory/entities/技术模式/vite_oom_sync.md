@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:43:50+08:00
+verdict_note: vite-build.mjs-19 含 NODE_OPTIONS max-old-space-size 解析，OOM 修复配置在现状代码中确有体现（提交号在子模块）。
+---
 # CI OOM: 仅同步 Vite 配置到子模块的多个分支
 
 在项目 苏州市房地产监测V3 中，CI 中的 Vite 构建因 OOM（JS 堆内存不足）而失败。该修复已同步到子模块 `zhi2-web-admin` 的多个目标分支，仅更新了构建文件。

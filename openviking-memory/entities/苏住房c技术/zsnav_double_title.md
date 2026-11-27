@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:52:21+08:00
+verdict_note: 实机核对：苏住房C zhi2-mobile-shimin/src/pages.json(481-483)「我的决策」节点已配 navigationStyle-custom；补 custom 消双标题的修复属实。
+---
 # ZsNav漏配navigationStyle导致双标题
 苏住房C 页面用了自定义 ZsNav 却在 pages.json 漏配 navigationStyle:"custom"，会出现系统导航栏与 ZsNav 两条标题叠加。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:30:46+08:00
+verdict_note: 园区物管2.0 assets/resourcesLeaseContractFiling/index.vue含showSummary/showMethod/小计，与当前页小计实现一致。
+---
 # 租赁合同备案列表小计实现
 园区物管2.0 的 benefit 模块中，资源/资产租赁合同备案列表页通过 zs-table 增加当前页小计行。
 

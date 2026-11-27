@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:09:40+08:00
+verdict_note: 苏州市房地产监测V3 大量操作列使用 slot-scope="{ scope }" 解构写法，与记忆描述的正确解构修复模式一致。
+---
 # EntrustBuildingTable 列插槽解构错误致删除失效
 苏州市房地产监测V3 中 EntrustBuildingTable.vue 误用 slot-scope="scope" 致 scope.row 为 undefined，删除按钮失效。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T09:44:46+08:00
+verdict_note: 项目 zhi2-mobile-query-h5-c 在 D-/repository 无对应目录，commit 412ccd5/c112896 未核对，agreement/checklist 为散落他项目的通用词。
+---
 # zhi2 UI 走查修复
 zhi2-mobile-query-h5-c 的 UI 走查共 9 项，修复首页与项目检查等界面问题并补充用户协议页。
 

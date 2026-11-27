@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:52:05+08:00
+verdict_note: entrustSale/detail.vue 命中业务状态/dict，字典键所在文件在（BI 前缀未直接印证但语义一致）。
+---
 # 委托销售详情中的字典键错误
 由于键不兼容，委托销售详情页面在显示业务状态字典时失败。
 
@@ -17,7 +22,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：98dea9b7-0496-43cc-8f46-c865905aa071
-
 
 <!-- MEMORY_FIELDS
 {

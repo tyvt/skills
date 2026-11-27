@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:49:32+08:00
+verdict_note: 产品2.0 zhi2-web-admin/src/views下无projectManagement/buildland/detail.vue，声称的导入路径修复落点文件不存在。
+---
 # Buildland 导入路径修正
 `projectManagement/buildland/detail.vue` 的导入路径已修正以通过构建。
 

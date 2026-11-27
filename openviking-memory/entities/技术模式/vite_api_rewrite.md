@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:40:27+08:00
+verdict_note: 产品2.0 vite.config.js-38-45 shouldStripApiPrefix 及 /api rewrite 实测存在
+---
 # Vite代理配置/api前缀移除修复
 产品2.0项目zhi2-web-admin/vite.config.js中createProxyConfig补充/api路径rewrite，与presale代理一致。
 
@@ -13,7 +18,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:33:57+08:00
+verdict_note: 苏州市房地产监测V3 路由信息.json-14,31 有 busCode，companyApplyAudit/detail.vue 与 companyRecord 链路存在，附件 busCode 取值描述属实。
+---
 # 经纪机构备案详情附件 busCode 取值链路
 苏州市房地产监测V3 中 `companyApplyAudit/detail.vue` 的 `appendixBusCode()` 按菜单优先链路取附件业务编码，兜底入网注册编码。
 

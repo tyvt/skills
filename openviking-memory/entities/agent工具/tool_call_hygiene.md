@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:21:06+08:00
+verdict_note: tool-call-hygiene SKILL.md 存在，dsh/AGENTS.md 命中 tool-call-hygiene/空参数/context-mode/session_search
+---
 # tool-call-hygiene
 tool-call-hygiene 是 agent 工具调用自愈规范，包含 SKILL.md 与 dsh/AGENTS.md。
 

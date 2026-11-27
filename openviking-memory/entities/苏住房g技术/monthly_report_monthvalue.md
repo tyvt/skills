@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:47:51+08:00
+verdict_note: 苏住房G monthlyReport.js-307-321 buildStatTableRows以extractValue=obj[valueKey]??null解包regionValues与total，合计列渲染数字而非对象，功能描述属实。
+---
 # 月报合计列未解包monthValue致显对象
 月报统计合计列因未解包monthValue而渲染对象而非数字，已通过新增辅助函数修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:32:12+08:00
+verdict_note: 园区公共收益 statisticsMap 目录虽有 mockApi.js/mock.js，但「模拟小区点不显示」关键词全仓仅见于记忆文件，具体修复无代码证据。
+---
 # 模拟小区点不显示兼容修复
 产品2.0中benefit/statisticsMap因经纬度字段未统一数值化导致模拟小区点不显示，已做兼容修复。
 

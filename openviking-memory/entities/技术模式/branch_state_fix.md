@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:23:17+08:00
+verdict_note: 苏州市房地产监测V3 branchStatus.js、AgencyPersonnelList.vue、personnelStatus.js 命中，分支状态修复属实
+---
 # branch_record_state字典编码不一致修复
 苏州市房地产监测V3 中 `branch_record_state` 字典与接口 `bizState` 编码不一致导致显示错误，已修复并用 Playwright 验证。
 

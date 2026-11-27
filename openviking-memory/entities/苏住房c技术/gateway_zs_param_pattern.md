@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:23:43+08:00
+verdict_note: 苏住房C 构建产物命中 zs-param/zs-path，V1/V2网关参数模式属实
+---
 # V1/V2网关请求参数统一进zs-param模式
 苏住房C的V1/V2接口经网关转发，业务参数须序列化进请求头zs-param，路径放zs-path。
 

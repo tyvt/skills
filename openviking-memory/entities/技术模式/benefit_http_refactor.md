@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:21:26+08:00
+verdict_note: 全仓真实项目代码中未找到 benefit.js 改用 @/http/http 的实现（仅迁移归档命中），核心代码证据缺失。
+---
 # H5项目benefit.js改用@/http/http请求封装
 H5项目中 benefit.js 从 import api from '@/api' 改为统一走 import { http } from '@/http/http'，与 property.ts、repair.js 写法保持一致。
 

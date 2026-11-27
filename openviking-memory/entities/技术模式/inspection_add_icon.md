@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:13:22+08:00
+verdict_note: 多个 H5 项目存在 ZsUploader 组件与 icon_add_img 默认图标配置，与描述一致
+---
 # 添加巡检图片默认图标缺失需组件配置
 物业手持B端添加巡检记录页上传图片的默认图标未显示，需补全组件默认图标配置。
 

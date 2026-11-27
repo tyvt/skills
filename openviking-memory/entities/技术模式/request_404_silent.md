@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:31:01+08:00
+verdict_note: 产品2.0 request.js 无 404 静默处理命中（code===404 n=0，404 多为 svg 资源名）；全局拦截器 404 静默无代码证据。
+---
 # 全局请求拦截器404静默
 园区物管2.0 的 axios 响应错误拦截器对 HTTP 404 直接 reject，不弹全局错误框，交由调用方处理。
 

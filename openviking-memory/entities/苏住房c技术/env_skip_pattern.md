@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T10:14:35+08:00
+verdict_note: 苏住房C 源码无 shouldSkipIdTypeChoose/getRealNameEntryUrl（0 命中），TypeChoose 仅见编译产物，环境变量跳过模式无法证实。
+---
 # 生产环境按环境变量跳过业务分支模式
 某功能后端未就绪时，生产环境跳过中间页直接进目标页，但开发测试环境保留，可用入口URL工厂+页面onLoad重定向双层拦截。
 

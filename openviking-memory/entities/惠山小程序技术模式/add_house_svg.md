@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:12:21+08:00
+verdict_note: 惠山小程序 8个涉及文件命中，selectMyHouseByLingXi 逻辑存在；SVG 为文档产物未入 git。
+---
 # 添加房屋流程图存为SVG
 惠山小程序已生成添加房屋流程图 SVG，涵盖主流程、遗留路径及绑定逻辑并以颜色标注。
 

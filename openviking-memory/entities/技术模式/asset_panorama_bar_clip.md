@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:48:54+08:00
+verdict_note: 园区物管2.0 assetPanorama/index.vue 含 bottom(3)/grid(4)/axisLine(2)/scale-clip(2)，ECharts 坐标轴裁切修复属实。grid.bottom 以配置键 bottom 形式存在。
+---
 # 资产全景页横向柱状图坐标轴裁切与纵向滚动缺失
 园区物管2.0 资产全景页（assetPanorama）横向条形图底部坐标轴被裁切且内容无法纵向滚动，已通过 ECharts grid 配置与布局裁切调整修复。
 ## 问题根因

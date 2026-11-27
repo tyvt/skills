@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:21:54+08:00
+verdict_note: VerificationReceiptDetailTable.vue 命中 slot=header，入账图标移至表头属实
+---
 # 入账金额提示图标移至列表表头
 园区物管2.0 将入账金额列的提示图标从每行单元格移至表头，消除重复渲染。
 

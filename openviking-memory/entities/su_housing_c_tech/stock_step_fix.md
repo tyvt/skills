@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:44:16+08:00
+verdict_note: 苏住房C 构建产物命中 stockHouseSign、w-full、steps，步骤条宽度修复已落地，与记忆一致。
+---
 # 存量房签约步骤条宽度修复
 苏住房C 小程序 `pages_transaction/stockHouseSign/apply.vue` 步骤条因 flex 收缩与未均分宽度导致标签重叠，已修复。
 

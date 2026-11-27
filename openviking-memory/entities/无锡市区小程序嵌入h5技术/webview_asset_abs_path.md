@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:24:27+08:00
+verdict_note: 无锡市区小程序嵌入H5 命中 getH5PublicBase/VITE_APP_H5_PUBLIC_BASE，绝对路径约定属实。
+---
 # 嵌 web-view 的 H5 轮播/静态资源绝对路径约定
 无锡市区小程序嵌入H5中接口返回的媒体路径须拼发布前缀绝对路径，禁止 ./ 相对当前路由的约定。
 

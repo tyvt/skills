@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:48:18+08:00
+verdict_note: 实机核对：苏州市房地产监测V3 personnelRecord.js(90) resolvePersonnelChangeBusCode、companyChangeManage/index.vue(85) CHANGE_DETAIL_TARGET_BY_BUS_CODE、jgcyrybg 映射均在；描述属实。
+---
 # 按路由和类型解析人员变更的 busCode
 在苏州市房地产监测V3项目中，原始逻辑将登记代码（cyryba/zlcyryba）与变更代码混淆。
 

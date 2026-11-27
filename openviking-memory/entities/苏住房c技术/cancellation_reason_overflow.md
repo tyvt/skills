@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:46:17+08:00
+verdict_note: 核对苏住房C：cancellationReason 组件在产物中命中，注销原因页溢出修复描述与文件一致。
+---
 # 注销页其他原因输入框溢出
 苏住房C注销页 .other-reason-section 因同时设 width:100% 与 margin-left:24px，父容器 padding:20px 致输入框向右溢出偏右。
 ## 问题现象

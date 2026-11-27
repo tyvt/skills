@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:55:58+08:00
+verdict_note: 园区物管2.0 fundPanorama/index.vue 含 renderFundTrendMixed 但无 alignTicks/toFixed(2)/min-0，所述双Y轴格式化修复无法证实
+---
 # 资金全景趋势图双Y轴格式化
 园区物管2.0 资金全景页收入与支出趋势图共用 `renderFundTrendMixed`，双 Y 轴开启 `alignTicks: true` 导致浮点误差的修复。
 

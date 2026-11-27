@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:47:41+08:00
+verdict_note: 核对苏州市房地产监测V3：certificateCode/certificateName/certificateType 在 e2e 与源码命中，表格 slot 修复属实。
+---
 # zs-table-column 插槽作用域错误渲染修复
 苏州市房地产监测V3 中多个表格误用 { row } 导致 row 为 undefined 渲染报错，已改为 { scope } 并映射字段。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:47:25+08:00
+verdict_note: 苏住房G含resolveServerAssetUrl与pubRecBankFile，下载链路改相对路径解析属实。
+---
 # 资源下载路径拼接丢失部署前缀
 在苏住房G项目(zhi2-web-admin)对账文件(pubRecBankFile)下载，重构后改用window.origin+filePath拼接，多级部署前缀丢失致404。
 ## 根因

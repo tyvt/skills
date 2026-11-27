@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:53:29+08:00
+verdict_note: SelectEntryDialog.vue 有 visible prop、-visible.sync 与'禁止直接改 props.visible'注释说明 re-render 复位，与记忆根因一致。
+---
 # SelectEntryDialog 直接改 prop 致弹窗重开
 苏州市房地产监测V3 中 SelectEntryDialog.vue 内部对 prop 直接赋值关闭弹窗，导致父组件状态不同步，列表页 re-render 时弹窗重开并重复请求。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:22:05+08:00
+verdict_note: 苏住房C 构建产物命中 resolveStaticUrl，H5静态资源相对路径修复属实
+---
 # H5子目录部署静态资源404需统一相对路径
 苏住房C市民端H5部署在子目录下，代码大量使用绝对路径/static/...导致资源请求到域名根而404，新增resolveStaticUrl并增强resolveMediaUrl统一转相对路径。
 

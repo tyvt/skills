@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:55:11+08:00
+verdict_note: 监测V3 PlanLicRelatedBuildingTable.vue 与 ConsLicBuildTable.vue 均含 submitDataKey，命名冲突重命名属实
+---
 # listName命名冲突修复
 苏州市房地产监测V3 中因 `listName` 在 mixin 的 `data()` 与组件 prop 中重复声明触发 `[Vue warn]` 的问题已修复。
 

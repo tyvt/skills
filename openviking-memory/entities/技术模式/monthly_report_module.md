@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:15:08+08:00
+verdict_note: 苏住房G 命中 ReportImportDialog、ReportItemsTable、monthlyReport、publicQuery，月报模块描述属实
+---
 # 物业管理信息月报表模块位置
 苏住房G 代码库中仅 zhi2-web-admin 前端项目包含「物业管理信息月报表 / monthlyReport」相关实现。
 

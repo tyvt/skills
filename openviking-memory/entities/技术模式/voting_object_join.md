@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:15:33+08:00
+verdict_note: 惠山二期G VotingItemsDialog.vue 存在且含 ownerFileList，对象数组 join 错误修复所涉组件与字段存在。
+---
 # VotingItemsDialog 中对象数组的 join 错误
 在 VotingItemsDialog.vue 的查看模式下，contentInfo 对 ownerFileList（对象数组）应用了 join(',')，生成了 [object Object] 和异常的附件。
 

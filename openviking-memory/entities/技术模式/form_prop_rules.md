@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:11:17+08:00
+verdict_note: 园区公共收益下 parkingSpaceContractFiling/detail.vue 不存在；parkingChargeStandardId 仅见产品2.0，parkingChargeStandardName 未同现，无法证实。
+---
 # Element UI 必填红星要求 prop 与 rules 键名一致
 zhi2-web-admin 详情页用 el-form 时，el-form-item 的 prop 需与 rules 键名完全一致，否则标签前不显红色必填星号且校验提示不一致。
 

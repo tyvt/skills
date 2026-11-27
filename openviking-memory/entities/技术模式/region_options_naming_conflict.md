@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:57:14+08:00
+verdict_note: AgencyEntryNetworkDetail.vue 含 administrativeRegionOptions，regionOptions 同名冲突重命名属实
+---
 # 组件data与mixin同名regionOptions冲突
 苏州市房地产监测V3 中 AgencyEntryNetworkDetail.vue 因组件 data 与 detailMixins 同名 regionOptions 触发 Vue2 同名限制警告，已重命名修复。
 

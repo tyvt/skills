@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:09:08+08:00
+verdict_note: 门户 zhi2-web-admin/src/views/home/publicPortal 下 PropertyDetailDialog.vue 及 PortalDialogHost.vue 存在，用途盒组件与归属属实。
+---
 # 用途盒未全宽致与表单网格列不对齐
 PropertyDetailDialog 用途盒原设固定宽与边距缩进悬空，违背全宽设计稿且列未并入表单网格，需移除固定尺寸撑满并归入同列。
 

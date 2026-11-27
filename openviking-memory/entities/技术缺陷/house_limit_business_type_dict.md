@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:19:30+08:00
+verdict_note: 苏州市房地产监测V3 中 HOUSE_LIMIT_BUSINESS_TYPE_DICT、dictUrl、type-tag/dict 命中，业务类型字典修复属实。
+---
 # 缺少 dictUrl 的业务类型列显示了原始数字
 
 在项目 苏州市房地产监测V3 中，"业务类型"列因缺少 `dictUrl` 而显示原始数字代码；已通过字典配置修复。

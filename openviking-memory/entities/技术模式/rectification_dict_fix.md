@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:42:18+08:00
+verdict_note: 苏住房G evaluation/rectificationNotice/index.vue 实存且用 biz_state，与字典统一修复描述一致。
+---
 # 整改通知书业务状态字典统一修复
 苏住房G项目修复整改通知书列表因字典不一致导致「已备案/审核中」筛选结果相反的缺陷。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:13:37+08:00
+verdict_note: jgxm/detail.vue 含 regulator-project-name-suffix 与 flex/flex-1；margin 实为 8px 非 auto，右对齐布局结论成立。
+---
 # 带右侧后缀的监管项目名称 flex 布局
 在项目 苏州市房地产监测V3 中，`supervision/agreement/jgxm/detail.vue` 中的 "监管项目名称" 字段使用 flex 将楼栋号段右对齐。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:12:35+08:00
+verdict_note: 苏住房G companyInfo.vue 有经营范围/机构介绍等 required 校验，描述属实
+---
 # 机构注册第二步必填项调整
 苏住房G 项目 companyInfo.vue 在机构注册第二步为 6 个字段新增 required:true 校验。
 

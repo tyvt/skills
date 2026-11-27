@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:54:01+08:00
+verdict_note: auth-helpers.js 含 storageState/loginWithRealAccount/baseURL 逻辑，E2E 登录回退修复属实
+---
 # E2E 登录 StorageState
 修正苏州市房地产监测V3项目中 E2E 登录在同一地址强制 `storageState` 导致的会话失败。
 

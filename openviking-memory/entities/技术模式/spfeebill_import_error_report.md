@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:12:57+08:00
+verdict_note: 产品2.0 downloadGet@main.js、errorReportUrl/errorSummary@import.vue、spFeeBill 均命中，导入错误报告处理属实
+---
 # spfeebill_import_error_report
 产品2.0 中 property/spFeeBill 导入模块完成错误报告处理与响应字段对齐。
 

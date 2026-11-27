@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:27:32+08:00
+verdict_note: 苏住房G assetPanorama/index.vue与fundPanorama/index.vue均含pageLoading/v-loading/loadPanoramaData，与首屏防白屏描述一致。
+---
 - In zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue and fundPanorama/index.vue, the root container uses v-loading='pageLoading'; mounted() awaits loadPanoramaData() then finally sets pageLoading=false to prevent roughly 10-second white screen on first load.
 - Timed or periodic refresh must NOT show the loading state.
 - Evidence: src=苏住房G/056.md; files: assetPanorama/index.vue, fundPanorama/index.vue, mapOverview/index.vue, bankAccountSupervision/index.vue.

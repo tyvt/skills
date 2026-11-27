@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:50:59+08:00
+verdict_note: 苏住房C命中 resolveStaticUrl/import.meta.env.BASE_URL/IdentityEntry/immediate-list，H5 图标相对路径修复属实。
+---
 # Inline relative icon path fails on H5
 add.vue used inline :style with hardcoded relative icon path, breaking under Vite build and H5 base './'; fixed via resolveStaticUrl with import.meta.env.BASE_URL.
 ## Root cause
@@ -15,7 +20,6 @@ add.vue used inline :style with hardcoded relative icon path, breaking under Vit
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：80e004b0-7fee-4cde-af50-62f07a822d3a
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:18:42+08:00
+verdict_note: ZsImage.vue 含 IMAGE_BASE 前缀与 onImageError/fallBackSrc 加载失败回退，工单弹窗组件均在，核心改造属实
+---
 # 报事报修工单图标缺失因静态资源丢失
 物业手持B端报事报修工单的催办/转办/退单图标因静态资源丢失而缺失。
 

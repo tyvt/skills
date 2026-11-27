@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:50:38+08:00
+verdict_note: 核对淮安物管：vite.config.js 命中 changeOrigin、rewrittenUrl、maintenance，building 代理模板一致。
+---
 # 本地联调 building 接口 Vite 代理模板
 淮安物管 zhi2-web-admin 本地将 /api/2.0/building 代理到联调机的 Vite 配置写法约定。
 

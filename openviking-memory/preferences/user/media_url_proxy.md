@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:23:06+08:00
+verdict_note: 苏住房C swiperImage.vue 命中，resolveMediaUrl统一VITE_APP_API_PROXY描述属实(生产域名非凭据)
+---
 - Media URL resolution must unify on `VITE_APP_API_PROXY`; do not add special-case branches (e.g. for `/zs-fym`) that switch to `VITE_APP_IMG_PROXY_V1`, as that caused production H5 image load failures
 - `src/utils/index.js` `resolveMediaUrl` should drop the `/zs-fym` special branch and use `VITE_APP_API_PROXY` consistently
 - `vite.config.ts` local dev proxy must sync to `VITE_APP_API_PROXY`
@@ -9,7 +14,6 @@
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：bb5ef4f6-787c-49c9-b071-0b62385878d7
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:47:18+08:00
+verdict_note: 苏州V3 supervision/deposit/refund/detail.vue 命中 regulatorProjectName/DETAIL_COL_FULL/FORM_COL_FULL，监管项目与通栏改造属实
+---
 # 定金退款详情监管项目与通栏改造
 苏州市房地产监测V3 完成定金退款详情页监管项目字段与退款说明通栏调整。
 

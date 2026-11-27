@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:19:51+08:00
+verdict_note: size-main-package.mjs/mainStaticPaths.js 不存在，conditionScreening.vue 仍在 pages/commonNew，componentPlaceholder 无命中
+---
 # 主包组件错放导致超限
 苏住房C 小程序主包上传预估超限的头号复发根因是把仅分包使用的组件放在主包 components/，需迁回分包并补 componentPlaceholder。
 

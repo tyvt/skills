@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:12:41+08:00
+verdict_note: 产品2.0 CandidateDialog.vue/CandidateTable.vue/enums.js 命中，候选人身份字典属实。
+---
 # 业委会筹备组候选人字典
 产品2.0后台业委会与筹备组候选人身份标识使用两套独立字典，非业主可跳过不动产校验，避免流程卡死。
 

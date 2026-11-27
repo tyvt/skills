@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:47:34+08:00
+verdict_note: 苏州市房地产监测V3 index.scss-300 存在 scrollbar-gutter-stable，与记忆修复方案一致。
+---
 # 详情页表单抖动缺陷（滚动条槽位）
 项目变更详情页部分分辨率下表单持续抖动，根因是内滚容器滚动条槽位不稳定，用 scrollbar-gutter: stable 预留槽位修复。
 

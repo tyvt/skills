@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:41:51+08:00
+verdict_note: zhi2-mobile-shimin的newHouseCertification/index.vue含goApply()，一手房申请按钮修复属实。
+---
 # 一手房交易去申请按钮点击无响应
 苏住房C小程序「我的-一手房交易」各区域「去申请」按钮因写在z-paging外部被遮挡导致无响应。
 

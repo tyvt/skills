@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:00:04+08:00
+verdict_note: resetStepForm、stepUploaderKey、clearPickerFiles、ZsUploader 在泰兴小程序相关代码中可查，与重置修复描述一致。
+---
 # 巡检步骤弹窗重置不全
 `resetStepForm` 仅清理 `stepFormImages` 但未清掉 `ZsUploader` 内部状态，且 `ZsUploader` 的 `watchEffect` 保留旧图，导致泰兴小程序巡检步骤弹窗在真机环境上传区残留旧图。
 ## 问题根因

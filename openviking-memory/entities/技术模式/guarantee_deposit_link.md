@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:23:28+08:00
+verdict_note: 榆林G guaranteeDepositAccount/AccountDetailTable.vue 命中，保证金账户链接描述属实
+---
 # 保证金账户明细业务编号跳转
 产品2.0 房屋质量保证金账户详情页为缴存/支用明细的「业务申请编号」列添加了跳转链接。
 
@@ -14,7 +19,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

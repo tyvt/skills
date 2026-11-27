@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:24:40+08:00
+verdict_note: 昆山市民 命中 wxJssdk.js/jumpToMiniProgram 与 index.html 的 jweixin，JSSDK修复属实。
+---
 # 鹿路通小程序H5对接JSSDK修复
 平安报事通在鹿路通小程序 web-view 中提示「请在微信小程序中打开」的问题修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:47:23+08:00
+verdict_note: 苏住房C 全仓无 WechatPhoneAuthPopup.vue / wechatPhoneAuthAnalytics.js / getPhoneNumber 命中，所述文件与授权修复无代码证据。
+---
 # 小程序手机号授权失败因后端接口未部署
 苏住房C小程序登录手机号授权申请失败，根因为后端接口未部署，需联调与优化前端提示。
 

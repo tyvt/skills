@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:29:39+08:00
+verdict_note: 太仓G decisionCommon/config.js-23-24 有 permissionPrefix/businessName='estate-maintainDecision'，maintainDecision 目录存在，权限前缀描述属实。
+---
 # 维修资金表决菜单权限前缀不一致致按钮隐藏
 太仓G端重构后维修资金表决页面组件路径与后台菜单权限前缀不一致，导致详情按钮全隐藏。
 

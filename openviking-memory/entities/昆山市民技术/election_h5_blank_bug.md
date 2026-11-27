@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:46:55+08:00
+verdict_note: 昆山市民命中 loginWithWxCode/loadElectionDetail/showPage/Participate，H5 分流修复与现状一致。
+---
 # 业委会选举 H5 参与页空白 Bug
 昆山市民业委会选举在 H5 中点击参与决策、阅读选举须知后下一页空白，根因为 H5 误走登录逻辑。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:12:12+08:00
+verdict_note: 苏住房C gateway.js/autonomy.js/user.js 命中 zs-desensitize-flag 兼容多大小写写法，与记忆描述一致。
+---
 # 网关脱敏头字段需统一使用 zs- 前缀
 苏住房 C 端（zhi2-mobile-shimin）后端要求网关头字段统一使用与 zs-method 一致的 zs- 前缀；gateway.js 已改为写入 zs-desensitize-flag 并保留大小写兼容回退，user.js/autonomy.js 的业务请求头也统一为 zs- 前缀。
 

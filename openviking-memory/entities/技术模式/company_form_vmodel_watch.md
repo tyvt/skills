@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T23:19:14+08:00
+verdict_note: 声称的产品2.0 CompanyBasicInfoForm.vue 全库 0 命中，localForm 在产品2.0 项目 MISS，无法找到对应源码，描述与现状证据不符，无法证明有效。
+---
 # 公司基本信息表单prop双向绑定警告修复
 产品2.0 CompanyBasicInfoForm.vue 因直接对 form prop 做 v-model 触发 Vue 单向数据流警告，已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T06:55:41+08:00
+verdict_note: 苏住房C 源码无 ZsPopup 组件（仅构建产物），showMask 全仓 ZsPopup 0 命中，所述新增 showMask 属性无法证明。
+---
 # ZsPopup缺遮罩开关且结果页未铺满
 苏住房C 中 `ZsPopup` 缺少遮罩控制属性，且各类 `DecisionResult` 页面未铺满灰色背景，导致留白与交互问题。
 

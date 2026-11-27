@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:11:01+08:00
+verdict_note: 全局真实业务代码搜不到 isOffline（仅记忆镜像命中），与记忆全项目搜不到 isOffline 一致；移除类描述无法证伪。
+---
 # pages_owner/payment 移除 isOffline mock 分支
 i-H5 的 src/pages_owner/payment/index.vue 已移除 isOffline 等 mock 分支，运行时报错系旧编译产物缓存所致。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:17:48+08:00
+verdict_note: 苏州V3 含 personnelCertificate/zs-table-column/发证机关/doLayout，表格列溢出与卡顿修复属实。
+---
 # 专业资格证书管理表格列溢出与卡顿修复
 修复了苏州市房地产监测V3中「专业资格证书管理」页面的表格列溢出遮挡与卡顿问题。
 

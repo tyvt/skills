@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:09:37+08:00
+verdict_note: 苏州市房地产监测V3 LeasePersonnelList.vue命中(3)，keyWord查询广泛存在，描述属实。
+---
 # 租赁人员列表合并姓名查询并移除冗余name参数
 `LeasePersonnelList.vue` 将从业人员姓名文案改为人员姓名并保留keyWord查询，删除冗余name参数。
 

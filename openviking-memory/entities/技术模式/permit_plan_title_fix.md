@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:16:54+08:00
+verdict_note: PermitPlanPanel.vue/CashsaleDetail.vue 命中；planTitle 命中 permitConstants.js，现售方案/预售方案文案命中，模板化修复属实。
+---
 # PermitPlanPanel 预售方案文案硬编码修复
 苏州市房地产监测V3 中 PermitPlanPanel.vue 的「需先在系统内完成信息维护」说明硬编码「预售方案」，现售备案传 plan-title=现售方案时仍显示预售，已改为模板使用 {{ planTitle }} 前缀。
 

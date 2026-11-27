@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:54:32+08:00
+verdict_note: 昆山市民命中 loginWithWxCode/loadElectionDetail/wxLogin/votedetail，H5 缺 code 致空白修复属实。
+---
 # H5选举页误调登录缺code致页面空白
 昆山市民H5选举页因误调登录接口且内页跳转缺code导致页面空白的bug根因与修复记录。
 

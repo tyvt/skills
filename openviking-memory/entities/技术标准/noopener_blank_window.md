@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:18:14+08:00
+verdict_note: 惠山二期G 命中 noopener/newWindow.opener/location.replace/bTerminalRedirect，窗口空白修复属实
+---
 # window.open 中 noopener 导致子窗口空白
 在 `window.open` 中使用 `noopener,noreferrer` 会使父页面丢失对子窗口的引用，导致无法重定向并出现空白页。
 
@@ -24,7 +29,6 @@
 ## 验证与归属
 - 所属项目：惠山二期G
 - 验证证据：extracted source=cursor project=惠山二期G
-
 
 <!-- MEMORY_FIELDS
 {

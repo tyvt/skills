@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:14:01+08:00
+verdict_note: 园区公共收益 operatorAddDialog.vue/operatorDialog.vue 存在且 el-form-item 上 required 属性=0、rules=3，英文提示修复属实。
+---
 # 操作人员弹窗必填英文提示修复
 园区公共收益项目修复新增/关联企业用户弹窗因 `el-form-item` 多余 `required` 属性导致英文校验提示覆盖中文提示的问题。
 

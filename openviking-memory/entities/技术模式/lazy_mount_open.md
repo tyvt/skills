@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:17:55+08:00
+verdict_note: 苏州V3 命中 PaymentOutletDialog/getList/other_record，懒挂载与 open 事件修复属实
+---
 # 懒挂载与open事件错配致getList未调用
 苏州市房地产监测V3 弹窗组件因懒挂载与 @open 事件生命周期不匹配，首次打开时 getList() 未被调用。
 

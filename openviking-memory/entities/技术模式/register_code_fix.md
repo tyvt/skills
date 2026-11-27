@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:51:39+08:00
+verdict_note: V3 实存 CompanyRegisterSingleForm/InstitutionRegisterSingleForm/registerValidate；smsCodeField 已清零，验证码必填修复属实。
+---
 # 机构与企业注册验证码必填校验修复
 苏州市房地产监测V3 中为机构注册与企业注册的图片验证码、短信验证码补充了与其他字段一致的必填校验。
 

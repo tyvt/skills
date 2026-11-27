@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:18:10+08:00
+verdict_note: 园区公共收益 detailMixins.js 含 skipFormCache，编辑态刷新假缓存修复所涉标志存在。
+---
 # 编辑态刷新详情页未调接口修复
 园区公共收益项目中，编辑态详情页刷新后未调用详情接口，直接恢复 sessionStorage 假缓存。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区公共收益
-
 
 <!-- MEMORY_FIELDS
 {

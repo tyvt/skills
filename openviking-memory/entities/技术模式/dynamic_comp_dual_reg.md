@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:45:27+08:00
+verdict_note: 苏州V3 contract/index.vue含loadComponents动态组件注册，与小写comp双重注册修复核心一致。
+---
 # 小写动态组件 comp 未双重注册导致 Unknown
 在项目 苏州市房地产监测V3 中，预售合同页面在 `data.js` 中使用小写的 `comp` 作为动态组件，但 `loadComponents` 仅按 SFC 的 PascalCase `name` 注册，产生 `Unknown custom element`。
 

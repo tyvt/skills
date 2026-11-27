@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:51:43+08:00
+verdict_note: 断言函数 assertRegisterFormLabelRightAligned 存在于 register-helpers.js，Step2LegalPerson.vue 含"法定代表人姓名"，竞态修复属实
+---
 # Step2容器可见时子表单未挂载致label竞态
 register-step-2 容器在 v-if="registerStep === 2" 时可见，但内部 Step2LegalPerson 表单未挂载，测试过早查找 .el-form-item__label 数量为0。
 

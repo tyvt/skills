@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:43:45+08:00
+verdict_note: 园区物管2.0 实存 pieLegendHover.js 与 index.vue，饼图下钻描述无矛盾证据。
+---
 # ECharts饼图hover高亮不消失
 园区物管2.0 中 ECharts 饼图手动 dispatchAction highlight 后必须配 downplay 成对，否则 mouseout 后扇区保持放大不恢复。
 

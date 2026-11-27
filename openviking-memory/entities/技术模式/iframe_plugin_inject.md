@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:44:08+08:00
+verdict_note: all_frames 与 @混淆图片.html 在各业务仓均无实据（仅存于记忆归档），H5项目无定位代码；插件iframe注入描述无法证明。
+---
 # 插件未注入iframe子页失效
 页面在 iframe 中渲染，脚本仅注入主页面未进子 frame 致插件不生效，需配置 all_frames 注入（含 about:blank 子页）。
 

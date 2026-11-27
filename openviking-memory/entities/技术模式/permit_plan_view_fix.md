@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:52:01+08:00
+verdict_note: PermitPlanPanel.vue 含 resolvedPlanId，detail.vue 含 consumePlanPageResult，修复属实
+---
 # 预售方案查看按钮启用条件修复
 苏州市房地产监测V3 中预售许可申请详情页「查看」按钮因 planId 被覆盖导致维护后仍灰显的修复。
 
@@ -19,7 +24,6 @@
 ## 验证与归属
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

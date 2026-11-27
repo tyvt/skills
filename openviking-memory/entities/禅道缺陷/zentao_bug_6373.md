@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:16:23+08:00
+verdict_note: src/directives/dialog/drag.js 命中；v-dialogDrag/el-dialog__headerbtn/onmousedown 均命中，关闭按钮 return 修复属实。
+---
 # 禅道缺陷 #6373
 苏州房地产客测环境开发企业基本信息预览附件关闭按钮无法关闭的缺陷。
 

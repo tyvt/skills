@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:45:37+08:00
+verdict_note: 苏住房C 命中 w-660(27)、houseVideo(10)、uni-searchbar(15)，与 ZsSearch 宽度修复一致。
+---
 # ZsSearch 搜索框宽度修复
 苏住房C 小程序 `houseVideo/index.vue` 中 `ZsSearch`（底层 `uni-search-bar`）默认宽度较窄导致搜索框无法撑满，已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:56:10+08:00
+verdict_note: 太仓G optionDecision/components/VoteRangeDialog.vue 含 optionGroup/decisionRecord/optionList/tMfOptionApplyList，两套接口区分属实
+---
 # 选项表决两套接口区分
 太仓G 选项表决的投票弹窗与详情「表决项」Tab 是两套接口，排查弹窗表决项为空应先看 optionGroup 而非 option 系列。
 

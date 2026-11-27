@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:12:52+08:00
+verdict_note: pubRegulatoryAccount/detail.vue 命中 canEditRegulatoryAccountFields 与 accountOpenType，与银行返回账户只读修复一致。
+---
 # 因未排除返回状态导致银行返回账户可编辑
 在 淮安物管 项目中，由于未排除返回状态，银行返回的银行账户在详情页面中保持可编辑状态。
 
@@ -20,7 +25,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=淮安物管
 - 来源会话：be883941-555c-45f9-bd6f-1078dd8d0fc0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:43:06+08:00
+verdict_note: 苏住房C szffluzm/index.html 实存且含 location.pathname，绝对路径加载描述属实。
+---
 # 线上脚本加载路径修复
 苏住房C H5因`index.html`使用相对路径导致微信/支付宝中脚本404，已改为基于`location.pathname`的绝对路径。
 

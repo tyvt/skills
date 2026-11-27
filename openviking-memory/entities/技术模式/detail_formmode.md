@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:17:39+08:00
+verdict_note: facility/detail.vue 与 detailMixins.js 命中 formMode，查看态用 formMode==view 属实
+---
 # 详情页模式标志用 detailMixins 的 formMode
 走 detailMixins 的整页详情页统一用 mixin 提供的 formMode（add/edit/view），不能用弹窗子组件的 dialogMode。
 

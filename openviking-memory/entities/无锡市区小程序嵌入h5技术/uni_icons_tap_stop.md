@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:14:13+08:00
+verdict_note: 无锡市区小程序嵌入H5 uni-icons(26)/tap.stop(16)命中，事件处理修复目标存在。
+---
 # H5下uni-icons勿用@tap.stop
 uni-app 编译到 H5 时 uni-icons 触发事件非标准 DOM Event，模板写 @tap.stop 会导致 event 为 undefined 报错并中断点击。
 

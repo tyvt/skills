@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:41:03+08:00
+verdict_note: OpenViking读取该uri返回NOT_FOUND；小程序仓也无 pages/home/new/index.vue 及 home-wrapper 样式，无法证明有效。
+---
 # 首页布局按设计稿恢复垂直节奏
 在 pages/home/new/index.vue 恢复设计稿要求的垂直节奏与尺寸规范。
 

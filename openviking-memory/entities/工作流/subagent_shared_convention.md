@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:21:25+08:00
+verdict_note: dataAnalysis 命中 DaEchart/heatStockList，多subagent共享约定属实
+---
 # 多subagent并行开发共享约定清单
 拆分HTML原型给多个subagent并行开发看板页面前，需固化共享约定清单以避免不一致隐患。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:19:08+08:00
+verdict_note: 产品2.0 layout/index.vue、user.js、projectContext.js 均含 ENABLE_B_TERMINAL_PROJECT_DIALOG_ON_LOGIN，显式开关常量属实。
+---
 # B端登录弹窗显式开关常量
 产品2.0 中 B 端登录后的「选择物业管理区域」弹窗行为，统一由 projectContext.js 的显式常量开关控制，避免散落多处导致回归。
 

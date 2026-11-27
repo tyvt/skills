@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:50:41+08:00
+verdict_note: rescue-workorder/index.vue-87 命中 /v2.0/safety/flood/rescue/page；attachUrl、navigationBarTitleText 命中，项目事实属实。
+---
 # 苏住房防汛C端（移动查询 H5）
 苏住房防汛C端移动查询 H5 项目，主检出位于 D:\repository\苏住房防汛C端，nginx 直读 dist 目录。
 
@@ -16,7 +21,6 @@
 - 浏览器 mock 需用简单 pattern 且不加 --allow-origin 才能命中（route URL 带 /api 前缀）
 - 项目未安装 eslint，语法校验以基线+改后构建 exit 0 为准
 - 2026-11-24 求援工单三页验证通过并提交推送，dev 分支 HEAD=3516f598（pages.json + index/form/detail.vue 共 4 文件）
-
 
 <!-- MEMORY_FIELDS
 {

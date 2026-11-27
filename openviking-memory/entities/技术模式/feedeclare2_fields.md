@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:21:34+08:00
+verdict_note: feeDeclare2/detail.vue 与 feeBindScopeTable.vue 存在并命中 feeDeclare2/feeBindScope
+---
 # 物业收费申报字段映射与展示
 苏住房G(zhi2-web-admin) 物业收费管理-申报缴费(feeDeclare2) 已按后端字段定义对齐多项字段的页面展示。
 ## 基础字段映射
@@ -24,7 +29,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:17:30+08:00
+verdict_note: HomeBizSection.vue 含 stretch、biz-section--stretch、height-100%/flex-1，全屏拉伸属实。
+---
 # HomeBizSection 全高隐藏次级区块
 所有的 HomeBizSection 都设置了 height:100% 和 flex:1，导致商业房产列占满全部空间并隐藏了二手房/租赁。
 

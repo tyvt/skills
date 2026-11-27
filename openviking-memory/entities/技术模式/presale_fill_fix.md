@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:13:33+08:00
+verdict_note: PresalePlanFillForm.vue/permitConstants.js 命中；LAND_MORTGAGE_STATE/COMMERCIAL_HOUSE_SALE_TYPE/normalizeSaleMode 均命中，改造属实。
+---
 # 预售方案填报字典与日期控件改造
 苏州市房地产监测V3 中预售方案填报页 `PresalePlanFillForm.vue` 完成字典下拉与日期控件改造。
 

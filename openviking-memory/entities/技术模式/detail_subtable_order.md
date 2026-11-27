@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:14:47+08:00
+verdict_note: 苏住房G（含 worktree 源码）存在 houseTable.vue/rangeTable.vue 与 complex/detail.vue，子表元素顺序规范所涉文件存在，无反证。
+---
 # 详情页子表元素顺序规范
 苏住房G 项目 V3 骨架 + zs-* 组件详情页内嵌子表须按「查询区 → 操作按钮区 → 表格 → 分页」四段顺序布局。
 

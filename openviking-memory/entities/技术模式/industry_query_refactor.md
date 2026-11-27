@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:54:02+08:00
+verdict_note: 苏住房G companyListQuery.js 含 getUpdateTimeSelectableBounds，查询改造属实
+---
 # 行业管理六页查询与列表改造（苏住房G）
 苏住房G 行业管理相关页面完成查询与列表通用改造，新增公共工具并统一多页面筛选与列。
 

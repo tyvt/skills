@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:45:03+08:00
+verdict_note: register-helpers.js、confirmDeleteDialog、deleteShareholderByName 全仓 0 命中，删除确认改造无法核实
+---
 # 股东信息删除确认提示修复
 苏州市房地产监测V3 项目修复股东信息删除确认提示，统一使用 Element UI $confirm 确认框。
 

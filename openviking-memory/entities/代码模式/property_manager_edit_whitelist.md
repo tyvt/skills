@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:43:49+08:00
+verdict_note: 苏住房G propertyManager/detail.vue 含 formMode 分支与「管理范围」字段，编辑态受限逻辑属实
+---
 # 物业管家编辑仅开放管理范围与人员姓名
 物业管家编辑态仅允许修改管理范围与物业服务人员姓名，其余字段只读，通过白名单与校验跳过实现。
 

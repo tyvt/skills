@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:10:11+08:00
+verdict_note: permitExtend/detail.vue、permitCancel/detail.vue 命中 zs-input 与 openPermitSelect 焦点绑定，与描述一致。
+---
 # 预售选证输入框改用zs-input聚焦打开对话框
 苏州市房地产监测V3 预售模块选证字段由 el-input + @click.native 改为 zs-input 并绑定 @focus 打开选择对话框。
 

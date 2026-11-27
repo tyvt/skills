@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:27:09+08:00
+verdict_note: 苏住房G pubRegulatoryAgreement/detail.vue含备注/其他模块与detailMixins，与字段调整描述一致。
+---
 # 监管协议打印模式
 监管协议的打印模式依赖于后端，前端仅调整页面。
 

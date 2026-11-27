@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:59:01+08:00
+verdict_note: 园区物管2.0 RegionTreeLayout.vue 仍含 align-self-flex-start、无 calc(100vh - 180px)，所述固定高度修复与现状不符
+---
 # 左侧树面板边框高度固定不随数据缩短
 园区物管2.0 中 property/complex 左侧树面板边框高度原随节点数量收缩，已改为固定高度。
 

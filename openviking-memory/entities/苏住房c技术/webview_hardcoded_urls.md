@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:56:40+08:00
+verdict_note: 苏住房C src/pages/common/webViewNav.vue 存在并按 url/title 承载，编译产物含 cc.szfcweb.cn 与 thirdMap，web-view 地址清单属实
+---
 # 苏住房C第三方web-view地址清单
 苏住房C小程序(zhi2-mobile-shimin)的便民政策/工具类页面通过3个承载页硬编码跳转8个第三方URL，新增同类页须复用既有地址。
 

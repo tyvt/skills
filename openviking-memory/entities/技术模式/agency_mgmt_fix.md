@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T19:44:58+08:00
+verdict_note: 全库无 company_business_scenario/businessScenario/AgencyEntryNetwork 实现，客户进入改造无法证明
+---
 # 经纪机构管理前端改造
 苏州市房地产监测V3 完成经纪机构入网认证、开业、基本信息及从业人员等相关前端改造。
 

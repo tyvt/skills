@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:12:18+08:00
+verdict_note: 泰兴小程序 uno.config.ts 与 OptionCardList.vue 均含 leading-1-4，小数类名改写属实。
+---
 # 小程序UnoCSS小数类名导致WXSS编译错误
 泰兴小程序使用 UnoCSS 时，带小数点的类名（如 `leading-1.4`）会生成非法 WXSS 选择器导致编译失败。
 ## 问题根因

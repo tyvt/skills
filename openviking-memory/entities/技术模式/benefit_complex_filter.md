@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:43:03+08:00
+verdict_note: 核对园区公共收益：/property/complex/page、pageOptionalComplex、pubAdvertiseSpace/detail 均命中，终端过滤规则与描述一致。
+---
 # benefit 详情选物业管理区域过滤规则
 收益类详情里「选择物业管理区域」弹窗请求 /property/complex/page，并按终端类型过滤。
 

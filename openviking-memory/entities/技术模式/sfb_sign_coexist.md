@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:42:54+08:00
+verdict_note: 苏住房C sign.js 双份实存；sz-sign 前缀在 szffluzm 打包产物 index-*.js 命中，nonce/timestamp/dispatcher 命中，签名共存约定属实。
+---
 # 苏服办与业务签名共存约定
 苏住房C 接入苏服办后请求头共存两套签名，通过 zs- 前缀区分业务侧与网关侧参数。
 

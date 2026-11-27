@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:17:56+08:00
+verdict_note: 补丁 V2.6.2-20261031-001.sql 真实存在，APPROVE_STATE、StdEvalReportPrepare、@TableField(exist=false) 命中，DDL 漏列修复属实。
+---
 # 实体继承BaseApprovalDO但建表SQL漏列
 StdEvalReportPrepare/StdEvalReport继承BaseApprovalDO带三列，但建表脚本漏建→报无效列名APPROVE_STATE。
 

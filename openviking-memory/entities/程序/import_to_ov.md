@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:56:34+08:00
+verdict_note: 无 import-local-sources.mjs、OV_MAX_COMMIT_QUEUE 源码；import_to_ov 仅见于 OpenViking benchmark，非所述 skills 导入脚本，无法证实
+---
 # import_to_ov
 OpenViking 记忆导入的逐批提交脚本，由 import-local-sources.mjs 串行调用完成每批写入。
 

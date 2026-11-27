@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:31:29+08:00
+verdict_note: 苏住房C 源码中 pages_main/publicNotice/index.vue 不存在（n=0，实际为 pages/publicNotice）；双列卡片 min-width 溢出修复无确切代码证据。
+---
 # 双列卡片布局最小宽度溢出修复
 `pages_main/publicNotice`等双列卡片因`flex:0 0 48%`配合标题`white-space:nowrap`与图标，最小宽超容器致双列失效。
 ## 问题根因

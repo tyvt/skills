@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:44:27+08:00
+verdict_note: 苏住房C 源码/产物广泛命中 @tap(112) 与 baseCard 组件，符合记忆所述小程序统一 @tap 的修复方向。
+---
 # 自定义组件@click不触发需改@tap并emit
 苏住房C 小程序中自定义组件（如 commonNew/baseCard.vue）标签上的 @click 不会触发，需改用 @tap 并在根节点同时 emit click/tap。
 

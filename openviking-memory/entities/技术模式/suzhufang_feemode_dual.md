@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:58:23+08:00
+verdict_note: 苏住房G bulkImportDialog.vue 含 feeMode/fee_mode_declaration/templateLoading/btnLoading，双链路必填修复属实
+---
 # 苏住房G 简易申报导入双链路必填 feeMode
 苏住房G 简易申报批量导入弹窗的「下载模板」与「导入」两条请求链路必须同时带齐 feeMode 等业务参数。
 ## 问题背景
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

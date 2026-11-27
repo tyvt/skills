@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T04:11:47+08:00
+verdict_note: 产品2.0 home/index.vue仍含toggleSideBar(4文件命中)，Navbar.vue无goHome；描述的"移除created中toggleSideBar+补goHome"在现状代码均不可证。
+---
 # home_sidebar_default_expand_fix
 产品2.0 修复工作中心首页左侧菜单（消息、待办任务、已办任务、我发起的）进入时未默认展开的问题。
 

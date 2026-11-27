@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:19:28+08:00
+verdict_note: 苏州V3 zlcyryba(11)/personnelRecordMenuConstants(2) 命中，e2e/zljg/lease-personnel-todo.spec.js 存在，待办分流属实。
+---
 # 从业人员待办按业务主体分流
 同一「从业人员」有经纪备案与租赁报送两条链路，待办必须按业务主体分流，租赁走租赁报送详情且附件 busCode 用 zlcyryba。
 

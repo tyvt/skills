@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:54:02+08:00
+verdict_note: 门户命中 resolveHomeLayoutVariant/homeLayout/hideLayoutChrome/PORTAL_BASE_URL，首页布局变体解析属实。
+---
 # 门户首页布局变体解析
 门户仓库 zhi2-web-admin（Vue 2.7 + Vite + Element UI）登录后工作台首页按 resolveHomeLayoutVariant 切换三套布局。
 

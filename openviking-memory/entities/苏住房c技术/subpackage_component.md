@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:45:48+08:00
+verdict_note: 苏住房C 无 src/components/article/ 目录；ListIndex/ListDetail 仍在 pages/news/components，记忆所述「抽到主包」未在现状体现。
+---
 # 微信小程序分包组件跨包引用限制
 苏住房C小程序分包页面引用另一分包组件会构建失败，需抽到主包src/components/<业务域>/并改引用路径。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T19:44:36+08:00
+verdict_note: 记忆指向苏住房C pages_vote/decision/common/DecisionResult.vue 灰色背景，但 DecisionResult 命中均在 i淮安H5/公版，苏住房C 目标文件未命中，无法证明
+---
 # 页面白底且内容区仅灰卡致下方留白
 苏住房C 移动端页面默认白色背景且内容区仅灰色卡片有背景色，下方未覆盖区域显白空白。
 

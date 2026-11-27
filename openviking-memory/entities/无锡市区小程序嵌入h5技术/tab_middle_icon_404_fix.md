@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:17:36+08:00
+verdict_note: custom-tabbar.vue/zhishuAsset.js 命中；resolveStaticIcon x3、resolveZhishuAsset、middleIcon、icon_tab_middle 均命中，子路径图标修复属实。
+---
 # 中间Tab图标绝对路径404修复
 H5部署在/h5/子路径时，中间Tab图标用了绝对路径/static/icon/icon_tab_middle.jpg导致404，首页与我的图标已通过resolveZhishuAsset处理而中间未处理。
 

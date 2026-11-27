@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:11:12+08:00
+verdict_note: 门户 PropertyDetailDialog.vue 存在，formatDateOnly 命中4次，纯日期展示实现属实。
+---
 # 门户房屋详情弹窗纯日期展示
 publicPortal `PropertyDetailDialog` 的日期字段使用 `formatDateOnly` 归一为纯日期 `YYYY/M/D`，去掉时间后缀。
 

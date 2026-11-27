@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:41:26+08:00
+verdict_note: 泰兴小程序issue/detail.vue含star-active.svg与/static/svg/路径，业主端repair/detail.vue同现SVG，与恢复+改路径描述一致。
+---
 # 工单评价星标不显示因SVG缺失路径误
 泰兴小程序工单评价星标不显示因 `src/static/svg/` 缺失 SVG 且星标路径误写，恢复并更正路径后业主端同步生效。
 

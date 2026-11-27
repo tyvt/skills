@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:15:32+08:00
+verdict_note: 门户仓 mock/rental.js-78 存在 matchRentalContract，RentalContractQueryPanel 可查，仅匹配出租方的问题定位属实。
+---
 # 租赁mock仅验出租方致承租方查失败
 `src/views/home/publicPortal/mock/rental.js` 中 `matchRentalContract` 仅与 fixture 出租方全量相等匹配，未比对承租方字段，致承租方凭正确备案编号仍查不到。需扩展匹配逻辑同时支持承租方凭证查询。
 

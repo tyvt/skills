@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:54:59+08:00
+verdict_note: 监测V3 companyCancel/index.vue 中 companyType 已清零、含"业务状态"，去机构类型筛选加业务状态列属实
+---
 # 机构注销管理筛选与列表调整
 苏州市房地产监测V3 的 companyCancel/index.vue 按截图要求去掉「机构类型」筛选并增加「业务状态」列。
 

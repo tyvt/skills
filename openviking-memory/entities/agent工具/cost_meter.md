@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:12:54+08:00
+verdict_note: skills 仓 dsh/cost-meter/lib/index.js 含 perStepOutputBudget 与 reasoning-watchdog 实现，cordis.patch.yml 有双写，功能描述与现状一致。
+---
 # cost-meter
 cost-meter 是 skills 仓库中的逐步用量与成本计量、熔断提醒技能。
 

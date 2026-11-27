@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:45:10+08:00
+verdict_note: 核对门户：UnifiedLogin.vue 命中，斑马纹 nth-child(even) 与行内 padding 改动与描述一致。
+---
 # 对外门户公示公告斑马纹
 对外门户 UnifiedLogin.vue 的公示公告区新增斑马纹与整行底色，原错误改动已从 HomeNoticeList.vue 回退。
 

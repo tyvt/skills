@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:48:37+08:00
+verdict_note: opencode 为非代码实体记忆，无仓内代码或可核实现状证据佐证导入序列，无法证明有效
+---
 # opencode
 用户提及的程序，其历史会话计划导入 OpenViking。
 

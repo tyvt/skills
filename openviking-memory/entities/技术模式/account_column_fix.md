@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:29:05+08:00
+verdict_note: 园区公共收益源码中 views/maintenance/accountType/index.vue 不存在（n=0），「固定列」「去掉竖线」仅见于记忆文件；操作列修复无代码证据。
+---
 # 账户分类列表操作列竖线冗余修复
 业务账户分类列表因操作列固定产生多余竖线，已通过取消固定并限定列宽修复，同时规范开户明细弹窗表格样式。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:46:06+08:00
+verdict_note: 苏住房C pages.json/pages.js 命中 pages_my/setting/userInfo/realInfo 与 My_Suzhufang，UserInfo 页路径修复属实。
+---
 # 我的-个人信息页未注册修复
 苏住房C小程序「我的」头像区因 `pages_my/setting/userInfo` 未在 `pages.json` 注册导致 page not found，已修复。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

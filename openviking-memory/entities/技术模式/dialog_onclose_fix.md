@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:46:20+08:00
+verdict_note: 产品2.0 源码命中 onClose、addCallback、AddDialog，与补 onClose 方法修复一致。
+---
 # AddDialog onClose 方法缺失修复
 产品2.0 的 AddDialog.vue 因调用未定义的 onClose 触发 Vue 警告，已按项目其他弹窗写法补全。
 

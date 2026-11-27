@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:45:00+08:00
+verdict_note: 该条为禅道 DB 状态记录（bug 6315/zt_action 88640/提交 5db26c36），本轮未取得禅道库或提交的实机证据，无法证明有效。
+---
 # 禅道 Bug 6315
 新禅道系统中登记的预售许可证模板文本框截断缺陷。
 ## Description
@@ -9,7 +14,6 @@
 ## Relations
 - 关联模板 presale-permit-template.docx
 - 修复提交 5db26c36 已合入 dev 分支
-
 
 <!-- MEMORY_FIELDS
 {

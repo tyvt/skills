@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:41:25+08:00
+verdict_note: assetsLeaseContractFiling/index.vue-235 isWarningContract、-27 isSelectable、-26 setRowStyle、-52 revenueContractId 均在，忽略按钮禁用逻辑一致。
+---
 # Filed warning contract selectable and ignore uses latest row
 In 苏住房G benefit contract filing lists, reserve-selection desynced selected-row fields from tableData, and filed-warning contract selection/style checks were inconsistent.
 
@@ -19,7 +24,6 @@ In 苏住房G benefit contract filing lists, reserve-selection desynced selected
 - 所属项目：苏住房G
 - 验证证据：extracted source=cursor project=苏住房G
 - 来源会话：7960611d-0d3b-4ae8-a217-98664ba2c7a2
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:44:39+08:00
+verdict_note: i淮安H5 verifyUser/index.vue 实机仅 wx.login=1，无 getWechatLoginCode/js_code/code2Session；记忆所称实时取码修复符号缺失，无法证明有效。
+---
 # 复用wx.login码致手机号授权报40029
 i淮安H5 在 verifyUser 页面预缓存 `wx.login` 的 `js_code`，用户授权时复用已过期或已使用的 code 调用 `auth.code2Session` 返回 40029。
 

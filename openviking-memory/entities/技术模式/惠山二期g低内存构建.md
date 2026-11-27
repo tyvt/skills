@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:18:25+08:00
+verdict_note: 昆山G 命中 maxParallelFileOps、cssCodeSplit 等 vite 并发构建配置，内存优化描述属实
+---
 # 惠山二期G低内存构建
 惠山二期G的CI机器仅4GB内存，通过降低构建峰值内存而非加堆解决OOM，改动在vite-build.mjs与vite.config.js。
 ## 背景约束
@@ -12,7 +17,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=惠山二期G
-
 
 <!-- MEMORY_FIELDS
 {

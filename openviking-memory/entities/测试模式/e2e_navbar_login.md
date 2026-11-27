@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T22:43:13+08:00
+verdict_note: 全仓（含产品2.0）不存在 navbar-sidebar-accessibility.spec.js，所述 E2E 顶栏侧栏遍历用例无实机文件
+---
 # 顶栏侧栏E2E登录与默认激活
 navbar-sidebar-accessibility.spec.js 遍历顶栏与侧栏所有叶子路由前，须确认登录态与 navbar-root，并注意系统默认激活第一个顶栏。
 
@@ -20,7 +25,6 @@ navbar-sidebar-accessibility.spec.js 遍历顶栏与侧栏所有叶子路由前�
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=2-0
-
 
 <!-- MEMORY_FIELDS
 {

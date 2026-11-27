@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:14:51+08:00
+verdict_note: resourcesLeaseContractFiling/index.vue 与 listMixins.js 命中；getQueryParams/bizState 命中，空值兜底方法论属实；717e0e6f1 为 git 考古哈希不在工作树属正常。
+---
 # 产品2.0 筛选条件被默认值重置
 [苏房] 产品2.0 列表页「业务状态」筛选项能选却查不动，因 getQueryParams 硬写默认值每次查询重置。
 

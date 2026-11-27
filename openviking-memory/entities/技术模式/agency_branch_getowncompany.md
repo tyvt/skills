@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:54:43+08:00
+verdict_note: 苏州市房地产监测V3 AgencyBranchDetail.vue 实存 loadAddPage/getOwnCompany/draftAppendixIds/configOnly，与描述一致。
+---
 # 中介分支 GetOwnCompany
 在苏州市房地产监测V3项目中，新建分支页面使用 `getOwnCompany` 代替 `init` 进行预填充的修正。
 

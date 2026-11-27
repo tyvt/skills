@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:49:20+08:00
+verdict_note: projectNameExampleDialog.vue、facilityDefinition/listTree、originalOptions 均命中源码，级联全量树修复属实。
+---
 # 级联懒加载未载子节点致编辑回显失败修复
 园区公共收益项目(zhi2-web-admin)中 projectNameExampleDialog.vue 的 el-cascader 因懒加载子节点未载，编辑时级联回退显示"请选择"，改为一次性加载全量树。
 

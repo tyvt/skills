@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:50:19+08:00
+verdict_note: D-/nginx/conf sites-enabled/防汛C端.conf 命中 8095/location /api//dist，站点配置与端口属实。
+---
 # 苏住房防汛C端 H5 nginx 站点
 苏住房防汛C端移动查询H5 的本地 nginx 站点（苏住房防汛C端.conf），监听 8095 直接服务本地 dist。
 
@@ -19,7 +24,7 @@
 ## 联调与测试
 - 2026-11-24 站点由本机 nginx UI 管理，面板详情见「nginx_ui」
 - Playwright e2e 端口 8095
-- 测试凭证 zsbase / Zs@2026Aa!，密码 AES-CBC 加密见 src/utils/passwordEncrypt.js
+- 测试凭证 {{ov_privacy:ambiguous}} / {{ov_privacy:ambiguous}}，密码 AES-CBC 加密见 src/utils/passwordEncrypt.js
 
 <!-- MEMORY_FIELDS
 {

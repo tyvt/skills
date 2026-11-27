@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:54:13+08:00
+verdict_note: 苏住房防汛C端 flood.ts 含 bizStatesParam、bizState 映射及 bug 6418 注释，与禅道 6418 修复描述一致。
+---
 # 禅道 Bug 6418
 禅道缺陷 6418 经历 Ref8443 演示数据问题、重开暴露待提交/已提交筛选缺陷、前端修复回退改派后端、按重开决策重做前端修复并 resolved 写回的完整过程。
 

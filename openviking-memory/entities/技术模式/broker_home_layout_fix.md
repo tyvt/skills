@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:53:29+08:00
+verdict_note: 门户terminalUser.js-16 hasBrokerHomeRole、homeLayout.js-247/268 resolveHomeLayoutVariant返回broker、homeDataMixin.js-65传参，首页布局修复属实。
+---
 # 经纪机构账号首页误判修复
 门户系统修正了经纪机构账号首页被误判为管理端或开发企业布局的问题，通过调整终端类型推断与布局解析逻辑。
 

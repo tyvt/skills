@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:52:53+08:00
+verdict_note: V3 bond/detail 实存 bondId/paymentBond/formComponents，缺失字段致警告修复属实。
+---
 # bond/detail 中缺失的字段导致 Vue 警告和接口失败
 在项目 苏州市房地产监测V3 中，`bond/detail.vue` 的 `data()` 未定义 `primaryKey`、`moduleName`、`businessName`，导致 Vue 警告且无法连接接口。
 

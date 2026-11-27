@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:45:12+08:00
+verdict_note: 园区物管2.0 login.vue 实存 el-login-footer 与 login--form-only，CSS 修复点可核对。
+---
 # flex内fixed底栏未设左右致偏移
 .login 页面 flex 布局下 fixed 底栏未设 left/right 致偏左不居中，需补 left:0;right:0 并避免外层 transform。
 

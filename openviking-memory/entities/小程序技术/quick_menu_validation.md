@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:18:18+08:00
+verdict_note: 小程序 webview/home.vue 命中 ensureHouseSelected/openWebViewForMiniRoute，快捷菜单校验入口属实
+---
 # 首页快捷菜单入口需先校验登录与绑定房屋再开 web-view
 首页快捷菜单（如「共有资金表决」）点击时先 ensureHouseSelected() 校验登录与绑定房屋，通过后再 openWebViewForMiniRoute 打开 mini 路由。
 

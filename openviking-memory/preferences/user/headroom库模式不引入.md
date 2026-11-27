@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:16:56+08:00
+verdict_note: headroom库模式不引入：claimed element-ui.js 关键词命中但为通用词，无真实调用证据，无法证明结论
+---
 - zhi2-web-admin 仅 public/assets/js/element-ui.js 命中关键词，无 openai/anthropic/langchain/litellm 调用，headroom 库模式 compress(messages) 无作用对象
 - 有效代理模式（headroom wrap claude / headroom proxy --port 8787）需常驻代理、全局配置及 GB 级依赖（torch、transformers、onnxruntime、sqlite-vec），与零配置轻量偏好冲突且 pi 框架自管请求，故不引入 headroom 库
 - 验证证据：src=苏州市房地产监测V3-leftover/128.md；涉及文件：public/assets/js/element-ui.js；来源会话：01a16d4f-9eb9-7048-964a-22741d50bcaa

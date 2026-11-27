@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:48:34+08:00
+verdict_note: depositRegister/detail.vue 命中 zs-table-column，去固定 width 自适应落点在。
+---
 # zs-table-column 列宽自适应模式
 表格列宽应交给组件弹性计算，避免手动写死固定 width 绕过自适应逻辑。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=榆林G
-
 
 <!-- MEMORY_FIELDS
 {

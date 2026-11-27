@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:45:49+08:00
+verdict_note: formInput.vue 命中 fitContent(1)、inputWrap(1)，$el 报错按 fitContent 门控属实
+---
 # FormInput $el 报错修复
 苏州市房地产监测V3 项目修复了 `FormInput` 组件 `$el` 报错，并保障现售合同编辑页大写金额输入框宽度自适应。
 

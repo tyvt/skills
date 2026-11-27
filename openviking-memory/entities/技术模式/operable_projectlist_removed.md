@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:11:30+08:00
+verdict_note: 苏州市房地产监测V3 中 bProjectDialog、operableProjectList、projectContext 三符号均 MISS，与记忆「已移除登录选项目功能」一致，属实。
+---
 # operableProjectList 登录选项目功能移除
 苏州市房地产监测V3 前端已移除 operableProjectList 登录选项目/小区功能及其全局项目上下文工具。
 

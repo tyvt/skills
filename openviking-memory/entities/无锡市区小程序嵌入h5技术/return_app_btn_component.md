@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:46:25+08:00
+verdict_note: ReturnAppBtn.vue「返回应用」与 backToApp.js 的 lightAppJssdk/navigateBack 均存在，组件封装属实
+---
 # 业主决策页返回应用按钮组件
 无锡市区小程序嵌入H5中，业主决策列表页已加入与截图一致的「返回应用」按钮，封装为可复用组件。
 

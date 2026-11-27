@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:40:13+08:00
+verdict_note: 园区公共收益两个 OpenDetailDialog.vue 仅 getDicts purpose_type/building_type/DEPOSIT_MODE，无记忆所称 ACCOUNT_TYPE 字典调用
+---
 # 账户类型因dictValue不匹配显示数字
 OpenDetailDialog.vue 的 form.accountType 因字典 dictValue 与字段值不一致导致 DetailTemplate 的 tag 匹配失败回退显示数字。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:47:38+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src 全局无 zs-button--block/zs-button.long，记忆所称全局按钮宽度覆盖类不存在
+---
 # 按钮宽度全局修复
 苏住房C小程序因 ZsButton 默认 width:inherit 与 .long 写在 scoped 样式中，导致底部提交按钮过窄，已全局修复。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

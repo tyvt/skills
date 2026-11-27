@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:27:56+08:00
+verdict_note: 产品2.0 zs-search-form.vue-124-126 精确命中 hasOwnProperty.call(attrs,'multiple')?attrs.multiple-false 及 model==='bizState'，默认单选修复属实。
+---
 # 业务状态选择器默认多选改单选修复
 产品2.0 项目 zs-search-form.vue 中，针对 type === 'select' 且 model === 'bizState' 的表单项，修复了未传 multiple 时默认多选的问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:19:19+08:00
+verdict_note: 苏州V3 含 RelatedBuildingsTable/changedetail/保函金额分配明细/SubTableToolbar，保函详情页布局调整属实。
+---
 # 保函相关详情页布局调整
 苏州市房地产监测V3 按截图要求调整了保函相关详情页布局，改动集中在 `RelatedBuildingsTable.vue` 与 `detail.vue`/`changedetail.vue`。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:45:54+08:00
+verdict_note: YhwdTable/WdmcDialog/superviseBank 命中 bankBranch/commercial/prefund/getList/getBranch，银行页迁移描述属实。
+---
 # 银行网点列表接口由 list 迁移至 page 分页路径
 苏州市房地产监测V3 中 bankBranch 列表接口分页路径由 /list 迁移至 /page 的前端调整。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:45:53+08:00
+verdict_note: 苏住房C含uni.setStorageSync与setToken，登录态持久化跨端修复描述属实。
+---
 # 登录状态持久化修复
 苏住房C小程序登录状态未缓存，关闭重开即退出，已将Pinia持久化改为全平台生效。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T14:12:26+08:00
+verdict_note: 记忆声称的 zhi2-web-admin/tests/e2e/navbar-sidebar-accessibility.spec.js 及 APP_LAYOUT_VISIBLE_TIMEOUT 常量在门户全项目与产品2.0 全仓均未命中，归属证据不存在，无法证实。
+---
 # Playwright 断言 timeout 机制
 Playwright 断言中的 timeout 表示最多等待多久断言才算失败，而非固定等待后再断言。
 
@@ -12,7 +17,6 @@ Playwright 断言中的 timeout 表示最多等待多久断言才算失败，而
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=2-0
-
 
 <!-- MEMORY_FIELDS
 {

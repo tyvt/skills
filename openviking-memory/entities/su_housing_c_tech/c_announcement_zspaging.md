@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:17:21+08:00
+verdict_note: 苏住房C含useAnnouncementPaging/ZsPaging/goToOther，公告ZsPaging改造属实。
+---
 # 苏住房C业主端公告ZsPaging改造
 苏住房C（zhi2-mobile-shimin）的社区公告与街道公告页已统一改用自定义 ZsPaging 组件与 useAnnouncementPaging hook，并调整电子业主卡报事报修入口为「暂未开放」。
 

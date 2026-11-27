@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:49:18+08:00
+verdict_note: 命中 moduleName/detailMixins/validateDetailRequiredParams/warn/QualificationFormSection/getDetail()/registerFormConsumerMixin，mixin 参数校验属实。
+---
 # 无参数 Mixin 对 getDetail 的错误调用
 在 Suzhou Real Estate Monitoring V3 项目中，`QualificationFormSection.vue` 使用了不带 `moduleName` 的 `detailMixins`，导致 `init()` 在错误的接口上调用了 `getDetail()`。
 
@@ -19,7 +24,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：5584ad88-6363-48c5-9d3d-5f769967f5f6
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:12:41+08:00
+verdict_note: 门户 zs-table.vue 命中 observeTableResize/handleTableResize/syncFixedColumnOffset，容器级 resize 属实
+---
 # zs-table 侧栏收展容器级 resize 重算布局
 门户首页待办等 zs-table 在侧边栏折叠变宽后列间出现空隙，需监听表格容器并走完整布局重算分支。
 

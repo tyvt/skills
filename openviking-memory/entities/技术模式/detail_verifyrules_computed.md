@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:12:32+08:00
+verdict_note: 苏住房G detail.vue 含 verifyRules、computed、indicatorData，规则改计算属性属实。
+---
 # detail.vue校验规则固化于data
 `detail.vue` 将 `verifyRules` 置于 `data()` 导致 `required` 在组件创建时固化，接口返回后 `watch` 更新 `indicatorData` 但规则不重算。
 

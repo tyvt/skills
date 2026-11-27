@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:49:46+08:00
+verdict_note: 苏州市房地产监测V3 命中 chapterComponents(4)、contractContent.vue，glob 映射 prop 注入属实
+---
 # 合同动态组件glob映射prop注入
 苏州市房地产监测V3中，移除全局注册后，动态组件依赖 prop 传入的映射来消除未知组件构建告警。
 

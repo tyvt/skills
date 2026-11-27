@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:41:03+08:00
+verdict_note: 在苏住房C仓源码命中核心符号(8/8)addeventlistener,balancepublicity,echarts,function，涉及文件存在，描述与现状一致，判有效。
+---
 # ECharts 5.3+ 初始化 el 监听非函数报错
 苏住房C 移动端 ECharts 5.4.1 初始化阶段报 `el.addEventListener is not a function`，源自 ECharts 5.3+ 行为变化。
 

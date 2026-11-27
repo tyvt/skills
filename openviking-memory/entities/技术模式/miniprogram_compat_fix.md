@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:27:55+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin/src全库无form-cache.js、getStorageSync、createSelectorQuery，所述云守护小程序兼容修复代码不存在。
+---
 # 苏住房C小程序端兼容修复
 小程序端处理guardApply表单缓存与StatisticsCard图表适配问题，确保跨端正常运行。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

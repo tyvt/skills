@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:51:55+08:00
+verdict_note: zs-table-column.vue 中 updated/doLayout 已移除、floor 仍在，zs-table.vue 含 floor+distributeRemainingWidth，与"移除updated量测"一致
+---
 # zs-table 列宽跳动闭环修复
 苏州市房地产监测V3 中 zs-table-column 在 updated() 全量量测列宽形成闭环，高 DPI 下亚像素致列宽跳动，已移除 updated 量测。
 

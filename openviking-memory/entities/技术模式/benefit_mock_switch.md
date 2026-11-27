@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T09:19:29+08:00
+verdict_note: valid
+---
 # benefit页加mock开关排查列表不显示
 在 src/pages/benefit/index.vue 增加 USE_MOCK 开关，开启直显模拟数据以排查列表不显示问题源于接口或 z-paging 渲染/样式层。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T11:15:19+08:00
+verdict_note: 产品2.0 changeThemeColor 存在但同步的 Element Plus 内置变量 --el-color-primary 全局真实代码0命中，核心修复点无证据。
+---
 # Element Plus 换肤变量同步
 `changeThemeColor` 仅设置自定义变量未同步 Element Plus 内置变量致换肤失效，须同步内置变量。
 ## 问题根因

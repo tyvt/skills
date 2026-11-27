@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T02:30:08+08:00
+verdict_note: scripts/nodejs-build.sh 全仓源码不存在；set -euo pipefail 仅见于 OpenViking 脚本。所述具体文件与改动无源码证据，无法证明有效。
+---
 # bash脚本引号截断报错诊断
 GitLab Runner 执行构建脚本时 bash 报 `line N` 附近 EOF 前少一个 `"` 的语法错，常因拷贝粘贴不完整导致脚本末尾截断、引号未闭合。
 

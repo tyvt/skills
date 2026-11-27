@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:11:34+08:00
+verdict_note: VerificationReceiptDetailDialog.vue 命中 relBusinessId 与 buildSubmitPayload，与记忆'编辑弹窗重拉详情丢字段'三级兜底修复一致。
+---
 # 编辑弹窗重拉详情丢字段
 子表编辑弹窗打开时重请求详情接口，但详情接口不返回某些字段（如 relBusinessId），导致提交更新接口时该字段缺失，后端参数校验 400。
 

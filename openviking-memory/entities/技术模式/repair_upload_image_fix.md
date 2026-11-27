@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:11:06+08:00
+verdict_note: 泰兴小程序 src/components/ZsUploader/ZsUploader.vue 命中 syncFileListFromPicker，上传缩略图同步修复属实。
+---
 # 报修页上传图片不显示修复
 泰兴小程序报修页 `ZsUploader` 上传状态同步问题已修复，微信小程序构建通过，双端组件已同步。
 

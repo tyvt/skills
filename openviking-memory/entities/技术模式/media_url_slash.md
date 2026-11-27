@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:25:56+08:00
+verdict_note: 苏住房C 命中 resolveMediaUrl、zhi2-pro，媒体相对路径修复对应代码存在。
+---
 # H5 子目录部署媒体相对路径被拼前缀
 苏住房C 的 zhi2-mobile-shimin 在 H5 子目录部署时，resolveMediaUrl 返回不带前导斜杠的相对路径，浏览器按当前页面路径拼接致图片 404。
 

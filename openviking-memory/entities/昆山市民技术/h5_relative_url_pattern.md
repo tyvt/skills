@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:48:03+08:00
+verdict_note: 昆山市民 resolveAssetUrl.js 含 resolveServerAssetUrl、resolveLocalStaticUrl，H5 相对路径规范属实。
+---
 # 昆山市民H5资源与接口相对路径规范
 H5 嵌入/子目录场景下，接口与媒体地址统一走相对路径（无前导斜杠、不加 /h5 段），小程序端仍用 IMAGE_BASE 拼完整域名。
 

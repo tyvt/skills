@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:49:50+08:00
+verdict_note: 核对园区物管2.0：pubReceiptVerificationDetail、VerificationReceiptDetailDialog 命中，relBusinessType 回写规则一致。
+---
 # 编辑态选择弹窗回写不得覆盖详情接口分类字段
 园区物管2.0 核销回单编辑态下，选择弹窗回写时不得覆盖详情接口已落库的 relBusinessType 字段。
 

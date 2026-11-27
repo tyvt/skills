@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:34:31+08:00
+verdict_note: 惠山二期G VotingItemsDialog.vue含ownerFileList、join、「其他材料」label，detail-template含getAttachmentFiles，与附件显示修复一致。
+---
 # 选项表决附件显示修复
 惠山二期G 后台选项表决详情查看表决项时附件显示不正确的修复，已合并三个分支。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=惠山二期G
-
 
 <!-- MEMORY_FIELDS
 {

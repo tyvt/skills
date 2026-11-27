@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:49:40+08:00
+verdict_note: 实机 isSuzhouzhizai 仅见于 docs/frontend/common-errors.md 记录，业务代码中已移除，与记忆“已移除区域分支”的现状一致。
+---
 # 区域分支 isSuzhouzhizai 移除规范
 多个文件包含未统一的 isSuzhouzhizai/currentEnvironment 分支，已将其移除以整合通用公共逻辑。
 

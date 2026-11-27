@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:46:11+08:00
+verdict_note: presale/template/detail.vue-49 命中 -gutter="24"；label-width≈140px 有 e2e register-layout.spec.js 佐证，表单对齐描述属实。
+---
 # 表单项要求 gutter 和 label-width 对齐
 在 苏州市房地产监测V3 项目中，`template/detail.vue` 接收 `:gutter="24"` 和 `label-width="140px"`；所有的 `el-col` 都位于 `<el-row :gutter="24">` 内部，以对齐 `versionManagement/detail.vue` 的三列布局。
 

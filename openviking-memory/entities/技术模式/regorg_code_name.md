@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:13:15+08:00
+verdict_note: 产品2.0含regOrg.js及getSubdistrictName/getBenefitRegCompanyName，街道社区编码名称统一工具属实。
+---
 # 街道社区编码名称统一工具 regOrg.js
 产品2.0 中公共收益/物业协议等模块选择街道/社区后页面显示编码而非名称，抽公共工具 regOrg.js 统一收敛口径。
 

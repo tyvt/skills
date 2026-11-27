@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T18:41:24+08:00
+verdict_note: 苏住房后端仅README提及 zhi2-property-api、pom含SNAPSHOT；com.zhishu.property.api.complex.util 与 2.5-SNAPSHOT 均无实据，Nexus快照落后属历史构建事实无法证明。
+---
 # Maven 缺自家包因 Nexus 快照落后源码
 全量 Maven 构建报缺 com.zhishu.property.api.complex.util，根因是 Nexus 上发布的 SNAPSHOT 构件比分支源码旧，需先本地 install 依赖模块再续建。
 

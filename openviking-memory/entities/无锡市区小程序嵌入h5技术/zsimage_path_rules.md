@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:19:01+08:00
+verdict_note: 无锡市区小程序嵌入H5 ZsImage.vue-33 含 IMAGE_BASE，H5/小程序分支路径逻辑在组件中可查，路径规则描述属实。
+---
 # ZsImage在H5子路径部署下的路径规则
 zhi2-mobile-admin-h5-c-unlimited部署在/sz/等二级路由且vite base为'./'时，ZsImage.vue在H5端走相对路径，小程序仍用IMAGE_BASE。
 

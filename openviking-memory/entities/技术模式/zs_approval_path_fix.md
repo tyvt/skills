@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:17:15+08:00
+verdict_note: 产品2.0 含 zs-approval/ApprovalProcessDialog 与 requestBody，审批补 path 修复所涉组件存在，无反证。
+---
 # 审批接口未传 path 修复
 产品2.0 的 zs-approval 组件审批请求体缺失 path 字段问题已修复。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

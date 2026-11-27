@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:41:40+08:00
+verdict_note: 苏住房G complexChange/detail.vue 实存；resolveRecordName/complexName/originalObj/detailCallback/rangeTable 等 distinctive 符号全部命中，四级回退描述属实。
+---
 # 变更单名称字段统一回退模式
 在苏住房G项目 complexChange/detail.vue 中，变更单 add 模式下名称字段需通过 resolveRecordName 四级回退统一取值。
 ## 问题背景

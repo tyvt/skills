@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:14:49+08:00
+verdict_note: skills/dsh/cost-meter/lib/index.js 含 stepReminderThreshold、askUserLongWaitMs、step-guard/ask-wait，一致。
+---
 # dsh cost-meter 插件
 dsh（DeepSeek Harness）的成本计量插件，监控会话步数与 ask_user 等待时长并发送提醒。
 ## 新增检查（A2）

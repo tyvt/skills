@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:58:47+08:00
+verdict_note: 监测V3 check-amount-input-placeholder.mjs 含 placeholder/disabled/readonly，ParcelDialog.vue 含占位符，扫描补齐描述属实
+---
 # 金额输入未配占位符致提示遗漏
 `AmountInput` 仅做 `$attrs` 透传，未传 `placeholder` 时不显示提示，宗地弹窗土地面积项遗漏，已通过脚本扫描补齐。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:14:07+08:00
+verdict_note: 苏州V3 conLandLic/AppendixPackageSection/checkRequiredAppendix/busCode 060602 全命中，内联要件描述属实
+---
 # 建设用地规划许可证详情页内联要件
 苏州市房地产监测V3 项目中，截图红框标注的「附件块」已在建设用地规划许可证详情页落地，实现方式与预售延期、人员备案等页面内联要件一致。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

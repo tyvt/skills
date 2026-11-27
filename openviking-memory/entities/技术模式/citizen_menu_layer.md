@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:32:55+08:00
+verdict_note: 苏住房C menuRouteMap.js-6,9 有 MENU_ROUTES、store/menu.js-4,7 有 menus.fallback.json 与 app.suzhufang.config；菜单三层来源属实。
+---
 # 市民端菜单三层来源
 苏住房C 市民端菜单由硬编码入口页、路由码映射表、后台配置键三处共同决定，改动时需同步理解各自职责。
 

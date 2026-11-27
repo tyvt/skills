@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:20:17+08:00
+verdict_note: buildingTable/index.vue、projectForm.vue 命中；building-container/building-page-tabs 命中 index.scss，留白修复描述有据。
+---
 # 项目信息与楼盘表间留白修复
 苏州市房地产监测V3 中楼盘表页项目信息卡片与下方楼盘表/图例之间留白过大的 bug 已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:44:48+08:00
+verdict_note: 无锡市区小程序嵌入H5 的 ZsMap.vue 存在；记忆为 Logo/POI/静态图场景区分结论，未声称已落地具体修复
+---
 # uni-app ZsMap的Logo误点与enable-poi限制
 ZsMap使用uni-app原生<map>（腾讯地图），需处理Logo误点跳转及H5上enable-poi限制。
 

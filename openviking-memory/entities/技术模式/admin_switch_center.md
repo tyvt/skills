@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:41:57+08:00
+verdict_note: detail-form.scss-7 align-items-start、-61 min-height-38px、-57 el-switch；element-ui.scss 同样含开关居中规则，与记忆一致。
+---
 # 管理员管理启用状态开关垂直居中修复
 修复了苏州市房地产监测V3中管理员管理详情页「启用状态」开关在栅格行内未垂直居中的问题。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

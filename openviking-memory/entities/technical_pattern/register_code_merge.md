@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:53:48+08:00
+verdict_note: 实机核对：V3 InstitutionRegisterSingleForm.vue(328) codeForm、registerValidate、smsCode、clearValidate 均在；合并验证码字段兼容校验属实。
+---
 # 注册表单合并验证码字段兼容校验
 苏州市房地产监测V3 中 formModel 通过 computed 合并 codeForm.code/smsCode 且 v-model 绑定 codeForm，与 Element UI validate() 正常配合。
 

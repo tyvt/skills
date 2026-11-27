@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:57:38+08:00
+verdict_note: 门户 publicPortal components/PropertyDetailDialog.vue 实存，标签左对齐偏好与该文件现状相符。
+---
 - 门户 publicPortal 系列详情弹窗（公司/许可证/房屋等）字段标签默认勿用 text-align: right，用户验收要求标签区左对齐
 - 改 .portal-detail-row 与预售用途行 .portal-permit-purpose 的 text-align 为 left
 - 房屋详情若未单独设对齐则保持默认左对齐即可

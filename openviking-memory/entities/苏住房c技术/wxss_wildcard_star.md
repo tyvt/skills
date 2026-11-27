@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:12:59+08:00
+verdict_note: 苏住房C PasswordForm(5)/form.scss(6)/form2.scss(20)命中，条件编译适配目标存在。
+---
 # 微信小程序WXSS不支持> *通配符致form.scss编译错
 苏住房C（uni-app）中PasswordForm.vue引入的form.scss使用`> *`子选择器，因微信小程序WXSS不支持通配符`*`导致编译报错，需通过条件编译适配MP端。
 ## 现象与根因

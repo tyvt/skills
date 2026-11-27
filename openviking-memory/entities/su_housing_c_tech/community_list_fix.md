@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:14:41+08:00
+verdict_note: 苏住房C link-icon命中、flex-shrink广泛，community/info列表flex布局修复目标存在。
+---
 # 业主辖区小区列表布局修复
 苏住房C 小程序 `pages_owner/community/info/index.vue` 中辖区小区列表因 flex 布局导致封面图被长地址挤压，已修复。
 

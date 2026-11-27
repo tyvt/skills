@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:10:18+08:00
+verdict_note: 苏州市房地产监测V3 docs/frontend/common-errors.md 与 AGENTS.md 记录 zs-select-dialog scale 测量坑，e2e 命中 getBoundingClientRect，技术结论属实。
+---
 # 弹窗表格宽度测量坑
 苏州市房地产监测V3 中弹窗表格在开场缩放动画中因宽度量错导致表格未撑满、布局错乱的根因与修复要点。
 

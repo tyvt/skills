@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:27:12+08:00
+verdict_note: companyAdmin/detail.vue-32,490 有 showChangeButton 计算属性，权限串 company-companyAdminChange-change 见 companyAdminChange.js-6，与描述一致。
+---
 # 因权限失败而隐藏的修改按钮
 管理员详情页面中的“修改”按钮由于 companyAdmin/detail.vue 文件中的权限验证失败而未显示。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:26:08+08:00
+verdict_note: 实机核对 skills/dsh/token-models/lib/client.js 与 index.js 存在 orchElapsed/elapsedSec/fmtDur/rowsFromOrchestrator，插件结构与描述一致。
+---
 # dsh-token-models
 DSH 的 token 模型展示插件，在 Models 面板（含编排器区块）展示各模型用量与耗时统计。
 

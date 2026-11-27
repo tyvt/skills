@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:19:20+08:00
+verdict_note: 园区公共收益 BuildingTable.vue 含 getUnitRooms/getUnitColumns，CandidateDialog.vue 含 disableHouseCheck，列错位修复属实。
+---
 # 筹备组征集楼盘表视图列错位修复
 修复园区公共收益项目筹备组征集新增报名选择户室时，楼盘表视图因楼层单元不一致导致列错位的问题。
 ## 主修复 BuildingTable.vue

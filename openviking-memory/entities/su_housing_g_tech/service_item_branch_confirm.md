@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:50:59+08:00
+verdict_note: 苏住房G 服务事项栏实存 serviceItem 与 terminalType 判断代码，sidebar 修复记录与现状一致。
+---
 # 服务事项列表页服务类别侧边栏修复确认
 苏住房G项目确认 develop/v2.6.2-suzhufang 分支服务事项列表页服务类别侧边栏修复已提交，无需重复修改。
 

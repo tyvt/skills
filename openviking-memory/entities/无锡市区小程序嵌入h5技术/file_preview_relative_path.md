@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:16:40+08:00
+verdict_note: 无锡市区小程序嵌入H5 命中 resolveFilePreviewUrl、filePreview，相对路径改造属实
+---
 # 文件预览地址相对路径改造
 filePreview 的地址解析改为与 ZsImage 一致，新增 resolveFilePreviewUrl 按平台处理路径。
 

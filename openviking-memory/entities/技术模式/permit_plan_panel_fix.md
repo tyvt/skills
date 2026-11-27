@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:13:10+08:00
+verdict_note: PermitPlanPanel.vue 命中 showMaintainButton；planPanelReadonly/canOperatePlan/AppendixEmpty 均命中，展示逻辑修复属实。
+---
 # 预售方案区块展示逻辑修复
 苏州市房地产监测V3 调整了 `PermitPlanPanel` 未维护且无操作权限时的展示逻辑，避免出现只有缺省图没有维护按钮的情况。
 

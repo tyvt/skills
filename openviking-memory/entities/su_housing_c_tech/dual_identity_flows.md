@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:12:53+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin含verification/authentication两套流程与FormNonLocal/UnauthorizedPage，双身份流程属实。
+---
 # 苏住房C含实名与房屋身份两套独立流程
 仓库主体为 zhi2-mobile-shimin（uni-app+Vue3+Vite），含实名认证与房屋身份认证两套独立流程。
 

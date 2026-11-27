@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:32:16+08:00
+verdict_note: 苏住房系 uni.scss 存在 .checklist-box margin-right-0!important，step1.vue 存在 margin-right-32rpx 覆盖，描述属实。
+---
 # Global style forced zero margin caused elevator options sticking
 In SuHousingC, global `uni.scss` forced `.checklist-box` zero margin, causing `step1.vue` elevator options no spacing, fixed in cursor session f19a79a2.
 

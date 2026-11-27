@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:50:48+08:00
+verdict_note: 园区物管2.0 实存 scrollFormToFirstError 与 candidate-form-box 容器，校验滚动定位属实。
+---
 # 表单校验失败滚动定位
 Element UI 校验失败仅标红不滚动，需在自定义滚动容器内新增 scrollFormToFirstError 实现定位聚焦。
 
@@ -18,7 +23,6 @@ Element UI 校验失败仅标红不滚动，需在自定义滚动容器内新增
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

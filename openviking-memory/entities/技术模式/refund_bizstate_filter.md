@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:46:35+08:00
+verdict_note: 工具/偏好/知识类记忆，核心符号在 skills 与 OpenViking 仓源码/配置全部命中，描述与现状一致，判有效。
+---
 # 资金返还列表业务状态筛选补全
 惠山G 项目 zhi1-web-admin 中资金返还（refund）列表页筛选区新增「业务状态」下拉，改动与同项目其他列表页一致。
 

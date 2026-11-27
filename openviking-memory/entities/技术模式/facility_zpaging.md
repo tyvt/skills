@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:52:14+08:00
+verdict_note: 泰兴小程序 pages_facility/facility.vue 含 z-paging 与 reload，属实
+---
 # facility.vue改用z-paging分页
 泰兴小程序设施设备列表页 `facility.vue` 已改为使用 `z-paging` 分页，与维修项目等页面保持一致。
 

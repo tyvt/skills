@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:18:03+08:00
+verdict_note: 苏住房C 命中 contractPDF、webViewNav、pages_transaction，合同 PDF WebView 描述属实
+---
 # 交易合同PDF预览修复
 苏住房C小程序中合同示范文本通过web-view打开H5 PDF导致空白，已改为直接调用原生PDF预览。
 

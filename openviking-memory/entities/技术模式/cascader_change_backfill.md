@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:12:28+08:00
+verdict_note: 存在 projectChange/detail.vue 级联回填与 onCascaderChange/shouldReset 区分手动与回填模式，与描述一致
+---
 # 详情回填复用级联 change handler 会清掉下游字段（产品2.0）
 产品2.0 项目变更详情页回填接口数据后复用级联 change handler 把下游字段清空，需 shouldReset 参数区分手动切换与回填。
 

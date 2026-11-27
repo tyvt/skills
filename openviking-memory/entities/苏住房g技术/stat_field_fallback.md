@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:47:39+08:00
+verdict_note: feeDeclare2/detail.vue 命中 queryOweFeeStatistic，统计接口合并回退链落点在。
+---
 # 统计接口覆盖详情字段致金额清0的三段回退链
 详情页先合并详情接口金额，再调统计接口时若直接用 ?? 明细汇总会覆盖成 0，须按「统计接口值→表单已有值→明细汇总→0」回退。
 

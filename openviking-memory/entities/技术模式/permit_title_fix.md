@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:13:20+08:00
+verdict_note: 苏州市房地产监测V3 PermitApprovalDialog命中(2)，预售许可审批弹窗标题修复目标存在。
+---
 # 预售许可证审批弹窗标题修复
 苏州市房地产监测V3 项目中修复预售许可审批弹窗（`PermitApprovalDialog.vue`）标题重复「审批」的问题，改为直接使用节点标签。
 ## 问题原因

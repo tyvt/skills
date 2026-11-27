@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:44:18+08:00
+verdict_note: auxiliaryProject 目录实存；detailMixins/houseTable/houseDialog/houseDialog 命中，辅助房屋重命名描述属实。
+---
 # 配套用房更名及封闭设施删除回写风险
 苏州市房地产监测V3 中配套用房模块已统一命名但侧栏旧名需后台改，且删除封闭设施字段可能因 detailMixins 回写需保存前过滤。
 

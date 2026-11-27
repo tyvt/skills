@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:09:20+08:00
+verdict_note: 命中 InformationPages.vue 的 portal-notice-title 插槽与 e2e/public-portal-interactions.spec.ts，公告标题复用详情路由属实。
+---
 # 在公告标题链接中复用详情路由
 门户规范：公共公告标题列通过高亮链接复用详情路由。
 

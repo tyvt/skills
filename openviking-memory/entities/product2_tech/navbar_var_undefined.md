@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:33:52+08:00
+verdict_note: 产品2.0 有 Navbar.vue 但未找到「未定义宽度 CSS 变量」导致标题与菜单重叠的具体证据（CSS 变量命中 n=0），无法证明有效。
+---
 # Navbar title and menu overlap due to undefined width CSS variable
 Navbar.vue uses --sidebar-expanded-width, but that variable is only defined in the unloaded variables.scss, while the effective variables.css does not define it, causing long titles to overlap with the top menu.
 
@@ -22,7 +27,6 @@ Navbar.vue uses --sidebar-expanded-width, but that variable is only defined in t
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：3c5a02bd-dab4-4af1-8656-5c6fc9ed5b9d
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:45:15+08:00
+verdict_note: 园区公共收益 pubBankDetailDay/index.vue 命中 doLayout，bankReceiptColumns 已移除，与记忆所述改静态列+doLayout 一致。
+---
 # 银行回单表动态列与固定操作列镜像错乱
 园区公共收益项目(zhi2-web-admin)中，业务对账页银行回单表用 v-for 动态列 + 右侧固定操作列导致列顺序镜像错乱。
 

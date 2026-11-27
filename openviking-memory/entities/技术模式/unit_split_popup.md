@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:52:57+08:00
+verdict_note: 园区物管2.0 houseImport/detail.vue 实查无 form-box/el-empty/mini，unit/index.vue 无 el-empty/common，所述分场景重构在当前代码无法证实
+---
 # 单元拆分弹窗UI布局修复
 园区物管2.0 中单元拆分弹窗曾存在布局容器错用、空数据异常、弹窗偏大、加载闪烁问题，已按数据量分场景重构布局。
 

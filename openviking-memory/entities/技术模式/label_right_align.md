@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:53:39+08:00
+verdict_note: 命中 zs-form/label-position/detail-from/labelWidth，编辑态标签右对齐全局调整属实。
+---
 # 编辑态横向表单标签右对齐全局调整
 苏州市房地产监测V3 已完成编辑态横向表单标签右对齐全局调整，默认仍 top。
 

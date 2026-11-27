@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:17:11+08:00
+verdict_note: 无锡市区小程序嵌入H5 detail.vue 源码命中 updateFixedLayout，z-paging 嵌套布局修复属实。
+---
 # z-paging嵌套布局样式修复
 z-paging 默认全屏 fixed 布局嵌套在卡片中会覆盖标题，需提升到页面根级并使用插槽修复。
 

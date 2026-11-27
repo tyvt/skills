@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:49:23+08:00
+verdict_note: 太仓G 实存 MaintainResultDialogLite.vue、VoteViewLite.vue、detail.vue，小数处理修复一致。
+---
 # 选项表决结论维护占比小数位修复
 太仓G 选项表决「表决结论维护」弹窗中参与户数占比、参与面积占比因浮点除法直接赋值而显示过长小数位，已修复为保留两位小数。
 

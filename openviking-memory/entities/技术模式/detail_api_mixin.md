@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:12:01+08:00
+verdict_note: 苏州V3 含 detailMixins/detailApiFull/delYhwdgl 及 /prefund/bankBranch/delete，详情接口统一 mixin 属实。
+---
 # 详情接口须用mixin禁自定义
 苏州市房地产监测V3中多个详情页删除自定义getDetail改用mixin，维护模块统一POST ${url}/detail含动态主键。
 

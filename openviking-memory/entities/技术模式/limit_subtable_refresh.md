@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:13:26+08:00
+verdict_note: 苏州V3 house-limit-helpers.js/limitFormMixin.js 命中，houseLimit 分页接口真实存在。
+---
 # 限制单据保存后子表不刷新修复
 苏州市房地产监测V3 修复了限制单据保存后子表不刷新的问题，变更集中在 `limitFormMixin.js`。
 

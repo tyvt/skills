@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:17:17+08:00
+verdict_note: 产品2.0/园区公共收益 pubRegulatoryAccount/detail.vue 命中 canEditRegulatoryAccountFields，银行回传只读逻辑属实
+---
 # 监管账户银行回传账号只读修复
 淮安物管开户申请与物业账户模块中，银行回传的账号在编辑模式下不应可修改，已修复为只读。
 

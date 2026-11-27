@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:22:47+08:00
+verdict_note: zs-input.vue 命中 medium/mini 尺寸映射，ElInput size 归一化属实
+---
 # ElInput size 非法值兼容归一化
 Element Plus ElInput 的 size 仅接受 ""|default|small|large，历史传 mini/medium 会告警，需在 ZsInput 封装层做映射。
 

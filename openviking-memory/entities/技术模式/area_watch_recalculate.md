@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:18:44+08:00
+verdict_note: 苏住房G 命中 aboveFloorArea/underFloorArea/complexBuildingAuth/AmountInput，watch 重算属实
+---
 # 面积字段watch重算总面积
 苏住房G项目多处详情页将地上/地下面积字段的change事件改为watch监听自动重算总建筑面积。
 ## 改动文件

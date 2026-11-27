@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:23:28+08:00
+verdict_note: 两轮全仓及苏住房C路径核对均无 openAutomaticRobot.js/HomeRobotFloater/isJumping 源码，无法证明该节流修复存在
+---
 # Android机器人问答页双跳节流方案
 苏住房C 安卓上打开机器人会进入两次问答页面，根因是组件内去重标志无效，须用模块级时间戳节流。
 

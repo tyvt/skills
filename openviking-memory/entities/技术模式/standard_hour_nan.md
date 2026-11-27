@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:12:37+08:00
+verdict_note: 泰兴小程序 parseStandardHour命中(2)，pages_facility/record(record/add.vue)存在，工时校验修复属实。
+---
 # 标准工时未校验致非法格式存为NaN
 泰兴小程序 `add.vue` 直接使用 `Number()` 转换标准工时，致 `0.0.5` 等非法格式存为 `NaN`，新增 `parseStandardHour` 校验并兜底展示。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:12:10+08:00
+verdict_note: H5 项目 App.vue 存在 ensureLingxiLogin/linxiLogin 登录流程与全屏 loading，与描述一致
+---
 # 灵犀登录全屏Loading
 在 src/App.vue 的 ensureLingxiLogin() 中增加全屏 loading 遮罩，保证登录期间有遮罩且 loading 必关闭。
 

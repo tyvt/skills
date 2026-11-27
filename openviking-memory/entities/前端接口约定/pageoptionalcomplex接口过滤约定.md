@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:42:32+08:00
+verdict_note: 园区物管2.0 benefit/alert/detail.vue-279 complexId 取 currentProjectId，符合接口过滤约定
+---
 # pageOptionalComplex接口过滤约定
 园区物管2.0 benefit模块详情页可选资源分页接口必须按当前项目过滤的约定。
 ## 背景

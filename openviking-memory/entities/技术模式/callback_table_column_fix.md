@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:47:26+08:00
+verdict_note: 产品2.0 detail.vue 命中 formMode!=add/zs-table-column/zs-select/min-width/width-100%，回调表格列宽修复属实。
+---
 # 集成回调配置子表与列宽修复
 产品2.0（zhi2-web-admin）系统管理同步日志/登录日志菜单的 `detail.vue` 中，新增时不应显示子表、子表列宽被压窄，已修复。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

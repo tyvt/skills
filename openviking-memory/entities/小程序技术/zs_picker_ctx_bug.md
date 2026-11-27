@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T14:13:25+08:00
+verdict_note: 记忆称已删除未使用的 getCurrentInstance().ctx.$attrs，但苏住房C ZsPicker.vue 中 const attrs = ref(getCurrentInstance().ctx.$attrs) 仍在，删除未落地，描述与现状不符。
+---
 # 苏住房C真机白屏因ZsPicker取ctx.$attrs未定义
 苏住房C市民端memberForm页在微信真机整页白屏而模拟器正常，根因是公共组件ZsPicker初始化阶段执行了未使用的getCurrentInstance().ctx.$attrs，真机ctx为undefined抛错。
 

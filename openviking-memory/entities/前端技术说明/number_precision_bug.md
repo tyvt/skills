@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:10:40+08:00
+verdict_note: 苏住房防汛C端 src/stores/flood.ts 命中 submitInspectionRemote/submitRescueRemote 与 templateItemId，Long 精度修复目标代码属实。
+---
 # store.flood.ts 中 Snowflake Long 精度丢失（Number() 崩溃）
 在 Su 住房保障防汛 C 端的 store.flood.ts 中，使用 Number() 转换 19 位的 Snowflake Long ID（eventId/templateItemId）会丢失最后几位数字，导致后端 400 错误和“重复项目”的虚假症状。
 

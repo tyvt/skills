@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:34:19+08:00
+verdict_note: 园区公共收益request.js含landPlotCode，pageRequestContext.js含toAsciiHeaderValue、request.js导入getLandPlotCodeRequestHeaders，与请求头机制一致。
+---
 # landPlotCode自动写入zs-remark请求头
 园区公共收益同源 Web 后台(zhi2-web-admin)约定：请求体或参数带 landPlotCode 时，拦截层自动写入 zs-remark 请求头。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:46:05+08:00
+verdict_note: 无锡市区小程序嵌入H5 实存 sfbFaceAuth.js、bdc.vue、face.vue，normalizeSfbFaceResponse 描述一致。
+---
 # 苏服办人脸识别回调JSON字符串修复
 苏服办SDK的success回调返回JSON字符串而非对象，导致人脸识别被误判失败，已在sfbFaceAuth.js修复。
 

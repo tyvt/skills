@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:44:04+08:00
+verdict_note: 苏住房G listMixins.js/table.js、complex/index.vue 实存 apiMethod/post 与 pageNew，旁路同源修复属实。
+---
 # listMixins 切 POST 接口旁路请求同源
 综合查询多条件混合搜索接口换 pageNew 且只支持 POST，需页面声明 apiMethod:'post' 并让导出/打印校验共用同一请求方法。
 

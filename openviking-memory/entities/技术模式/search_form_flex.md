@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:22:43+08:00
+verdict_note: DictDataDialog.vue、zs-dialog.vue、detail-form.scss 在产品2.0/苏州V3命中，search表单flex方案属实
+---
 # search_form_flex
 搜索表单中的 flex 对齐冲突导致项目 苏州市房地产监测V3 中的字典对话框错位。
 ## 问题
@@ -15,7 +20,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：f3c35b72-3629-4796-b668-c4d4ead84829
-
 
 <!-- MEMORY_FIELDS
 {

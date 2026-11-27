@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:13:35+08:00
+verdict_note: 产品2.0 命中 UnitTable.vue/unitTable.vue 组件，Windows 大小写导入修复主题属实
+---
 # Windows 大小写不敏感掩盖 import 路径大小写错误
 本地 Windows 构建通过、提交后 Linux CI 构建因 import 路径大小写与实际文件名不一致而必挂，此类问题本地任何检查都发现不了。
 

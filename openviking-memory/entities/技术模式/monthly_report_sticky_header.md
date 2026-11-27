@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:46:25+08:00
+verdict_note: monthlyReportStat/detail.vue 命中 sticky，表头吸顶样式在。
+---
 # 月报统计详情表头吸顶返工（禅道 2730）
 禅道 2730「物业管理信息月报表前端交互体验优化」任务的详情表头吸顶返工已完成代码提交推送与禅道附图回写，chain 目标达成。
 

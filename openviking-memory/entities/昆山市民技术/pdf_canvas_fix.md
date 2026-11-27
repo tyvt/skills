@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:15:58+08:00
+verdict_note: filePreview.vue 命中 offsetWidth、createElement、canvas，与PDF预览scroll-view/canvas修复描述一致。
+---
 # H5合同PDF预览 scroll-view与uni canvas不可用
 H5 下 `scroll-view` 与 uni-app `<canvas>` 导致物业合同 PDF 预览失败，需改用原生 canvas + pdfjs。
 

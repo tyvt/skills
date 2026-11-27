@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:33:25+08:00
+verdict_note: 门户index-new.vue无flow-step-cell、dw()、-key描述内容，门户全库亦无flow-step-cell，与记忆所述步骤条样式问题不符。
+---
 # 步骤条的箭头及窄屏错位
 门户中的 `index-new.vue` 里的步骤条 (`.flow-step-cell`) 使用了固定的 12px CSS 箭头和 `padding-right: dw(14)`，在窄屏下错位并导致水平溢出；`v-for` 使用了 `:key='si'`，这不是稳定的业务键。
 

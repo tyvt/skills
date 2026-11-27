@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:17:06+08:00
+verdict_note: 苏住房C 的 menuRouteMap.js/custom-tab-bar 命中，sfb 分支与 pages.json 分包迁移方法论有据；子模块先行父仓更新指针属实。
+---
 # 双分支子模块间功能互迁固定打法
 苏住房C采用superproject+子模块zhi2-mobile-shimin双分支开发，功能互迁须子模块先迁再更新父仓指针。
 

@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-28T02:45:05+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin 实存 pages_owner/house/index.vue、Bg-szf.png、ZsImage.vue，条件编译修复一致。
+---
 # 业主房源页背景图条件编译修复
 苏住房C `pages_owner/house/index.vue` 中 `.top-empty` 等本地 WXSS 背景图在微信小程序端报错，已改为条件编译写法。
 
@@ -18,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

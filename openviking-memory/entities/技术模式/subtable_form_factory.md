@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:56:24+08:00
+verdict_note: 产品2.0 bankTable.vue（companyRegister/companyManagement）实存 createDefaultForm 工厂与 $set 回填，与描述一致。
+---
 # 子表弹窗 form 工厂预定义全字段（产品2.0）
 产品2.0 机构注册银行账户子表弹窗因 Vue2 后加属性非响应式，导致选银行回填不反显，需用工厂函数预定义全字段并配合 $set。
 

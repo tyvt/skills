@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:16:34+08:00
+verdict_note: 苏州V3 含 narrative-line/PresalePlanFillForm/clearable，窄框输入框清除图标重叠修复属实。
+---
 # 窄框输入框清除图标重叠修复
 zs-input 默认 clearable 在窄框与占位符重叠，已通过关闭清除图标与调整布局修复。
 

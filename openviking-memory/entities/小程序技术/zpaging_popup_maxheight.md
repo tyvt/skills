@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:13:12+08:00
+verdict_note: 苏住房C/zhi2-mobile-shimin 命中 popup.vue、hooks/usePaging.js，aroundProjectName/computedList 特征均在，代码与描述一致
+---
 # z-paging 放入 uni-popup 弹窗列表空白
 苏住房C 小程序中 z-paging 放入自定义 uni-popup 弹窗时列表空白，接口有数据但不显示。
 

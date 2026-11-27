@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:48:09+08:00
+verdict_note: views/components/BuildingTable.vue-220/229 命中 flex-shrink-0、white-space-nowrap，zs-select-dialog.vue 命中 building-table-mode，禁止压缩属实。
+---
 # building_dialog_noshrink
 对话框中的建筑表格遭受 flex 压缩导致标签垂直显示；需要禁止压缩并启用水平滚动。
 
@@ -26,7 +31,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区公共收益
-
 
 <!-- MEMORY_FIELDS
 {

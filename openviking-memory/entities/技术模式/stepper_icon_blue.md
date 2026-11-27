@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:50:36+08:00
+verdict_note: 苏州市房地产监测V3 register-step/README.md 引用 generate-register-step-icons.py，图标资源目录存在，与记忆一致。
+---
 # 注册Stepper完成态图标须蓝底白文档与步骤统一
 苏州市房地产监测V3 中 step-info-complete.png 原样式与后续步骤完成态不一致，需改用蓝底白文档原设计稿并重生成图标。
 

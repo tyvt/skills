@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-28T01:41:55+08:00
+verdict_note: 门户仓库 UnifiedLogin.vue、openNotice.js 实存；extractPageRows/noMessage/skipAuthDialog/applyCode 命中，免登录+空态+解析兼容描述属实。
+---
 # UnifiedLogin 预售公告列表
 门户 UnifiedLogin 接入的预售许可公告列表功能，涵盖免登录接口、注销过滤、空态与解析兼容等实现要点。
 
@@ -32,7 +36,6 @@
 - 验证证据：extracted source=cursor project=门户
 - 验证证据：审查结论指出 presaleList 初始空且无 loading、解析只用 res.data、cancelFlag 未覆盖数字 1；另含 src=门户/033.md 与 cursor 会话提取
 - 所属项目：门户；来源会话：074a72f3-331b-40b4-8c2f-331816b2d29d、6b002207-e45f-4242-836c-3b25c34bb174；代码基线：04586c4
-
 
 <!-- MEMORY_FIELDS
 {

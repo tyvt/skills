@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:51:28+08:00
+verdict_note: V3 allocation 实存 TransactionDetailTable 与 title-text 用法，外层标题重复修复属实。
+---
 # 资金调拨详情外层Headline标题重复
 苏州市房地产监测V3 中 allocation/detail.vue 等页面的外层 Headline 与 TransactionDetailTable 内置默认标题"明细"重复，需移除外层标题改用表格标题。
 

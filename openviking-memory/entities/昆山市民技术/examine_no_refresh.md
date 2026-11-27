@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T01:47:53+08:00
+verdict_note: 昆山市民 pages_examine 文件实存，但记忆核心修复 refreshKey 全仓 0 次；examineDetail.vue 仅 onLoad 无 onShow/refreshKey，operationBtn 无 refreshKey。描述与现状不符。
+---
 # 保险立项审核后页面未刷新
 昆山市民小程序从消息通知再次进入保险立项详情时，审批成功后按钮与详情未刷新，再点审核报单据已被处理。
 

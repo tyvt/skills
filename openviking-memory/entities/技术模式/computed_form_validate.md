@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:19:07+08:00
+verdict_note: 苏州市房地产监测V3 中 registerValidate、clearValidate、companyRegister 命中，computed 表单校验改造属实。
+---
 # 计算属性合并表单配合Element UI校验
 formModel 用 computed 合并 codeForm.code/smsCode 且 v-model 绑定 codeForm，可正常配合 Element UI validate() 校验；企业端与机构端验证码字段不一致需统一 clearValidate 与清空。
 

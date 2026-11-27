@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:15:27+08:00
+verdict_note: 园区物管2.0 命中 mapOverview/chartOptions.js 的 selectedMode 与 silent，ECharts 地图三态去高亮属实。
+---
 # ECharts 地图去高亮三态禁用
 园区物管2.0 的 ECharts 地图要求鼠标移入和点击都不出现高亮，只保留代码控制的轮播高亮。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:32:00+08:00
+verdict_note: i淮安H5/苏住房C elect/DecisionResult.vue 存在 btn-container 与「修改选举」按钮，flex 居中修复代码在源。
+---
 # 选举页修改按钮居中修复
 苏住房C 投票页「我的选举」底部「修改选举」按钮因 flex 横向排列导致宽度收缩、未居中，已在 cursor 会话 e1dc3fb9 修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:31:12+08:00
+verdict_note: 产品2.0 spFeeBill/components/discountDialog.vue、discountTable.vue 存在 discountType 双字段方案，描述属实。
+---
 # 账单优惠双模式共用输入框缺陷
 账单优惠弹窗按金额与按比例共用同一输入字段，导致选金额无框、选比例填金额。
 

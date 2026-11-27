@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:19:27+08:00
+verdict_note: 产品2.0 collectionDialog.vue 用 spOrder(L441)/payState(L301)/startPolling/stopPolling 轮询，已无 queryOrderStatus，与记忆描述一致。
+---
 # 支付状态轮询改用订单详情
 物业收费/账单收款弹窗轮询支付完成时，禁用不存在的 /queryOrderStatus，改为查订单详情接口取 payState 判定已支付。
 

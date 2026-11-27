@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:17:41+08:00
+verdict_note: 提交 da61486cb 在本地任一仓库均不存在，zt_action/task 回写事实无法证明。
+---
 # ZenTao Task 2336
 ZenTao task 2336 finished via DBX write-back on 2026-11-09.
 

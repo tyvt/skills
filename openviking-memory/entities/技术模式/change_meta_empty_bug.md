@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:46:41+08:00
+verdict_note: change-record-dialog.vue-39 引入 resolveChangeMeta，detailCallback 合并审计字段方案在现状代码有据。
+---
 # 淮安物管变更记录弹窗审计字段为空
 变更记录弹窗顶部「变更时间/变更人/变更说明」显示空，但表格字段对比正常，因 detailCallback 合并遗漏顶层审计字段。
 

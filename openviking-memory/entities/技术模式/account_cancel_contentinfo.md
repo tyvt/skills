@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:25:51+08:00
+verdict_note: accountCancel、DetailTemplate、businessType在产品2.0命中，contentInfo缺项修复属实
+---
 # accountCancel 详情 contentInfo 对齐 zs-form
 查看态 contentInfo 若少表单项，会出现编辑能填、查看看不到，须对照同页 zs-form 补齐字段。
 

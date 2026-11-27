@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:15:18+08:00
+verdict_note: 命中 riskProRegisterId/projectDeliveryId/realTransactionId/proChangeId/versionId 及 baseTemplate.replace、v-hasPermi，迁移口径属实
+---
 # 列表页迁 ListTemplate/listMixins 映射口径
 将手写 el-table 列表页统一迁到 ListTemplate + listMixins 时，需按 URL 拆 businessName、权限串拆 permsPrefix、自定义流程靠 baseTemplate.replace 注入。
 

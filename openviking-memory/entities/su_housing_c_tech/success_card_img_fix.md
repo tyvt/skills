@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:58:35+08:00
+verdict_note: 苏住房C SuccessCard.vue 已改为 ZsImage、原生 <img> 清零、含 authorized.png，图片路径修复属实
+---
 # 认证成功页SuccessCard图片路径修复
 苏住房C小程序中SuccessCard.vue的success状态误用原生`<img>`导致微信端500错误，已改为ZsImage修复。
 

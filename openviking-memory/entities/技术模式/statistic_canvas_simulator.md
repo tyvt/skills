@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:15:53+08:00
+verdict_note: 泰兴小程序 echarts-uniapp.vue 源码命中「canvas 节点未就绪」日志，模拟器中同层渲染排查属实。
+---
 # statistic页产物正常疑模拟器同层渲染兼容
 泰兴小程序 statistic 页产物均验证正常，canvas 渲染异常根因疑似模拟器同层渲染兼容或运行时状态，需查 Console 日志定位。
 

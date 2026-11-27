@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:48:30+08:00
+verdict_note: 苏住房G zs-select-dialog.vue/func 命中 pageSize/$nextTick，动态分页与铺满修复属实
+---
 # zs-select-dialog 左侧列表 pageSize 写死致超量不显示
 苏住房G 公共选择弹窗 zs-select-dialog 左侧列表 pageSize 写死为 10，选项超 10 条不显示且下方留白，多业务页共现。
 

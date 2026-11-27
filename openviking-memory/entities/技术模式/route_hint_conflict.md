@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:12:36+08:00
+verdict_note: 苏州V3 ruoyi.js 含 resolveListRoutePathHint/CONTRACT_PAYMENT_NOTE/buildDetailNavigation，路由 hint 冲突修复属实。
+---
 # 路由name首段作hint致合同缴款定金详情解析错误
 苏州市房地产监测V3 的 zhi2-web-admin 中 buildDetailNavigation 使用路由 name 第一段作 pathHint，导致合同缴款与定金缴款共用路由时解析错误。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T21:55:02+08:00
+verdict_note: InfoCardDialog.vue 现状为 certificateTypeOptions/ensureCardDicts/getDicts(company_personnel_certificate_type)，无 bizStateOptions/loadCredential/personnel_business_status，与描述不符
+---
 # 在 prop 和 data 中声明的字典选项触发 Vue 警告
 在项目 苏州市房地产监测V3 中，在 `InfoCardDialog.vue` 的 `props` 和 `data()` 中声明的 `bizStateOptions` 触发了 Vue 警告。
 

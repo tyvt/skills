@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:33:18+08:00
+verdict_note: AppMain.vue 为通用布局文件但「内容区层叠上下文隔离防盖住 Navbar」的具体 z-index/position 改动无代码证据，无法证明有效。
+---
 # 内容区层叠上下文隔离防止盖住 Navbar
 园区物管2.0 后台地图类页面因主内容区未建立独立层叠上下文，内部高 z-index 元素盖住 Navbar 顶栏，需给 AppMain 加 isolation。
 ## 现象
@@ -14,7 +19,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

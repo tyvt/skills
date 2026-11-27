@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:15:50+08:00
+verdict_note: 苏住房G index.vue/listMixins.js 命中，双接口列表属实。
+---
 # 同名列表双接口分页分流
 苏住房G 公共信息—物业管理区域信息列表因统一切 pageNew 导致每页设 10 条却只显示 1 条，需按高级筛选条件分流。
 

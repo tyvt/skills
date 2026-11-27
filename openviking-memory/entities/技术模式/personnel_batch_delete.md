@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:58:29+08:00
+verdict_note: 产品2.0 toB/personnelRecord/components/index.vue 实存 multiDeleteButton，与批量删除修复描述一致。
+---
 # 从业人员管理批量删除修复
 苏州市房地产监测V3 修复两处列表页批量删除按钮逻辑，改用 mixin 的 multiDeleteButton。
 

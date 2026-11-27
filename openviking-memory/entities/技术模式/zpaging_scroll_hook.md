@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T15:16:01+08:00
+verdict_note: “uni-app双端交付”无对应仓库，pages/history/index.vue 全库 FILE-NOT-FOUND，z-paging 仅编译产物 css 命中，无法证明该文件与滚动钩子属实
+---
 # z-paging 页面滚动模式显式注册钩子
 z-paging 页面滚动模式必须显式注册 useZPaging 钩子才继续加载，且其为默认导出，命名导入致 H5 构建失败。
 

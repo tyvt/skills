@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:15:19+08:00
+verdict_note: 泰兴小程序 dist/build/mp-weixin/app.json 主包恰为 9 页，与记忆测量结论一致，未超限；dist/dev 现已被清理但报告核心结论可查。
+---
 # 泰兴小程序主包体积测量报告
 泰兴小程序主包构建产物体积未超 2048KB 限额，dev 与 build 差异源于过期 dev 产物及 vendor/static 体积不同。
 

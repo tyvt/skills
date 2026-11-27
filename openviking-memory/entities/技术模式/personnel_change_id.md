@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:47:13+08:00
+verdict_note: 命中 -id=flowBusId/personnelRecordChangeId/primaryKey 与两个 Detail.vue，从业人员变更传变更态 id 属实。
+---
 # 从业人员变更须传变更态id
 苏州市房地产监测V3 中经纪/租赁从业人员页内变更时 operation-btn-group 未传 :id 误用路由 personnelRecordId 提交，实际需 personnelRecordChangeId。
 

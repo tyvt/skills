@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T08:14:53+08:00
+verdict_note: result.vue 含 min(100vw...)、payment-popup、560rpx，WXSS 宽度回落问题属实。
+---
 # WXSS不支持min()致:deep弹层宽度失效变窄卡片
 `src/staff/pages/cashier/result.vue` 使用 `:deep(.payment-popup){ width: min(100vw, 750rpx) }`，因 WXSS 不支持 `min()/max()/clamp()`，该声明被静默丢弃，弹层宽度回落到 `ZsPopup` 默认 `560rpx` 并居中，变为窄卡片悬浮。
 ## 问题根因
@@ -13,7 +17,6 @@
 - 涉及文件：src/staff/pages/cashier/result.vue、src/components/ZsPopup/ZsPopup.vue
 - 来源会话ID：54c23926-7b8a-40d1-a6aa-2e3dcc903484
 - 代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:46:18+08:00
+verdict_note: 苏住房C v1Instance 实存；property/common/article/transaction/security/file 分模块实例命中，双 API 实例描述属实。
+---
 # 双API实例架构与接口清单产出
 zhi2-mobile-shimin同时对接苏找房旧系统(V1)与新版服务(V2)，两套接口走不同代理不同axios实例，整理接口清单须按导出实例归类。
 

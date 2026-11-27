@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:45:01+08:00
+verdict_note: C-/Users/Administrator/.pi-web/scripts/workbuddy-checkin/checkin_all.py 确实存在，签到脚本迁移落点属实
+---
 # WorkBuddy签到定时任务迁移至pi-web
 苏州市房地产监测V3 环境中，WorkBuddy 签到脚本从 `.workbuddy` 迁移至 `.pi-web` 并由 pi-web-ui 创建 cron 定时任务。
 

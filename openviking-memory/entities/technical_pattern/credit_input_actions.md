@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:20:16+08:00
+verdict_note: Step1BasicInfo.vue 命中 input-with-actions，zs-input.vue/institutionRegister 均在
+---
 # 信用代码改为input-with-actions布局
 苏州市房地产监测V3 的 `Step1BasicInfo.vue` 将「统一社会信用代码」从 append-buttons 改为 input-with-actions 布局，避免按钮挤压输入框。
 

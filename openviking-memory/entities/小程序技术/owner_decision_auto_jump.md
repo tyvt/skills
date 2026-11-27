@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:45:20+08:00
+verdict_note: 小程序 pages/webview/home.vue 命中 isLingXiSuccess 与 authCode，自动跳转抑制条件在。
+---
 # 业主决策自动跳转投票页条件
 首页/我的页点「业主决策」后自动打开投票页，须满足本次灵犀选屋成功(isLingXiSuccess===true)。
 

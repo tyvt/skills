@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:14:01+08:00
+verdict_note: 产品2.0 源码不存在 building/project/components/buildingTable.vue，记忆所述修复后导入路径与现状不符。
+---
 # buildingTable.vue导入路径错误修复
 产品2.0中projectManagement/buildland/detail.vue因引用不存在的buildingTable.vue路径导致构建失败，已修正为正确路径。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:47:34+08:00
+verdict_note: 产品2.0 table.js 实存335行，__hasFetchedList/applyPlatformDefaultPageSize/platformListDisplay 均已不存在，与'移除listDisplay逻辑'描述一致。
+---
 # table.js移除listDisplay相关逻辑
 在 `zhi2-web-admin/src/mixins/table.js` 中已完成 `listDisplay` 相关逻辑移除，消除无意义的状态与监听。
 

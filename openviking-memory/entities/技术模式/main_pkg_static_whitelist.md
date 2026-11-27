@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:47:19+08:00
+verdict_note: 全仓未找到 zhi2-mobile-shimin/src/utils/mainStaticPaths.js 及 MAIN_STATIC_PATHS 白名单，描述的主包白名单修复无对应代码。
+---
 # 主包白名单多余兜底图占体积
 苏住房C 小程序主包上传预估贴边时，因把分包已有的兜底图加入 MAIN_STATIC_PATHS 致主包构建超 2048KB 失败。
 

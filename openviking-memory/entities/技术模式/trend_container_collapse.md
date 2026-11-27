@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:50:04+08:00
+verdict_note: fundPanorama/index.vue 命中 0.65 与 280px，弹性比例修复在。
+---
 # 趋势图容器压缩致高度塌陷重叠
 园区物管2.0 资金全景趋势图因容器弹性属性误用导致高度塌陷、图表重叠，已修正。
 

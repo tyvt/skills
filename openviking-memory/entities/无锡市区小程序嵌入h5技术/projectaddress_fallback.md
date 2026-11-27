@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:52:10+08:00
+verdict_note: 无锡市区嵌入H5子目录zhi2-mobile-admin-h5-c-unlimited下elevatorPubEngCons/benefit的buildRegionAddress与projectAddress均0命中，地址多级回退描述与现状不符。
+---
 # 小程序嵌入H5只写project/projectName时公共收益地址显示-的修复
 嵌入场景未同步regionName等导致benefit页projectAddress为空或显示-，须setProjectInfo与projectAddress多级回退。
 

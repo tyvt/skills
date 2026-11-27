@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:44:15+08:00
+verdict_note: 在产品2.0仓源码命中核心符号(3/3)leaseapply,pubusemoneyapply,subvenuetable，涉及文件存在，描述与现状一致，判有效。
+---
 # subVenueTable.vue引用路径调整修复
 产品2.0中benefit/leaseApply/detail.vue因错误引用subVenueTable.vue路径导致找不到模块，已修正。
 

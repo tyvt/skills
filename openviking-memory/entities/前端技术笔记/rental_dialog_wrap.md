@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:43:31+08:00
+verdict_note: 租房仓库 RentalDetailDialog.vue/README 实存 rental-field-pair/rental-field-value，弹窗包裹修复属实。
+---
 # 租赁详情弹窗宽度与字段换行修复
 门户企业开业信息公示基本信息弹窗（RentalDetailDialog，rental-enterprise 类型）长字段值（经营范围、企业名称等）在自身栅格单元内换行，弹窗宽度由 fit-content 演进至 960px，避免文字溢出压到相邻字段。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:18:56+08:00
+verdict_note: 命中 dictFormatter、isCorrectionOptions、benefit_is_correction，字典初始化描述属实
+---
 # incomeExpenseDetail字典初始化补全
 园区物管 incomeExpenseDetail.vue 字典未初始化致单元格空白需补全选项。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:48:45+08:00
+verdict_note: 苏州市房地产监测V3 variables.css-40 定义 --detail-page-padding-24px，与记忆所述间距 token 一致。
+---
 # 在详情页中使用 tokens 统一间距
 在项目 zhi2-web-admin (苏州市房地产监测V3) 中，将固定的 24px 值替换为间距 tokens。
 
@@ -23,7 +28,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：280dea0c-9d8d-46bc-8e8f-9208741e4322
-
 
 <!-- MEMORY_FIELDS
 {

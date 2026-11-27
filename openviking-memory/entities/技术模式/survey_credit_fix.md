@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:44:17+08:00
+verdict_note: 苏州市房地产监测V3 实存 surveyChangeConstants.js 的 resolveSurveyChangeCreditCode/mapSurveyChangeProjectRow，描述一致。
+---
 # 测绘变更选项目信用代码字段映射缺失致未回填修复
 `/presale/surveyChange/selectProject` 返回 `uniformSocialCreditCode` 但 `handleProjectSelect` 仅映射旧字段致代码未回填。
 

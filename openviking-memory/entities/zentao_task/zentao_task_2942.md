@@ -1,51 +1,34 @@
----
-audit_status: valid
-last_checked: 2026-11-27T00:51:38+08:00
-verdict_note: 防汛C端命中 StageFilterDialog/RescueFillDialog/common/complex/page, 禅道任务进展属实
----
-# 禅道任务 2942
-禅道任务 2942 是「求援工单填报弹窗（物业管理区域 + 预警事项）」开发任务，方案为填报前弹窗选择物业管理区域 + 预警事项、复用 StageFilterDialog 编写 RescueFillDialog；2026-11-26 hop1 完成组件与页面改动并通过 build，hop2 出弹窗验证截图，hop3 因用户反馈补齐禅道需求第 2、3 点：修正区域下拉数据源（/common/complex/page、去 eventId 门禁）并完成 mock E2E 验证出图；hop3 已硬交接，form 联系人/电话截图、验证门、提交推送与禅道回写待下一跳接续。
+# ZenTao Task 2942
+Zentao task 2942 is the rescue-workorder fill popup development task for property management area and warning-item selection.
 
-## 需求与方案
-- 任务编号 2942，链接 http://zentao-biz.zhi.com/index.php?m=task&f=view&id=2942
-- 标题：求援工单填报弹窗（物业管理区域 + 预警事项）
-- 填报前弹窗选择「物业管理区域 + 预警事项」；检索 StageFilterDialog 引用位置、求援相关 API 与部署配置后确认可直接复用
-- 禅道需求三点：①物业登录查看该小区数据；②物业区域默认带出当前账号登录时选择的区域、下拉可选、选项为有权限区域；③联系人/电话自动带出且可编辑
-- 禅道附图（fileID 24508/24509/24523）显示「请先选择预警事项」，与需求文字「默认带出当前登录区域」冲突
-- 2026-11-26 用户澄清：无「当前登录区域」字段，按下拉里选的物业管理区域来；方案去掉登录字段预填，核心改为修正区域下拉数据源
+## Requirements And Decisions
+- Task 2942 (link `http://zentao-biz.zhi.com/index.php?m=task&f=view&id=2942`; title "求援工单填报弹窗（物业管理区域 + 预警事项）") requires a popup to select "物业管理区域 + 预警事项" before filling a workorder.
+- Three Zentao requirements: property users see their area's data; the property area defaults from the account's selected area, remains selectable, and choices are authorized areas; contact/phone autofill and are editable.
+- Attachments fileID 24508/24509/24523 showed "请先选择预警事项", conflicting with the written "default current login area" requirement; on 2026-11-26 the user clarified there is no "current login area" field: use the property management area selected in the dropdown, login-field prefill was removed, and the core work became fixing the area dropdown data source.
+- Audit: status valid, last checked 2026-11-27T00:51:38+08:00; flood C-end hit StageFilterDialog/RescueFillDialog/common/complex/page and task progress was true.
 
-## 实施进展
-- 起草精简实施计划，用 todo_write 列步骤并写计划文件，提交编排器审核
-- 计划审核通过（82 分，0 个 P0）；2026-11-26 用户确认实施，更新计划 frontmatter
-- 基于 StageFilterDialog 编写 RescueFillDialog 并修复样式引用；更新 index.vue 与 form.vue；去除表单 DEMO_COMPLEX
-- 8150 端口未监听，拉起本地静态服务并打开浏览器验证
-- hop2 截图自检通过（1256×581），弹窗含标题「填报工单」+选择预警事项+选择物业管理区域+取消/确定；用户反馈第 2、3 点未在截图中体现
-- hop3 核对：联系人/电话自动带出已实现（form.vue:13-20，bug7002 既有逻辑）；物业区域默认带出当前登录区域未实现（RescueFillDialog.vue:13-22 初始为空、L48-57 需先选预警事项）
-- 用户选择补做；补充计划三审通过（82→86→91 分，均 0 P0）；竞态已由现有 complexSeq 序号实现（RescueFillDialog.vue:33-45），无需新增
-- 2026-11-26 hop3 五处改动：①loadComplex 传 useCommonApi=true；②openAreaDropdown/toggleAreaDropdown 去 eventId 门禁；③pickAlert 切换预警事项不再清空已选区域；④模板区域 input 去 eventId 依赖的 disabled/placeholder；⑤onMounted 主动拉一次权限区域
-- 改前基线与改后 build 均 DONE（job bash-b5b4060862cf4d5f）；编排器结构化通道拒绝，改用后台任务 + 监听
+## Plan And Implementation
+- A concise plan with todo_write steps and a plan file was drafted, sent to the orchestrator, approved (82 points, 0 P0), confirmed by the user on 2026-11-26, and its frontmatter was updated.
+- Implementation wrote RescueFillDialog based on StageFilterDialog, fixed style references, updated index.vue and form.vue, removed form DEMO_COMPLEX; port 8150 was not listening, so a local static service was started and a browser was opened.
+- The user chose to continue; the supplemental plan passed three reviews (82→86→91, all 0 P0); baseline and post-change builds were both DONE (job bash-b5b4060862cf4d5f) using a background task plus listener because the orchestrator structured channel refused.
 
-## 相关代码
-- StageFilterDialog：可复用的筛选弹窗组件，用于求援工单填报前选择
-- RescueFillDialog.vue：新建的求援工单填报弹窗组件，填报前弹窗含汛中预警 + 物业管理区域；complexSeq 处理区域加载竞态
-- index.vue:146-147：物业角色显示「填报」并打开弹窗，未登录时 canFill=false 被隐藏
-- form.vue：query 校验并传入真实 complexId 与 eventId；:13-20 取登录用户 realName/nickName/userName + phone 作联系人/电话（可编辑 input）
-- 求援区域下拉应走 /common/complex/page（flood.ts:527-537），此前误走 /plan/complexPage；登录缓存 LoginUserInfo 无区域字段
+## Related Files
+- `index.vue:146-147`: property role shows the fill button and opens the dialog; `canFill=false` hides it when not logged in.
+- `form.vue`: query validates and passes real complexId/eventId; lines 13-20 take login user realName/nickName/userName plus phone as editable contact/phone.
 
-## 验证与交接
-- hop1/2 本地 8150 + sessionStorage 模拟物业（wyqy）点击「填　报」出弹窗；截图 task2942-dialog-20261126-104656.png、task2942-rescue-20261126-104402.png 位于 C:/Users/ADMINI~1/AppData/Local/Temp/
-- 联系人/电话实机 E2E 受阻：form 页需从列表弹窗确认后正常导航进入（直接访问被守卫重定向登录页）；本机后端未配返回「连接服务器超时」
-- hop3 mock /common/complex/page 返回权限区域（观澜花园、湖畔家园）+ 注入物业用户：未选预警事项时区域下拉即可拉出两个权限小区；选区域「观澜花园小区」再选预警事项「台风蓝色预警」，切换事项后区域保持；截图自检有效非空
-- hop1 交接文档 D:/plan/苏住房防汛C端/HANDOFF-CHAIN-zentao-2942-rescue-dialog-hop1-20261126-1047.md，排定 hop2（10:48）
-- hop3 硬交接文档 HANDOFF-CHAIN-zentao-2942-rescue-dialog-hop3-20261126-1106.md（9 节，chain_id/hop=3/maxHops=10，4 项未完成）；下一跳 schedule-417f9435-a506-431f-a524-01c1acbe4f0c，11:07:08（+15 秒），new_once
-- 待下一跳：form 联系人/电话截图、验证门确认、提交推送、禅道 #2942 回写带附图；通过后默认执行，除非用户说暂不提交
+## Verification And Handoff
+- hop1/2 used local 8150 plus sessionStorage to simulate property user wyqy; clicking fill opened the dialog; screenshots `task2942-dialog-20261126-104656.png` and `task2942-rescue-20261126-104402.png` are under `C:/Users/ADMINI~1/AppData/Local/Temp/`.
+- hop2 screenshot passed self-check (1256×581) with popup title "填报工单", warning-item selection, property-area selection, and cancel/confirm; the user said requirements 2 and 3 were not reflected; hop3 found contact/phone autofill implemented by bug7002 logic while default login area was still missing.
+- Contact/phone real-device E2E was blocked: the form page requires normal navigation after confirming from the list dialog (direct access redirects to login), and the local backend was not configured and returned "connection timed out".
+- hop3 mock `/common/complex/page` returned authorized areas (观澜花园, 湖畔家园) with an injected property user; the area dropdown opened before warning selection; selecting area 观澜花园小区 and warning 台风蓝色预警, then switching warning, preserved the area; screenshot self-check was valid and nonempty.
+- hop1 handoff doc `D:/plan/苏住房防汛C端/HANDOFF-CHAIN-zentao-2942-rescue-dialog-hop1-20261126-1047.md`; hop2 was scheduled for 10:48; hop3 hard handoff doc `HANDOFF-CHAIN-zentao-2942-rescue-dialog-hop3-20261126-1106.md` (9 sections, chain_id/hop=3/maxHops=10, 4 remaining); next schedule `schedule-417f9435-a506-431f-a524-01c1acbe4f0c`, 11:07:08 (+15 seconds), new_once; pending next-hop work: form contact/phone screenshot, verification-gate confirmation, commit/push, and Zentao #2942 writeback with images; default action was to proceed unless the user said not to commit.
 
 <!-- MEMORY_FIELDS
 {
   "category": "zentao_task",
   "name": "zentao_task_2942",
-  "source_extraction_id": "215855c16e084e2da6f057b2ec9e062f",
-  "version": 3,
+  "source_extraction_id": "94e1c22f64e94304a58b58ba013cf026",
+  "version": 6,
   "memory_type": "entities"
 }
 -->

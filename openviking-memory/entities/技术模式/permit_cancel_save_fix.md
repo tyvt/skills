@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:16:37+08:00
+verdict_note: 苏州市房地产监测V3 zhi2-web-admin/src/utils/apiV3Normalize.js 命中 REST_ACTIONS 与 permitCancel，保存后缀修复属实。
+---
 # 预售注销保存后缀被错误改写修复
 苏州市房地产监测V3 中预售注销详情页保存接口因请求拦截器误改写后缀导致 400，已在 REST_ACTIONS 增加 save 修复。
 

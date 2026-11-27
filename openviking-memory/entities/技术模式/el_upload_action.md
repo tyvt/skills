@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:16:55+08:00
+verdict_note: 产品2.0 存在 certificatesTable/certificatesDialog 与 el-upload action='#' 写法，与描述一致
+---
 # El-upload 要求必填的 action 属性
 Element UI 的 el-upload 组件即使通过 http-request 进行自定义上传，也强制要求 action 属性。
 
@@ -17,7 +22,6 @@ Element UI 的 el-upload 组件即使通过 http-request 进行自定义上传�
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：a3245b72-8923-4386-a8ad-ff00068ae739
-
 
 <!-- MEMORY_FIELDS
 {

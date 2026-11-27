@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T22:42:01+08:00
+verdict_note: 全仓 install.mjs/.npmrc 均无 esbuild 或 omit=optional/include=optional 修复痕迹，声称固化到 install.mjs 未落地；根因知识虽对但本项目无实机证据
+---
 # CI 构建报 esbuild 平台二进制缺失
 CI 上 vite build 失败报 The package "@esbuild/linux-x64" could not be found，根因是安装时禁用了 optional dependencies 导致平台二进制没装上。
 

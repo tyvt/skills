@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:11:59+08:00
+verdict_note: 苏住房C 8个涉及文件全命中（FormManual.vue/App.vue/user.js 等），onShow 清仓快照修复属实。
+---
 # 上传期间onShow清仓库致证件信息空
 苏住房C小程序 App.onShow 清空 userStore 临时数据，导致 FormManual.vue 提交时读取证件信息为空，已通过快照修复。
 

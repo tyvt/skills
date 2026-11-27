@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:59:43+08:00
+verdict_note: guaranteeDeposit 系列 index.vue 实存 getQueryParams、propertyProjectId、isBTerminalPractitioner，与 B 端过滤描述一致。
+---
 # 房屋质量保证金B端权限过滤模式
 产品2.0 项目为房屋质量保证金模块所有列表菜单补充 B 端权限过滤，按当前选中物业管理区域传入 propertyProjectId。
 

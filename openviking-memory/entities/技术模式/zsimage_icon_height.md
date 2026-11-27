@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:53:17+08:00
+verdict_note: 苏住房C conditionScreening.vue 含 16px 图标与 ZsImage，图标高度修复属实。
+---
 # ZsImage 使用全高导致父级无显式高度时图标高度为零
 在项目 苏住房C (zhi2-mobile-shimin) 中，`ZsImage` 在父级没有显式高度时渲染出高度为 0 的图标。
 

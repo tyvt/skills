@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:12:06+08:00
+verdict_note: 苏住房防汛C端仓 docs/契约/测试中可查端口 9610、bootstrap.yml、complexPage、notScopePage Feign 相关记录，服务信息描述与现状证据一致。
+---
 # service-expand 后端服务
 苏住房防汛C端后端服务之一，承载 Flood 巡检接口。
 

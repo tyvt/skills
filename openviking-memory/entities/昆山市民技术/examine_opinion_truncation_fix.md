@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:42:36+08:00
+verdict_note: 昆山市民 listStyle.scss-22-23 实测 min-width-0 + word-break-break-all，长文本截断修复手法一致(文件名为 listStyle.scss)
+---
 # 保险立项审核处理意见截断修复
 保险立项审核「处理意见」被截断问题已修复。
 

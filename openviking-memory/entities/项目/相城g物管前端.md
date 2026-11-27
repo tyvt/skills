@@ -1,4 +1,3 @@
-# 相城G zhi1-web-admin（相城物管前端）
 相城G（苏州相城武港）物管平台的前端子模块，对应独立 GitLab 项目与 dev 部署域名。
 
 ## 项目信息
@@ -10,8 +9,9 @@
 
 ## 登录验证要点
 - 该 dev 站点登录需要图形验证码（GET /prod-api/code，返回 code 与 uuid），须先通过验证码识别再回写面板。
-
 ## 验证环境与经验
+- 校验：2026-11-27T06:09:07+08:00 端口8171、KSXM账号及privacy脱敏引用齐备，属真实会话记录且无矛盾证据；非代码修复类，按现状一致判有效。
+
 - 登录流程：`/code` + vision + `POST /auth/login` 走通；浏览器内 `fetch /prod-api/code` 与页面 uuid 同源同步；先点 Close 关改密弹窗、填明文密码、验证码每次重取、优先 find placeholder/text（避免 PowerShell 吞 @ref）。
 - 专属 agent-browser 会话先 session list，不用 default/AGENT_BROWSER_NAMESPACE。
 - 路由接口 `GET /prod-api/system/menu/getRouters` 返回 `/#/xmxx/lz/buildinginfo`（勿用 `/getRouters`）。
@@ -21,8 +21,8 @@
 {
   "category": "项目",
   "name": "相城G物管前端",
-  "source_extraction_id": "8bb2f5476dab4a4f8ea5485e6cda7705",
-  "version": 3,
+  "source_extraction_id": "4100fd7d52464db790d0a249a0c9f03b",
+  "version": 4,
   "memory_type": "entities"
 }
 -->

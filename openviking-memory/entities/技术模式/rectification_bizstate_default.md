@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:23:41+08:00
+verdict_note: 苏住房G rectificationNotice/index.vue 命中 bizState- undefined，与默认值清空修复一致。
+---
 # 整改通知书业务状态默认清空（苏住房G）
 苏住房G 项目整改通知书列表页搜索条件「业务状态」默认值由「已备案」改为空，修复默认只查已备案数据的问题。
 

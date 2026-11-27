@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:47:57+08:00
+verdict_note: 苏住房C publishHouse/index.vue 等实存 tab-box/flex-1 布局，tab 均分修复属实。
+---
 # 发布房源页Tab栏未设flex且用span致布局异常
 苏住房C 移动端 `pages_transaction/publishHouse/index` 的 `.tab-box` 未设 `display: flex` 且 Tab 用 `span`，导致挤压靠左及小程序兼容异常。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:25:54+08:00
+verdict_note: MCP 白名单热改致工具失联的经验记忆，历史会话记录命中 OPENVIKING_MCP_TOOL_ALLOW。
+---
 # MCP 工具白名单热改致工具失联
 在运行中的 DSH 会话里热改 MCP 工具白名单，会导致当前会话工具瞬间“失联”且需新开会话才能恢复。
 

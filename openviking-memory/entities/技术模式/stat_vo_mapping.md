@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:11:39+08:00
+verdict_note: 苏住房G含totalHouseholds/paidHouseholds/collectionRate，统计字段对接后端VO属实。
+---
 # 统计字段对接后端 VO 字段名对齐
 苏住房G 物业费申报详情新增统计展示时，按「显示名→后端字段」对照表绑定，并写旧字段回落与本地计算兜底。
 

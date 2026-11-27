@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:17:39+08:00
+verdict_note: 苏住房G TodoPanel/暂无待办/暂无消息 命中；DEMO_ROW MISS 符合记忆所述“已删除 DEMO_ROW 常量”
+---
 # 待办面板移除Mock与补齐逻辑坑
 苏住房G首页V2的TodoPanel.vue移除mock数据时，仅删DEMO_ROW常量不够，还需拆除while补齐循环并按Tab拆分空态文案。
 ## 问题根因

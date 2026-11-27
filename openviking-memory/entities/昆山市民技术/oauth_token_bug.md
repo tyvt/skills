@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:46:05+08:00
+verdict_note: 昆山市民verifyUser/index.vue含getOauthInfoByIdNumber/setToken/accessToken，token覆盖风险分析属实。
+---
 # 实名成功后 getOauthInfoByIdNumber 缺 accessToken 会静默清空登录态
 昆山市民小程序实名流程因无条件 setToken 可能将已有 token 写为 undefined，导致后续接口 401。
 

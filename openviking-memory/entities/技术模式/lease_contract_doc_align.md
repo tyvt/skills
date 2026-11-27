@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:45:04+08:00
+verdict_note: 苏州市房地产监测V3 companyCancel.js-6/11/20 使用 administrativeArea + 字典 ECONOMIC_INSTITUTIONS_REGION，与约定一致
+---
 # 租赁合同备案前端对接文档对齐
 苏州市房地产监测V3 按《租赁合同备案-前端对接文档》对齐租赁合同前端逻辑。
 
@@ -22,7 +27,6 @@
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：`leaseContractConstants.js`、`PropertyVerifyDialog.vue`、`index.vue`、`detail.vue`、`PartyTable.vue`、`PartyDialog.vue`、`lease-contract-mocks.js`、`lease-contract-real-api-flow.spec.js` 及对接文档
 - 所属项目：苏州市房地产监测V3；来源会话ID：6631c584-2e4d-4124-840c-3e4918698ae7；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

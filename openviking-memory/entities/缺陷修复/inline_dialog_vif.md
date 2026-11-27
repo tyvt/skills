@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:47:45+08:00
+verdict_note: showProjectDialog 广泛命中(54)，嵌入式对话框 v-if 挂载销毁控制属实
+---
 # 嵌入式对话框缺少 v-if 导致关闭时出现空白
 苏州房地产监测V3 中的 Bug：嵌入在 template/detail.vue 中的 zs-select-dialog 在关闭时留下空白。
 

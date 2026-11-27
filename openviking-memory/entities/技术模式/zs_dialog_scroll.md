@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:12:40+08:00
+verdict_note: zs-dialog.vue/zs-select-dialog.vue 命中 overflow-y 与 max-height，与弹窗加滚动修复描述一致。
+---
 # 系统显示缩放导致弹窗内容截断统一加滚动
 Windows 显示缩放/低分辨率下，登录页、选择弹窗、业务子表弹窗等内容区被裁切且无法滚动，逐页改 height 不可靠。
 

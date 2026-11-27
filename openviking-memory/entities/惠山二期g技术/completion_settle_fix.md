@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:13:55+08:00
+verdict_note: 惠山二期G completion/detail.vue 源码命中 constructionSettleAmountTip 及「维修工程的实际造价」文案，修正属实。
+---
 # 竣工验收施工结算总额注释修正
 竣工验收详情页「施工结算总额」的问号提示误用了「线下核查费」注释，已修正文案。
 

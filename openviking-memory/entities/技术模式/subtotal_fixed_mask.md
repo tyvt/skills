@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:17:44+08:00
+verdict_note: 含fixed-footer-wrapper与zs-operate-column-cell，小计行遮罩修复属实。
+---
 # 小计行固定操作列穿透遮罩修复
 带合计/小计行且横向滚动时，右侧固定操作列被小计数据穿透，需用 td:last-child 选择器与伪元素遮罩修复。
 

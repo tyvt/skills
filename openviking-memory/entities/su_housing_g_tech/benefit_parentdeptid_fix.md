@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:53:11+08:00
+verdict_note: 苏住房G zhi2-web-admin/src/mixins/benefitRegionTreeMixin.js存在，公共收益树状模式区划过滤修复的基础设施属实。
+---
 # 公共收益树状模式 parentDeptId 过滤无效修复
 苏住房G(zhi2-web-admin) G端用户或管理员登录进入公共收益经营管理和共有资产时，树状模式下列表无数据，已修复。
 

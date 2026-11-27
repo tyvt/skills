@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:43:53+08:00
+verdict_note: 太仓G listMixins.js 命中 searchParamsKey/decisionRange/bizState，独立缓存键修复属实
+---
 # 同路由缓存搜索条件致决策范围数据为空
 太仓G端 listMixins 按路由路径缓存搜索条件，表决项筛选污染决策范围请求致空。
 

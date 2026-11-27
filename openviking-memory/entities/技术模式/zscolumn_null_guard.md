@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T17:25:46+08:00
+verdict_note: 项目bugfix无对应仓库；全仓真实zs-table-column.vue均无row?.column?.label防护，仅记忆归档命中，无法证明有效。
+---
 # zs-table-column.vue 表头渲染未防护 row.column 致 label 报错
 公共组件 zs-table-column.vue 在 getHeader/computedWidth 中直接读取 row.column.label，在部分渲染时机 row.column 为 undefined 时抛错。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:50:23+08:00
+verdict_note: 产品2.0 命中 superviseAgree(5)、regulatoryAgreementId(21)、AgreementDetailsTable(2)，与协议详情页框架改造一致。
+---
 # 监管协议详情页框架改造
 产品2.0 完成 xy/detail.vue 与 AgreementDetailsTable.vue 新版框架改造，对齐同目录 end/detail.vue 等模式。
 
@@ -14,7 +19,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

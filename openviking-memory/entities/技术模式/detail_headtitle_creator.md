@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:46:18+08:00
+verdict_note: article/components/detail.vue 含 HeadTitle/formMode/createTime/createUser，顶部创建信息与去重实现属实。
+---
 # 详情组件顶部HeadTitle显创建信息避重复
 园区物管2.0 中 article/components/detail.vue 顶部新增 HeadTitle 展示创建人及时间，并从详情字段列表移除对应项避免重复。
 

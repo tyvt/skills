@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:19:17+08:00
+verdict_note: 产品2.0 OperationBtnGroup 命中 goBack/go(-1)，返回逻辑修复属实
+---
 # OperationBtnGroup 返回逻辑误退新增页
 OperationBtnGroup 的返回使用 $router.go(-1)，在新增保存跳详情后历史栈为列表→新增→详情，致退回新增页而非列表。
 
@@ -16,7 +21,6 @@ OperationBtnGroup 的返回使用 $router.go(-1)，在新增保存跳详情后�
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

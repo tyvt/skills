@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:48:45+08:00
+verdict_note: personnel-certificate-crud.spec.js 不存在，submitForm/beforeSaveHook 的 E2E 修复无代码证据。
+---
 # 从业人员测试用例保存按钮修复与E2E定位优化
 产品2.0 的 zhi2-web-admin 从业人员增删改查用例中，02 新增阶段的保存按钮无响应问题已修复，E2E 定位方式同步优化。
 

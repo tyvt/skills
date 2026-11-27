@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:58:40+08:00
+verdict_note: 苏住房G mixins/bTerminalProjectMixin.js 实存 isBTerminal && !!currentProjectId 布尔归一写法，与 !! 归一化方案一致。
+---
 # Vue2布尔prop短路求值告警
 B端页面将`a && b`短路结果绑到布尔prop，返回字符串ID触发prop类型警告且禁用态可能不生效。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:51:38+08:00
+verdict_note: 江阴H5 menus.vue用/static/images/home/menu_icon*.png(23-49)，vite.config.ts-97 assetsInlineLimit-0，裂图修复属实。
+---
 # 江阴H5
 江阴智慧物业 uni-app Vue3 移动端 C 端项目，前端目录 D:\repository\江阴H5，git 远程 origin/main（gitlab.zhi.com）。
 

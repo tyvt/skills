@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:47:33+08:00
+verdict_note: 苏住房G pubParkingRate/detail.vue 与 ChargeStandardDialog.vue 均含 regionCode 赋值，收费标准行政区划修复属实。
+---
 # 收费标准保存行政区划为空修复
 苏住房G(zhi2-web-admin) 保存「收费标准」时提示行政区域不能为空，因前端选择物业管理区域后仅设置 regionName 未同步 regionCode，已修复。
 
@@ -15,7 +20,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

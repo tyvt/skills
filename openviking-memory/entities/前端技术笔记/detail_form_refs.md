@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:24:57+08:00
+verdict_note: guaranteeDeposit/components/detail.vue 与 detailMixins.js 命中 guaranteeDeposit/detailMixins/DetailTemplate
+---
 # 详情页仅 DetailTemplate 无编辑表单致保存无反应
 产品2.0 的 zhi2-web-admin 详情页，只渲染只读 DetailTemplate 而无 zs-form 时，编辑/保存会因 $refs.form 不存在被静默拦截。
 

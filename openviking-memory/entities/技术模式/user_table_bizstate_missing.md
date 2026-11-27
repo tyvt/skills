@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:45:10+08:00
+verdict_note: userTable.vue/selectUserDialog.vue 命中 bizState 与 isSelectable，复选框列处理逻辑在。
+---
 # userTable 的复选框因缺少 bizState 未渲染
 userTable.vue 中的复选框列有 v-if="bizState=='0'"，但 selectUserDialog 未传递 bizState。
 

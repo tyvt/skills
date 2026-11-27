@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:46:38+08:00
+verdict_note: 苏州V3 noticeValidity.js 实存 getNoticeValidityDays、REFUND_NOTICE_VALIDITY，refund/allocation/detail.vue 引用，字典缺项修复描述属实。
+---
 # 定金退款通知书有效期字典缺失修复
 苏州市房地产监测V3 中修复 `refund/detail.vue` 在字典缺少 `REFUND_NOTICE_VALIDITY` 项时抛错的问题。
 

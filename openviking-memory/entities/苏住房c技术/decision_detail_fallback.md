@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:29:16+08:00
+verdict_note: 苏住房C zhi2-mobile-shimin 存在 selectOptdec、goLatestDetail、voteStore、optional/detail.vue 与 DecisionRecord.vue，三级回退代码在源。
+---
 # 小程序表决详情页内容为空：跳转前写缓存+详情页三级数据回退
 苏住房C 业主表决「选项表决·我的决策」详情页空白，因列表跳详情未预写缓存且详情页纯依赖接口，需跳转侧预写+详情侧多源回退。
 

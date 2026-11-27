@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:40:40+08:00
+verdict_note: 在园区物管2.0仓源码命中核心符号(12/15)could,element,function,image，涉及文件存在，描述与现状一致，判有效。
+---
 # ImageViewer组件去除element-ui依赖
 产品2.0（zhi2-web-admin）中 ImageViewer 组件改为纯本地预览遮罩层实现，不再依赖 element-ui 包。
 
@@ -17,7 +22,6 @@
 - 验证证据：extracted source=cursor project=2-0
 - 涉及文件：zhi2-web-admin/src/components/ImageViewer/index.vue、element-ui/packages/image/src/image-viewer.vue
 - 所属项目：2-0；来源会话：05e68b5b-3b5d-4912-9698-90636098e05c；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

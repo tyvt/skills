@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:52:54+08:00
+verdict_note: loginBox.vue 的 .title-class 含 color-#333/font-size-18px，深色模式标题修复属实
+---
 # 登录框标题未设色致深色模式白底白字隐形
 太仓一网通办H5 中 loginBox.vue 的 .title-class 未指定颜色，深色模式白底白字导致标题不可见。
 

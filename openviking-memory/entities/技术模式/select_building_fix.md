@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:55:06+08:00
+verdict_note: 苏州市房地产监测V3 PresaleSelectBuildingDialog/CashsaleSelectBuildingDialog.vue 实存 -no-auto-query 用法，与描述一致。
+---
 # 选择楼幢弹窗关闭自动查询修复
 苏州市房地产监测V3 项目中「选择楼幢」弹窗因公共组件自动查询导致列表被清空，已通过关闭自动查询修复。
 

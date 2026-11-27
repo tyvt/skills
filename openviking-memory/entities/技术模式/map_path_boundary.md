@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:49:26+08:00
+verdict_note: 产品2.0含ZsTencentMap/statisticsMap/mapLoader.js，官方边界简化替换描述属实。
+---
 # 将 map.js 的 path 替换为简化的官方边界
 常规多边形区域不遵循真实轮廓；使用行政区划官方来源 320214 并进行保形简化（580 个点缩减为 74 个），并替换 map.js 中的多边形点字符串。
 
@@ -16,7 +21,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：95e2008d-fb62-4d82-a1ce-c691d8ecfd29
-
 
 <!-- MEMORY_FIELDS
 {

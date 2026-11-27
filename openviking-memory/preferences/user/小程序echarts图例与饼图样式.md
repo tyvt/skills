@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:19:53+08:00
+verdict_note: i淮安H5 命中 echarts-uniapp/legend/radius 38%，小程序图例与饼图样式属实
+---
 - 小程序 canvas 渲染 ECharts 图例易缺色且饼图尺寸过大导致穿屏，需特殊处理。
 - 将 `legend` 设为 `{show:false}` 并用 Vue 渲染彩色圆点替代默认图例。
 - 饼图 `radius` 改为 `38%-58%`、`center` 改为 `50%,50%`。

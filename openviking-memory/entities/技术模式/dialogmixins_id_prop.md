@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:44:34+08:00
+verdict_note: 核对产品2.0：dialogMixins、printConfigId 在 CandidateDialog.vue 命中，与 id prop 修复描述一致。
+---
 # dialogMixins 声明 id 为 prop 后 $attrs.id 恒 undefined
 混入 dialogMixins 的弹窗组件若把 id 声明为 prop，Vue 不会将其放入 $attrs，取主键必须用 this.id 而非 this.$attrs.id。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:31:29+08:00
+verdict_note: 苏住房C cancellationReason.vue含getDict从@/api/common导入及cancel_reason，与补import修复一致。
+---
 # 注销页字典列表空且静默：getDict 未导入
 苏住房C 小程序注销页因未导入 getDict 导致注销原因选项全空且无报错，需作为固定排查项。
 

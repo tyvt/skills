@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:08:35+08:00
+verdict_note: 实机核对：苏州市房地产监测V3 zhi2-web-admin/src/styles/variables.css 与 index.scss 均命中 --list-section-gap-12px 及 .list-container gap 用法，与记忆一致。
+---
 # 全局列表查询区与卡片间距统一为12px
 苏州市房地产监测V3 的 zhi2-web-admin 通过调整 CSS 变量与容器 gap 统一列表间距。
 
@@ -15,7 +20,6 @@
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：variables.css、index.scss、property/complex/index.vue、e2e/company/company-record-change.spec.js
 - 所属项目：苏州市房地产监测V3；来源会话：750c5f05-27fa-429e-89fd-82d7adcd5bc9；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

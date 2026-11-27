@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:51:17+08:00
+verdict_note: 新禅道 DBX 核对：bug6950=resolved/fixed/tiany/trunk/openedBy=zhoudongdong；action99120=tiany/files=24229/objectID=6950；file24229 挂 bug6950，回写属实。
+---
 # ZenTao Bug 6950
 禅道缺陷 6950：2026-11-24 通过 DBX 事务直连完成 resolved 回写，并挂上复现截图附件。
 

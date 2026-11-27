@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:17:31+08:00
+verdict_note: 园区公共收益 zs-table.vue 命中，resyncTableLayout/table.doLayout() 存在，小计列宽修复属实。
+---
 # zs-table小计数字落到固定操作列修复
 园区公共收益综合查询等列表因element-ui 2.15.13列宽同步时序问题，小计金额偶发显示在操作列。
 

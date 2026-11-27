@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:16:27+08:00
+verdict_note: 苏州V3 命中 BaseLandLicForm/不动产权证号/conLandLic，字段顺序调整属实
+---
 # 建设用地规划证不动产权证号错序
 苏州市房地产监测V3 中「建设用地规划许可证」字段顺序不符设计稿，不动产权证号位于第4位，已调整至第7位。
 

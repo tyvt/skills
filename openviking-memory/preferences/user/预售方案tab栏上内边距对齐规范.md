@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:46:47+08:00
+verdict_note: 苏州V3 PresalePlanFillForm/CashsalePlanFillForm 命中 plan-fill-tabs/tabs-bar/16px，Tab 上内边距对齐属实
+---
 - 为与预售申请详情 Tab 顶距一致，PresalePlanFillForm.vue 的 .plan-fill-tabs :deep(.tabs-bar) 增加 16px 上内边距
 - CashsalePlanFillForm.vue 同步修改
 - 涉及文件：presale/permit/components/detail.vue、permitConstants.js、PresaleBuildingSection.vue、permit/plan/detail.vue、PresalePlanFillForm.vue、styles/index.scss、cashsale/plan/detail.vue、CashsalePlanFillForm.vue

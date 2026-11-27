@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:12:39+08:00
+verdict_note: 惠山二期H5 main.ts 源码命中 VITE_APP_VCONSOLE 环境变量开关，vConsole 调试方案属实。
+---
 # vconsole H5调试面板启用与接口日志
 惠山二期H5等项目在H5环境下通过vConsole进行调试，并按环境开关打印接口请求/响应/错误日志。
 

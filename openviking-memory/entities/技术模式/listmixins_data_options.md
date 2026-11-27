@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:16:18+08:00
+verdict_note: 命中 desensitizeFlag（大量 listMixins/select-dialog 使用），data() 读 $options.props 的场景属实
+---
 # listMixins data() 访问 $options.props 抛 undefined
 列表重置场景下 listMixins.js 的 data() 直接读取 this.$options.props 在 Vue3 部分混用场景会炸。
 ## 问题描述

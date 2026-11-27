@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:26:42+08:00
+verdict_note: package.json dev="uni" 无 --outDir（拆出 dev-mp-weixin=uni -p mp-weixin），与 dev 移除 --outDir 一致
+---
 # uni CLI --outDir 参数修复
 苏住房C 项目 `dev` 脚本误用 `uni` CLI 的 `--outDir` 参数导致报错，已移除。
 

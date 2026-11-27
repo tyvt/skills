@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:53:23+08:00
+verdict_note: 太仓G VoteRangeDialogLite.vue 引用 CandidateConfigTable，所述错误路径致构建失败的组件存在
+---
 # VoteRangeDialogLite错误引用CandidateConfigTable
 太仓G端decisionCommon的VoteRangeDialogLite.vue曾因错误路径引用CandidateConfigTable导致构建失败。
 

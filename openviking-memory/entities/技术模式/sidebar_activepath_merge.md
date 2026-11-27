@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:52:23+08:00
+verdict_note: 苏住房G RecursiveMenu.vue-66 import getSidebarActivePath、-105 activePath 消费，main.js 亦引用，与记忆一致。
+---
 # sidebar_activepath_merge
 苏房侧栏高亮归并：activePath 只改「当前路径」不改「菜单路径」，精确/前缀两种匹配语义不能混用。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:49:42+08:00
+verdict_note: customerProject 下无 -dot="6"（命中在 landPlotChange 非本项目，已移除）；formatFixedDecimal、ParcelDialog 佐证，两位小数修复属实。
+---
 # 投资金额字段六位小数修复
 苏州市房地产监测V3 中 customerProject 金额输入误设 :dot="6" 致六位小数，已改回默认两位。
 

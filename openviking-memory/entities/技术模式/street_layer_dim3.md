@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:13:48+08:00
+verdict_note: 园区物管2.0 statisticsMap 命中 getAreaQueryParams/overviewLayerLevel/dimension，街道层维度3属实
+---
 # 滚轮街道层须传市级码与维度3
 园区物管2.0 资产统计地图 `getAreaQueryParams` 中滚轮放大至街道总览须用市级编码与 `dimension:3`，点击下钻用区县编码与 `dimension:2`。
 

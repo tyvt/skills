@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:16:26+08:00
+verdict_note: 门户 RentalContractQueryPanel.vue 源码命中 200px 固定标签宽，输入框左对齐修复属实。
+---
 # 租赁输入框左对齐修复
 门户与操作指引版「住房租赁合同备案查询」表单输入框因标签自适应宽度导致左边缘未对齐，已统一固定标签宽 200px 并显式左对齐。
 

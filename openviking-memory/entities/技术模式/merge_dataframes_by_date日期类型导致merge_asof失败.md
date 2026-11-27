@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:29:19+08:00
+verdict_note: fund/data_cache.py-175存在merge_dataframes_by_date，cyb_data.py/us_index_data.py用merge_asof，与记忆所述模块一致。
+---
 # merge_dataframes_by_date日期类型导致merge_asof失败
 投资推送中 `data_cache.merge_dataframes_by_date` 将日期转 python date 致 object dtype，并发缓存刷新后 merge_asof 混用类型报错。
 

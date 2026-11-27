@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:26:50+08:00
+verdict_note: 园区公共收益源码中 views/property/handover/detail.vue 路径不存在（n=0），startDate/endDate 仅见于无关文档；承接查验起止日期拼接修复无代码证据。
+---
 # 承接查验起止日期查看模式显示不全修复
 园区公共收益项目handover/detail.vue在查看模式下起止日期仅显示开始日期，已修复为拼接开始与结束日期。
 

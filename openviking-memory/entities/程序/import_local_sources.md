@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:14:32+08:00
+verdict_note: skills仓含import_local_sources脚本与--skip-extract等参数，导入工具记忆属实。
+---
 # import_local_sources
 OpenViking 历史会话本地导入脚本，按源与项目把本地会话导入记忆系统。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:50:43+08:00
+verdict_note: 描述与现状不符：记忆关键项「前往报事报修」蓝色条与 content-z-index/z-index-10 在 repair/index.vue 无命中；虽 #top 插槽含 ZsSearch/筛选、page/repair-page height-100%，但所述具体修复要素缺失，无法证明有效。
+---
 # 报事报修列表 z-paging 盖住顶部操作区修复
 无锡市区小程序嵌入H5中「我的-电子业主卡-报事报修」列表页顶部操作区被 z-paging 滚动层覆盖的修复约定。
 

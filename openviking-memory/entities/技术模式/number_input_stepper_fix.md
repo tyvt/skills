@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:48:26+08:00
+verdict_note: 仓内 zs-input-number.vue/element-ui.scss 含 calc(50%) 步进按钮尺寸、list-card 等，边框/圆角修复模式属实。
+---
 # 数字输入框与步进按钮边框修复
 产品2.0（zhi2-web-admin）中数字输入框圆角被步进按钮遮挡、列表卡片内容溢出，已修复。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:00:37+08:00
+verdict_note: 苏州市房地产监测V3 detail-template.vue 已无 required-mark 星号渲染（其他仓仍有），与 V3 全局移除描述一致。
+---
 # DetailTemplate 必填星号全局移除
 苏州市房地产监测V3 已完成 DetailTemplate 必填星号的全局移除与冗余配置清理。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

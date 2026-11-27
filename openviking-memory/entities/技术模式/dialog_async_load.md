@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:18:37+08:00
+verdict_note: V3 仓 src/utils/dialogAsyncLoad.js 存在且含 beginDialogAsyncLoad(L7)、loadSeq(L4)，异步加载工具描述属实。
+---
 # 预售弹窗异步加载与监听收敛
 苏州市房地产监测V3 中预售申请相关弹窗统一引入异步加载工具与合并监听机制，解决快速关开导致的请求乱序与父级监听失效问题。
 

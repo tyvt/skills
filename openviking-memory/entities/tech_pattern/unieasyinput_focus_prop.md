@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T16:50:55+08:00
+verdict_note: 苏住房C ImgCode/index.vue 有 uni-easyinput 但 inputFocus/nextTick 0 命中，focus prop 方案无法核实
+---
 # uni-easyinput Focus Prop Misuse
 In zhi2-mobile-shimin, uni-easyinput has no focus() method; focus is a boolean prop, misuse caused t.call is not a function.
 ## Root Cause
@@ -20,7 +25,6 @@ In zhi2-mobile-shimin, uni-easyinput has no focus() method; focus is a boolean p
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：ab7bb862-0a23-40aa-ab1b-fe4173708a80
-
 
 <!-- MEMORY_FIELDS
 {

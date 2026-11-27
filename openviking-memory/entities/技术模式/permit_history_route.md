@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:14:47+08:00
+verdict_note: 苏州市房地产监测V3 中 PermitHistoryPanel 命中，/presale/permit/ 与 handleView 存在，许可历史路由修复属实。
+---
 # 预售许可历史查看硬编码路由致页面未授权
 在苏州市房地产监测V3中，预售许可历史查看因硬编码路由导致未授权，已改用统一路由解析。
 

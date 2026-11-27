@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:51:01+08:00
+verdict_note: bankTable.vue 命中 DetailTemplate，组件注册修复在。
+---
 # bankTable.vue 注册 DetailTemplate 修复
 产品2.0 项目修复 bankTable.vue 查看模式未注册 DetailTemplate 组件导致的警告。
 

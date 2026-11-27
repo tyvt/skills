@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:50:21+08:00
+verdict_note: 产品2.0 src/views下无priceParameters/index.vue与detail.vue，价格备案区域选择修复的落点文件不存在。
+---
 # 价格备案区域选择修复
 价格备案参数维护页面（priceParameters）的区域选择组件因数据未加载及属性误用导致无数据项，已修复。
 

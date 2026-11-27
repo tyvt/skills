@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:13:34+08:00
+verdict_note: 苏州市房地产监测V3/zs-table.vue 与 system/menu/index.vue 存在 zs-table-column-cell inline-block 树形列样式，与描述一致
+---
 # 树形表列单元格 inline-block 修复
 苏州市房地产监测V3 的 zhi2-web-admin 修复了树形表格中展开箭头与单元格内容错位的问题，涉及 zs-table.vue 全局样式与 menu/index.vue。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:48:21+08:00
+verdict_note: companyManagement/components/detail.vue-10 命中 beforeForm；toB/companyRecord/detail 命中，重复取数覆盖修复属实。
+---
 # 变更详情重复调备案detail致状态被覆盖
 变更详情页顺手加 companyRecord/detail 请求并把返回整表 Object.assign 进 form，导致审批/提交按钮不显示、编辑态误锁，控制台无报错。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:24:40+08:00
+verdict_note: 楼幢表单位不一致修复相关组件在业务仓命中，描述属实
+---
 # 楼盘表视图楼层单元不一致导致列错位
 园区公共收益项目(zhi2-web-admin)中 BuildingTable.vue 原仅用 tableData[0] 生成表头，楼层单元不一致时列错位，需按全部楼层 unitId 去重汇总排序生成表头并独立计算单元列宽。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:49:57+08:00
+verdict_note: collectBtn.vue、aixin_e.svg、resolveStaticUrl、ZsImage.vue 的 IMAGE_BASE 均命中源码，收藏图标三因修复属实。
+---
 # collectBtn图标不显示三连根因
 苏住房C新房详情页底部「收藏」图标不显示，三独立根因：漏注册 ZsImage、subpackage 未传、小程序端 resolveStaticUrl 误走远程 IMAGE_BASE。
 

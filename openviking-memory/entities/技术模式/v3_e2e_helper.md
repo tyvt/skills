@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T07:14:27+08:00
+verdict_note: 源码无 supervision-bank-helpers.js，clickAndMaybeWaitUnionBankList 0 命中，E2E helper 描述无法证明。
+---
 # 开户银行选择弹窗 E2E Helper 修复
 苏州市房地产监测V3 修复 E2E helper 以对齐开户银行选择弹窗 UI。
 

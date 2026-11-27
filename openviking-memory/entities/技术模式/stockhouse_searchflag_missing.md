@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:43:49+08:00
+verdict_note: 苏住房C src/pages_transaction/service/stockHouseContract.vue存在，searchFlag与houseNewContract命中，修复属实。
+---
 # 存量房页面未置 searchFlag 致结果区不渲染
 存量房页面 `stockHouseContract.vue` 接口报错时未置 `searchFlag` 为 true，导致查询结果区域不渲染。
 

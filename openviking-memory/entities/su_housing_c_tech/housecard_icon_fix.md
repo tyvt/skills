@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:47:51+08:00
+verdict_note: 苏住房C houseCard.vue-300-304 .orientation 仅 width/height/margin-right，无记忆所称 flex-shrink-0
+---
 # houseCard 定位图标布局修复
 苏住房C 的 houseCard 卡片底部地址栏定位图标在双列窄卡片中被压缩消失，已通过补充 flex-shrink:0 修复。
 

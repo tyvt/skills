@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:32:23+08:00
+verdict_note: i淮安H5 源码中 VITE_BENEFIT_MOCK 与 pages_benefit mock 分支均已不存在（n=0），与「移除 mock 走真实接口」描述一致。
+---
 # 移除benefit模块mock逻辑
 i淮安H5 项目中对 benefit 相关页面移除 mock 分支，改走真实接口。
 

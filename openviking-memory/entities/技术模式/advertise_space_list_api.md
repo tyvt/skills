@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:43:20+08:00
+verdict_note: 工具/偏好/知识类记忆，核心符号在 skills 与 OpenViking 仓源码/配置全部命中，描述与现状一致，判有效。
+---
 # 物业管理区域广告位列表接口（苏住房G）
 苏住房G 项目物业管理区域查询详情页的广告位列表由子组件 advertiseTable 渲染。
 

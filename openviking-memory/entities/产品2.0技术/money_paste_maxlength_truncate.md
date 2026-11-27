@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:41:21+08:00
+verdict_note: 产品2.0 money.js 实存，stripMoneyGrouping/onpaste/clipboardData/prefixCleanLen 全部命中，粘贴清洗方案属实
+---
 # 金额指令粘贴被maxlength截断
 产品2.0 金额输入框粘贴「1,111,111」时被截断成 1111，根因是 maxlength 在清洗前抢先截断含千分位逗号的原文。
 

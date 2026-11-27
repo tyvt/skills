@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:53:59+08:00
+verdict_note: 昆山市民 onlineIndex.vue 含 articleType、.then、getList，类型重命名+去 regenerator 修复属实
+---
 # 昆山市民async函数regenerator变量冲突修复
 昆山市民在线服务列表因 async 函数被 regenerator 编译后压缩变量名冲突导致只读错误，已改为普通函数+.then() 修复。
 

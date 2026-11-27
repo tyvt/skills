@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:41:14+08:00
+verdict_note: 现状 appAnalytics.js 仅4个埋点函数用 noReject、无 skipToken/analyticsConfig，httpInstance.js 仍写 Authorization，与记忆记载移除 skipToken 修复后状态一致，判有效。
+---
 # 埋点请求配置skipToken致鉴权头缺失
 appAnalytics.js 中 analyticsConfig 设置 skipToken:true，httpInstance.js 拦截器因此不写入 Authorization 头，埋点接口无 token。
 

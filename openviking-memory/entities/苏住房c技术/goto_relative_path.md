@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:48:34+08:00
+verdict_note: 苏住房C src/utils/menuRouteMap.js 中存在 normalizeLegacyPageUrl（记忆写作 route-map.js，文件名有出入但核心函数与补斜杠机制属实），一致。
+---
 # 分包页相对路径跳转被补斜杠致找不到
 苏住房C分包内跳转写相对路径TypeChoose?...，被goto的normalizeLegacyPageUrl补成/TypeChoose致navigateTo失败。
 ## 问题现象

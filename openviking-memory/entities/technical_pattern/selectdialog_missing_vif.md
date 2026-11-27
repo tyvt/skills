@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:14:27+08:00
+verdict_note: template/detail.vue 含 showProjectDialog、detail-container、v-if，SelectDialog 加 v-if 属实。
+---
 # 内联SelectDialog缺v-if致关闭残留空白
 苏州市房地产监测V3 合同范本详情的内联 `SelectDialog` 未加 `v-if`，关闭后挂载于 flex 容器 `detail-container` 末尾产生空白占位。
 

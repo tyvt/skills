@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:08:56+08:00
+verdict_note: 园区物管2.0/zhi2-web-admin/.../autonomy/userAuth/index.vue 命中 committeeName-undefined 及列表/查询配置，与描述一致。
+---
 # 自治用户授权列表组织名称筛选
 园区物管2.0 的 zhi2-web-admin 在 autonomy/userAuth/index.vue 中按后端字段接好「组织名称」(committeeName)，列表与查询均会带上。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:17:46+08:00
+verdict_note: 苏住房C houseCard.vue 存在 showTypePrefix(L171) 与 addressText(L44)，类型前缀修复描述与代码一致。
+---
 # HouseCard 未实现类型前缀致标识缺失
 Project_Suzhufang.vue 传入 show-type-prefix，houseCard.vue 未实现该属性致新房/二手房标识缺失。
 

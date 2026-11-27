@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:18:12+08:00
+verdict_note: BankAccountTable.vue 命中；table-tr/itf_bankList/Headline 均命中，绑定列表长度触发紧凑空状态方案属实。
+---
 # 银行表空状态不应固定行数
 
 在 `BankAccountTable.vue` 中固定的 `:table-tr="5"` 导致空状态下出现不紧凑的空白和按钮未对齐。
@@ -20,7 +25,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：a5d89768-99be-4451-84bf-85a35b766c41
-
 
 <!-- MEMORY_FIELDS
 {

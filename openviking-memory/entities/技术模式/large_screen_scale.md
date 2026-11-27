@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T07:45:25+08:00
+verdict_note: assetPanorama/index.vue-4/382/401 命中 scale、1920、Math.ceil 动态设计稿宽度计算，大屏留白修复属实。
+---
 # 大屏等比缩放右侧留白修复
 园区物管2.0 数据沙箱/全景类大屏页按 1920 设计稿缩放导致右侧留白的根因与动态设计稿宽度方案。
 
@@ -18,7 +22,6 @@
 - 验证：会话 aedd6cfa 给出根因推导与动态设计稿宽度公式，调整设计稿宽度与统一缩放比，收紧默认高度并侧栏重算；用户提示刷新后宽度贴边铺满，若某列偏窄可指定左/中/右单独调列宽比例
 - 涉及文件：src/views/benefit/dataSandbox/assetPanorama/index.vue、src/views/benefit/dataSandbox/fundPanorama/index.vue、src/views/benefit/mapOverview/index.vue
 - 所属项目：园区物管2.0；代码基线 f00310232；来源会话 aedd6cfa-10c2-4204-ace0-2dc1b2eb8a12；验证证据：园区物管2.0/027.md
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:48:30+08:00
+verdict_note: 苏住房C命中 icon_arrow_right/icon_feedback/./static//../static/ 及 repair/add，分包 static 500 根因与修复属实。
+---
 # 分包页面 ./static/ 不被 uni-app 打包致 500
 苏住房C 小程序中分包页面用 import './static/xxx.png' 引用图片时，构建产物落在页面子目录 /分包/页面/static/，uni-app 只复制分包根部 static，导致运行时 500。
 

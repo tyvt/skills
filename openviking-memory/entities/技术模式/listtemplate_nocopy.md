@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:42:16+08:00
+verdict_note: 在园区物管2.0仓源码命中核心符号(15/15)accountcancel,accountopen,bottomsummaryvariant,complex，涉及文件存在，描述与现状一致，判有效。
+---
 # 列表页禁止复制 ListTemplate HTML
 园区物管2.0 列表页改造时不应复制 ListTemplate 的 HTML 写独立模板，缺能力应增强公共层。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

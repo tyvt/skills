@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:50:29+08:00
+verdict_note: useUrlQueryParam.js 含 decodeURIComponent 处理，外跳 URL 二次解码逻辑属实
+---
 # 外跳投票页h5ExternalWebview二次解码破坏Base64 token
 业主决策等外跳投票页URL的query中token、certificateNum等为Base64形态，经h5ExternalWebview进入后鉴权失败。
 

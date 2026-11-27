@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:54:20+08:00
+verdict_note: 产品2.0 feeDeclare2 下 feeBindScopeDialog/feeBindScopeTable.vue 实存，浅橙 #fff7e6/#ffd591 与「导入上次申报数据」文案在代码中可查。
+---
 # 欠费户室弹窗单选模式 row 未定义修复
 选择欠费户室弹窗 feeBindScopeDialog.vue 单选模式 row 未定义导致确定按钮异常，已重构为楼幢树+列表/楼盘表 Tab 并修复 row。
 

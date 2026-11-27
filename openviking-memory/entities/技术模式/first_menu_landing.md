@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:44:53+08:00
+verdict_note: 苏州市房地产监测V3 实存 landingPath.js/resolveFirstMenuPath、permission.js、ruoyi.js，首菜单跳转属实。
+---
 # 登录后按菜单顺序进入首个非隐藏叶子页
 苏州市房地产监测V3 登录后通过 resolveFirstMenuPath 深度优先取第一个非hidden叶子项跳转首菜单。
 

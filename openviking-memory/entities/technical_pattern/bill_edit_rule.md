@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:50:11+08:00
+verdict_note: spFeeBill enums.js 含 isBillEditable/paidState/billStatus，仅未付未作废可编辑属实
+---
 # Sp Fee Bill Edit Rule
 Only unpaid and non-voided bills are editable; otherwise hide edit entry.
 
@@ -23,7 +28,6 @@ Only unpaid and non-voided bills are editable; otherwise hide edit entry.
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：5d376bda-346d-42a9-b39d-cc3b000dca1e
-
 
 <!-- MEMORY_FIELDS
 {

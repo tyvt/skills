@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:14:52+08:00
+verdict_note: 苏住房G 命中 companyManagement/components/index.vue 的 companyRecordChange 与 bizState，多值序列化修复目标属实。
+---
 # company_change_bizstate_multivalue
 在提交 c2ab33f8b 将 bizState 全局改为多选后，companyManagement/components/index.vue 中对 /company/companyRecordChange/page 的调用错误地将多值字符串序列化为 '1,2'。
 

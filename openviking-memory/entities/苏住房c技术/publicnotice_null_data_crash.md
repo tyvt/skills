@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:19:25+08:00
+verdict_note: 苏住房C 中 publicNotice.vue 与 getContractNoticeList 命中，公告详情空值处理相关文件存在。
+---
 # 单对象接口返回 null 被强加列表致模板崩溃
 苏住房C 市民端公告详情因接口 data:null 被包装成列表唯一行，子组件读字段崩。
 

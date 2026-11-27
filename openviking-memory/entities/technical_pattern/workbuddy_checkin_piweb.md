@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:16:48+08:00
+verdict_note: 实机确认 C-\Users\Administrator\.pi-web\scripts\workbuddy-checkin 与 scheduler-tasks.json 均存在，workbuddy 签到迁移 pi-web 属实。
+---
 # WorkBuddy scheduled checkin migrated to pi-web via wbipc
 The original WorkBuddy timed checkin is brought under pi-web scheduling management.
 
@@ -15,7 +20,6 @@ The original WorkBuddy timed checkin is brought under pi-web scheduling manageme
 ## Verification and Attribution
 - Evidence: src=苏州市房地产监测V3/123.md
 - Project: 苏州市房地产监测V3; Session: 01a171cc-76a9-7048-964a-22d6748131b4; Baseline: none
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:50:03+08:00
+verdict_note: 命中 jsencrypt-polyfill/decryptResponseData/x-encrypt/axios-miniprogram-adapter，响应解密实现属实。
+---
 # 昆山物管 C端
 昆山物管 C端（昆山市民 / kssm）uni-app Vue3 项目（repo: zhi1-mobile-shimin-h5-zhishu-c-unlimited），同时构建 H5 与微信小程序，使用 axios + axios-miniprogram-adapter。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:48:01+08:00
+verdict_note: 园区物管2.0 table.js 实存 syncDisplayColumns/loadTableConfigFromStore，store/modules/table.js 含 table_config_，刷新列序恢复描述属实。
+---
 # 表格自定义列配置刷新后丢失修复
 园区物管2.0 的 global-table-config 自定义列后刷新页面列表恢复默认列顺序，而配置弹窗显示已保存顺序，两边不一致。
 

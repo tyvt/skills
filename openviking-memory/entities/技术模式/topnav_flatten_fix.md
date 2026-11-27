@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:14:53+08:00
+verdict_note: 苏州V3 permission.js 命中且路由信息.json 含「待办事项」首项，顶栏展平修复属实
+---
 # 顶栏菜单展平逻辑修复
 苏州市房地产监测V3 项目中，顶栏菜单第一项错误显示子菜单标题的问题已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:20:16+08:00
+verdict_note: 苏住房C pages_guard相关UI与step1/step2.vue在保障房G/兴化物管命中，云守护页面改动属实
+---
 # 云守护相关页面UI调整
 苏住房C(zhi2-mobile-shimin)中【掌服务-小区管理-云守护】相关UI已调整，涉及云守护首页与申请Step1组件。
 

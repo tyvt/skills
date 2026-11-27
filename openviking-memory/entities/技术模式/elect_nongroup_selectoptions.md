@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:51:17+08:00
+verdict_note: 苏住房C src/pages_owner/elect/ResultRecord.vue 同时含 selectOptions 与 selects.rows 两条分支取值，非分组取 selectOptions 描述属实
+---
 # 选举详情非分组分支取错字段
 苏住房C 投票选举模块非分组选举详情页候选人整块不显示，因非分组分支误用 selects.rows 而非 selectOptions。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:16:17+08:00
+verdict_note: 苏州市房地产监测V3 openBuildingTable/customerProject命中，projectId回退链目标存在。
+---
 # 由于 projectId 为 null 导致点击建筑表格无响应
 在 zhi2-web-admin 的 customerProject 模块中，`openBuildingTable()` 静默返回，因为 `form.projectId` 为 null。
 

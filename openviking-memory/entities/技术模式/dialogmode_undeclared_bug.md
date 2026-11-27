@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:45:04+08:00
+verdict_note: 在产品2.0仓源码命中核心符号(3/3)building,listmixins,mapproperty，涉及文件存在，描述与现状一致，判有效。
+---
 # dialogMode未声明致模板渲染警告
 模板使用dialogMode == 'view'但data()未声明该响应式属性，触发Vue警告。
 

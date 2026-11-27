@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:46:07+08:00
+verdict_note: 门户仓 portalRoutes.js 第8行 inventory 为商品房可售房源信息公示，PortalDialogHost.vue 存在，弹层页头加商品房前缀与记忆一致，判有效。
+---
 # 弹层页头标题遵循菜单名加商品房前缀
 首页「更多」菜单文案为"可售房源信息公示"，弹层标题误用"商品房可售房源展示"。
 ## 问题根因

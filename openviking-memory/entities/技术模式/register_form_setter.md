@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:11:17+08:00
+verdict_note: 苏州V3 registerFormContext.js 有 setRegisterForm，registerValidate.js 引用，setter 修复描述属实
+---
 # 没有 setter 的注册表单在赋值时产生警告
 在 Suzhou Real Estate Monitoring V3 项目中，`registerFormConsumerMixin` 使 `form` 变为 computed readonly，但 `CompanyRegisterSingleForm` 混入了 `detailMixins`，导致在赋值 `this.form` 时产生警告。
 
@@ -18,7 +23,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：87dc18b1-c6cb-4944-ae78-7dd985b6bc0d
-
 
 <!-- MEMORY_FIELDS
 {

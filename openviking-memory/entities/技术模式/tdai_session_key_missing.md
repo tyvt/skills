@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:48:01+08:00
+verdict_note: tdai_recall/session_key 仅在记忆文件出现，无项目代码支撑且该工具不在当前环境，判无证据。
+---
 # tdai 工具要求必填 session_key
 在项目 苏州市房地产监测V3 中，MCP 工具如 `tdai_recall` 要求 `session_key`（例如：苏州市房地产监测V3）；缺失会触发 Missing required argument 错误。
 
@@ -16,7 +21,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：003bc3d6-55d2-4909-bd30-0c1d02f0083d
-
 
 <!-- MEMORY_FIELDS
 {

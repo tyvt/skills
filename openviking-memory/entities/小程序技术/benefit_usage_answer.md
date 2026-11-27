@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:30:25+08:00
+verdict_note: 无锡市区小程序嵌入H5/pages/service/index/index.vue 命中「补充物业专项维修资金」，客服9项答案扩充描述有代码证据。
+---
 # 公共收益用途智能客服答案
 wygl小程序智能客服将「公共收益能用在哪些地方？」的答案由4项扩充至9项，并新增关键词触发逻辑。
 

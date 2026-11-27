@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:52:45+08:00
+verdict_note: 苏住房C cancellationReason.vue 含 getDict/cancel_reason/cancelReasonList 导入与调用，缺失导入修复属实
+---
 # 注销原因列表不显示修复
 苏住房C 小程序「我的→账号安全→注销」页因缺失 `getDict` 导入导致注销原因不显示，已修复。
 

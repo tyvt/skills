@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:51:41+08:00
+verdict_note: 门户 marketMonitor KpiCards.vue 无 fmtPct 方法（改用 formatNumber+toFixed），描述的 fmtPct 两位小数修复无对应代码。
+---
 # 房产监测环比百分比全局两位小数
 zhi2-web-admin 房产监测页切换区县后 KPI 卡片环比出现浮点长尾（如 +0.799999999999998%），需全局保留两位小数。
 

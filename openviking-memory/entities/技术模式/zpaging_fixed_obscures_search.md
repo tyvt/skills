@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:10:54+08:00
+verdict_note: ZsPaging.vue 组件实存且含多插槽透传机制，与记忆'搜索/筛选移入#top插槽'的主题一致。
+---
 # z-paging 默认 fixed 覆盖搜索
 `z-paging` 默认使用 `fixed=true`，全屏渲染并覆盖外部搜索导航。
 ## 上下文
@@ -12,7 +17,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：671da04e-7711-4f45-b4cb-a4bcab90d503
-
 
 <!-- MEMORY_FIELDS
 {

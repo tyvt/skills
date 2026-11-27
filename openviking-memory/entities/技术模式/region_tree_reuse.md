@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:17:58+08:00
+verdict_note: 产品2.0 table.js 与多个列表页存在 RegionTreeLayout、shouldDeferListForRegionTree，区域树复用描述属实。
+---
 # 区域树列表页统一复用 RegionTreeLayout
 物业域列表页通过 RegionTreeLayout 统一左侧区域树与右侧列表布局，避免各页手写树交互不一致。
 

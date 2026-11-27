@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:17:16+08:00
+verdict_note: 产品2.0 ForgotPassword/zs-input 命中，登录样式迁移描述属实
+---
 # login_migrate_style
 登录页从 assets 迁进 views 后整页控件尺寸全坏，需补回 scoped 样式与选择器层级。
 

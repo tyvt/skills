@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:14:58+08:00
+verdict_note: 园区物管2.0 rangeTable 命中 clearSelection/defaultSelectedRangeList，勾选同步属实
+---
 # 弹窗表格选中项与外部默认值同步
 园区物管2.0 中弹窗表格（rangeTable.vue）清空外部默认数组不会清掉 el-table 内部勾选，watch 须 clearSelection 再回填。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

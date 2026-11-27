@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:44:22+08:00
+verdict_note: 苏州V3 contractChange/detail.vue 实存 custom-print、contractChange-contractChange、ZsSubmit、permission-prefix，移除无效Submit描述属实。
+---
 # Unknown custom element Submit 修复
 苏州市房地产监测V3 修复了 `Unknown custom element: <Submit>` 警告，调整了合同变更与合同详情页的提交按钮。
 

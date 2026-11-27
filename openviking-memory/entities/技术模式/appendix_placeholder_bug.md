@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:46:04+08:00
+verdict_note: 前端 appendix-package-helpers.js 仅 e2e fixture，flattenAppendixPackagesToUploadedList/usedConfigIds 未在源码命中，核心修复无证据。
+---
 # 占位分配拆散多文件要件致补充材料多图回显失败
 苏州市房地产监测V3 前端因缺少 appendixConfigId 时占位分配拆散多文件要件，致 UI 仅显示单张图。
 

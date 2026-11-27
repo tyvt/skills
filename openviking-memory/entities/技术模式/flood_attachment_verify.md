@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:10:30+08:00
+verdict_note: 防汛C端src/stores/flood.ts含photosToInspectionFiles/photosToAttachUrl/buildSavePayload，附件字段实现属实。
+---
 # 苏住房防汛C端H5 附件字段保存验证
 `zhi2-mobile-query-h5-c-unlimited` 在 chain `flood-attachment-local-verify`（2026-11-26）完成汛前检查保存请求附件字段补齐、实机抓包验证与提交推送，链路已收口。
 

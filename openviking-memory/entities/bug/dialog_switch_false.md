@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: valid
+last_checked: 2026-11-27T07:12:16+08:00
+verdict_note: 榆林G utils/projectContext.js 源码 ENABLE_B_TERMINAL_PROJECT_DIALOG_ON_LOGIN=true，与「改回 true 恢复弹窗」一致。
 ---
 # Project Dialog Switch Disabled
 The B-terminal login project selection popup was actively disabled by setting a constant to false.

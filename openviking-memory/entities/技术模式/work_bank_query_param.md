@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:52:03+08:00
+verdict_note: 苏住房G src/utils/workBank.js-2 定义 WORK_BANK_SOURCE_MODEL，buildQueryStartBankParams 存在，与记忆一致。
+---
 # 开户银行查询统一 sourceModel 与 regionCode
 苏住房G 项目 zhi2-web-admin 新增 workBank.js 工具，统一为 queryStartBank 传入 sourceModel 和 regionCode。
 

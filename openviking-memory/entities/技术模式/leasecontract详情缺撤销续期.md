@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T20:53:10+08:00
+verdict_note: leaseContract/detail.vue 实查无 handleRevoke/handleTerminate/handleRenew/confirmRenew，所述撤销/终止/续期按钮在当前代码无法证实
+---
 # leaseContract详情缺撤销终止续期功能
 `leaseContract/detail.vue` 未实现合同撤销、终止与续期操作，需参照 `contract/detail.vue` 补充。
 
@@ -19,7 +24,6 @@
 ## 验证与归属
 - 所属项目：G
 - 验证证据：extracted source=cursor project=G
-
 
 <!-- MEMORY_FIELDS
 {

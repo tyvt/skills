@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:24:13+08:00
+verdict_note: 前端技术笔记，ListTemplate mixin缺能力增强方案，相关list mixins在产品2.0命中，描述有据
+---
 # 列表页禁止复制 ListTemplate 的 HTML 写独立模板：缺能力时增强 ListTemplate/mixin 本身
 
 什么情况：给多个列表页（accountCancel、accountOpen/complex、settlementAccount、accountOpen/components）做「主子表样式一致 + 底部合计行」改造时，AI 参考了没用 ListTemplate 的 owner/index.vue，把 ListTemplate 的 HTML 整段复制成独立 <template> 套到这几个页面。用户质疑「为什么要改模板，和通用模板不一致吗？」，复核确认这些复制没有新增能力，反而与项目惯例不一致。为什么：ListTemplate.js + listMixins 是本后台列表页的主流写法，已内置 list-container/list-card 外框、ListOperationButtonContainer 标题栏、border/show-summary 等 props；复制 HTML 后各页样式来源分叉，后续全局表格调整（如补 border、合计行）无法一处生效。怎么做：缺某个能力（如底部合计行）时，优先增强公共层——在 ListTemplate.js 补 bottom-summary-items / bottom-summary-variant prop，在 table.js mixin 里加默认 summaryItems:[]、bottomSummaryVariant:'table'，页面只用 script 重写 summaryItems/showMethod/listCallback 并改回 template: template；只有通用模板确实覆盖不了的场景（额外业务弹窗、额外导出按钮、列定义不走 displayColumns 配置，如 owner 页）才允许写独立模板。排查信号：发现某个列表页出现整段复制的 ListTemplate HTML 且无新增节点，即应回退。
@@ -12,7 +17,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=园区物管2.0
-
 
 <!-- MEMORY_FIELDS
 {

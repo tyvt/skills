@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:47:57+08:00
+verdict_note: 门户 PortalTable.vue 的 displayedPages() 返回 Array.from({length-this.pages})，已无 Math.max(2,...)，修复落地，一致。
+---
 # Portal Page Math Max
 页码生成误用了 Math.max，产生了多余的页面。
 
@@ -16,7 +21,6 @@
 - 所属项目：门户
 - 验证证据：extracted source=cursor project=门户
 - 来源会话：176808fe-ac0e-40e4-872f-fa68fc7638ab
-
 
 <!-- MEMORY_FIELDS
 {

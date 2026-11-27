@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:56:39+08:00
+verdict_note: e2e 配置含 E2E_BASE_URL，构建产物落父仓 dist 与静态站约定属实
+---
 # 构建产物落父仓库根 dist 与 E2E 静态站约定
 本项目构建产物在父仓库根 dist/ 而非子模块，E2E 须显式设 E2E_BASE_URL 指向静态站否则 playwright 自动拉 dev server。
 

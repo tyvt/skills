@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:27:34+08:00
+verdict_note: 产品2.0 scrappedRecord/index.vue-80,96 有 handleViewFacility 链接列，getRouterPathByFilePath 导入存在，跳转设施详情属实。
+---
 # 从报废记录列表跳转至设施详情
 修改 `scrappedRecord/index.vue` 以使设施名称可点击并打开设备详情。
 
@@ -20,7 +25,6 @@
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：71a2b0ad-3e39-4680-9567-9bb5c7e84b89
-
 
 <!-- MEMORY_FIELDS
 {

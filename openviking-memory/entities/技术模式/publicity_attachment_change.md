@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:15:48+08:00
+verdict_note: 泰兴小程序 maintainProject.js 命中 publicityId/fetchPublicityDetail，附件查询改造属实
+---
 # 公示附件按 publicityId 查询改造
 泰兴小程序维保项目模块已将公示附件查询改为按 publicityId 获取，修复原按记录 ID 取附件的问题。
 

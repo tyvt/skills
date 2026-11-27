@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:57:33+08:00
+verdict_note: 监测V3 detailMixins.js 含 init/businessName/moduleName 拼路径逻辑，所述视图模式拼错路径根因属实
+---
 # detailMixins视图模式拼错详情请求路径
 `detailMixins` 在 `formMode: 'view'` 时由 `init()` 按 `moduleName`+`businessName` 拼出不存在的 `/company/institutionRegister/detail`，需在 `detail.vue` 覆盖 `init()` 阻断自动请求。
 

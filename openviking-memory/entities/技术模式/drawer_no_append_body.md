@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:18:25+08:00
+verdict_note: 园区物管2.0 6个文件命中（detail.vue/index.vue 等），抽屉 append-to-body 修复属实。
+---
 # 申报页抽屉未挂body致遮罩不全
 园区物管2.0 中 pubQuarterlyDeclaration 移动端抽屉因未设置 append-to-body 导致遮罩无法铺满视口。
 

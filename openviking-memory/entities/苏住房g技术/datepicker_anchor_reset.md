@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:50:37+08:00
+verdict_note: 苏住房G companyListQuery.js 实存 _updateTimePickAnchor，校验失败重置 anchor 逻辑可核对。
+---
 # 日期范围disabledDate的anchor跨度逻辑
 苏住房G的companyListQuery.js更新时间选择器共用边界/跨度逻辑驱动三处，校验失败分支必须重置anchor否则过期anchor收窄可选范围。
 ## 问题根因

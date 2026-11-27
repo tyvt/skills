@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:52:51+08:00
+verdict_note: companyApplyAudit 含 getRouteMetaValue/effectiveBusCode，busCode 路由读取修复属实
+---
 # 企业备案审核总线代码路由修复
 苏州市房地产监测V3 中修复机构备案审核详情页提交时 busCode 硬编码错误，改为从路由 meta 读取。
 

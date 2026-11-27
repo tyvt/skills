@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:48:22+08:00
+verdict_note: 苏住房G 命中 resolvedProjectId(4)、markerProjectId(2)、reportComplexId(4)，ID 语义拆分属实
+---
 # 台账类接口 ID 主键优先级错配致 200 空数据
 苏住房G统计地图/小区台账点物业管理区域 marker 打开抽屉，Network 全 200 但页面显示全 0 和「暂无数据」，根因是台账接口 ID 主键被改成 complexId 优先。
 

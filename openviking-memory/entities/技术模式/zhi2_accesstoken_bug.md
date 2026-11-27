@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:19:52+08:00
+verdict_note: 园区公共收益 request.js/auth.js 命中；accessToken 命中 login.vue、Bearer/getToken 命中，登录鉴权用 accessToken 写请求头方案属实。
+---
 # 园区公共收益Web后台登录鉴权须用accessToken写请求头
 园区公共收益项目(zhi2-web-admin)登录成功后接口仍401，根因是请求拦截器误用登录返回里的token字段而非accessToken。
 

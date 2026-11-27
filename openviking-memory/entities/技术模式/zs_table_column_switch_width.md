@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:14:31+08:00
+verdict_note: zs-table-column.vue 存在 isStretchableColumn/isFixedWidthCustomSlot/slot-width 列宽判定，与描述一致
+---
 # zs-table-column 开关列未设固定宽致过宽
 `zs-table-column` 内带 `el-switch` 的自定义插槽未声明固定宽类型时参与剩余宽度均分，导致列过宽。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:42:11+08:00
+verdict_note: 苏州市房地产监测V3 contractRevoke/index.vue 实存；contractNo/queryParams、POST /presale/contractRevoke/page、model-contractNo 命中，筛选缺失修复属实。
+---
 # 合同撤销列表合同编号筛选缺失
 苏州市房地产监测V3 中合同撤销列表页原 `queryParams` 未含 `contractNo` 且无输入框，无法按合同编号过滤。
 

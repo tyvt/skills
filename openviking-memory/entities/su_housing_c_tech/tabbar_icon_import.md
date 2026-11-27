@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:12:55+08:00
+verdict_note: 未找到 AppTabBar 组件及 ./../static 旧路径；相关文件静态引用为 ../../static，核心修复无法证实。
+---
 # TabBar Icons Must Be Imported Locally and Static Paths Corrected
 In Su Housing C project, AppTabBar did not import local icons and some pages had wrong static paths, causing icon errors.
 
@@ -27,7 +32,6 @@ In Su Housing C project, AppTabBar did not import local icons and some pages had
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：7004b2d1-f4ed-47aa-b1b7-975f6fb37b58
-
 
 <!-- MEMORY_FIELDS
 {

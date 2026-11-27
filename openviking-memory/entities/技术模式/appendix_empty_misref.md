@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:49:40+08:00
+verdict_note: 苏州市房地产监测V3命中 AppendixEmpty/AppendixPackageSection/conLandLic，导入路径与注册修复属实。
+---
 # AppendixEmpty 错误引用导致 Vite 报错
 `conLandLic/detail.vue` 和 `changeDetail.vue` 导入了不存在的 `@/components/AnnexUpload/components/AppendixEmpty.vue`（实际：`@/components/AppendixEmpty/index.vue`）；`AppendixPackageSection/index.vue` 未注册 `AppendixEmpty`。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:16:08+08:00
+verdict_note: V3 仓存在 AgencyEntryNetworkSections.vue 与字典 company_business_scenario，业务范围区块描述有代码依据。
+---
 # 企业入网认证页面业务范围区块调整
 苏州市房地产监测V3 中企业入网认证页（`AgencyEntryNetworkSections.vue`）在基本信息与机构管理员信息间新增「业务范围」独立区块。
 

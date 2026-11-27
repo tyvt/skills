@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:17:51+08:00
+verdict_note: 基金面板 index.html 命中 fundVol/波动率，波动率徽标记忆属实
+---
 # 基金面板波动率倍数徽标
 基金面板中以 `fundVol` 计算年化波动率，并相对自身近一年倍数展示彩色徽标以解决绝对波动率跨资产不可比问题。
 

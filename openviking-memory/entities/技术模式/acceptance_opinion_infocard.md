@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:49:09+08:00
+verdict_note: completion-acceptance.vue-4 命中 info-card、-10 命中竣工验收日期；opinion-card 已无命中，验收意见合并属实。
+---
 # 验收意见并入信息卡片不再单独分块
 泰兴小程序 completion-acceptance.vue 中删除 opinion-card，将验收意见区域移入 info-card 内部紧贴竣工验收日期之下。
 ## 问题根因

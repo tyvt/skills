@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:16:26+08:00
+verdict_note: 产品2.0含stepPictureUrlList，步骤图片images类型回显修复属实。
+---
 # 设施设备记录步骤图片回显修复
 物业/设施详情中步骤图片因 DetailTemplate 的 image 类型做后缀判断而不显示，改用 images 类型修复。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

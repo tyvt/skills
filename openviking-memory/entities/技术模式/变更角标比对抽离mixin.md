@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:26:39+08:00
+verdict_note: 苏州市房地产监测V3/docs/frontend/mixins-guide.md-131 与缺陷单6011文档明确记载 changeObjectMixins/changeBadgeValue 逐字段比对、日期仅比对 yyyy-MM-dd，与描述一致。
+---
 # 变更角标比对抽离mixin忽略日期格式差异
 苏州市房地产监测V3 中资质与从业人员变更角标比对逻辑重复，抽离为 changeObjectMixins.js 统一处理并忽略日期格式差异。
 

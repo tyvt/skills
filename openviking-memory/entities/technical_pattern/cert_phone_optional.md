@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:49:21+08:00
+verdict_note: personnelCertificate/detail.vue 命中 contactPhone，联系电话规则在。
+---
 # 专业资格证书联系电话非必填
 苏州市房地产监测V3 中专业资格证书管理（新增/编辑页）的「联系电话」移除必填校验，仅保留填时格式校验。
 

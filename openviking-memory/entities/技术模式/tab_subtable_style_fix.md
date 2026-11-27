@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:12:22+08:00
+verdict_note: 苏州V3 含 collapse-container/tabs-header-action/BuildingChangeTable，move-subtable-toolbar 脚本经执行为 0 files，Tab 子表样式修复属实。
+---
 # Tab内子表去内框与工具栏同行样式修复
 苏州市房地产监测V3 中优化详情页 Tab 内子表样式，去除内层边框并将工具栏与标题同行。
 

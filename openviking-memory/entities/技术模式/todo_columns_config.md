@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-28T02:29:44+08:00
+verdict_note: 产品2.0 flowable/todo.vue 存在 submitTittle/busCodeOptions 列配置与 handleProcess，描述属实。
+---
 # 待办列表列配置接入
 产品2.0 的 zhi2-web-admin 中 flowable/todo.vue 已生成并接入 columns 配置，并修复重复定义。
 ## 配置内容
@@ -15,7 +19,6 @@
 ## 验证与归属
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

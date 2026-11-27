@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:44:49+08:00
+verdict_note: 苏住房G worktrees/screen-motion 实存 studyNav.js、hasStudyAttachment、resolveStudyDetailFilePath，学习园地条件下载/跳转描述属实。
+---
 # 学习园地条件下载与详情跳转
 苏住房G 项目 zhi2-web-admin 首页学习园地（StudyPanel）实现条件下载与菜单详情跳转，新增 studyNav.js 路由映射。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T09:46:28+08:00
+verdict_note: 仅通用词 playwright 命中，Firefox 录屏限制无代码产物或配置证据，无法证实。
+---
 # Playwright Firefox 录屏不生成文件
 Playwright 对 Firefox 存在已知限制，Windows 及特定版本组合下配置 video:'on' 仍不生成视频文件，非项目配置错误。
 

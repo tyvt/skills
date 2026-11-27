@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:16:25+08:00
+verdict_note: 产品2.0 ruoyi.js 命中，getid 动作修复文件存在。
+---
 # getId解析路由主键须排除动作段
 utils/ruoyi.js的getId()从路径末段解析业务主键时须排除/add等动作段，否则新增页拿到假主键。
 

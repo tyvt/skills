@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:47:41+08:00
+verdict_note: 惠山二期H5命中「暂未选择」/ViewOptionsList/DescribePopup/decisionRequired，非必填占位方案属实。
+---
 # 非必填议题未投票显示「暂未选择」
 惠山二期H5 多议题表决模块按 UI 要求，非必填且未投票时在查看选择处统一显示「暂未选择」。
 

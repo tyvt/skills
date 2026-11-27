@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:50:20+08:00
+verdict_note: 苏州市房地产监测V3 命中 noticeValidity.js、getNoticeValidityDays(6)，字典缺项安全查找属实
+---
 # 退款详情字典缺项直接读dictValue报错
 `refund/detail.vue` 的 `initDict()` 对 `NOTICE_VALIDITY` 字典 `find()` 结果直接访问 `.dictValue`，缺 `REFUND_NOTICE_VALIDITY` 时抛 `Cannot read properties of undefined`。
 

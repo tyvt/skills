@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:14:42+08:00
+verdict_note: 太仓一网通办H5 命中 ParticipateIn.vue 中 StepSign 与 FaceStep 组件，四步表决流程属实。
+---
 # 表决流程签字与人脸识别均接入且为必经步骤
 太仓一网通办H5 的参与表决页定义四步流程，签字与人脸识别均为实际接入的必经步骤。
 

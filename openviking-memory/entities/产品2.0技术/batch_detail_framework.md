@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:49:34+08:00
+verdict_note: migrate-detail-framework.mjs 存在，含 operation-btn-group/DetailTemplate/moduleName 五条改造，属实
+---
 # 详情页批量迁新框架
 存量迁移模块的 detail.vue 停留在旧框架，需用脚本批量落地五条统一改造标准，再人工处理例外文件。
 

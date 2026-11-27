@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:53:04+08:00
+verdict_note: 产品2.0 实存 -has() 与 supports/fallback 兜底代码，兼容方案属实。
+---
 # zhi2-web-admin :has() 兜底方案
 zhi2-web-admin 的 index.scss 与 main.js 使用 :has() 选择器，需为不支持的浏览器（如奇安信可信浏览器 Chromium<105）提供兜底。对应禅道 bug 6279。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:17:47+08:00
+verdict_note: 苏住房C 命中 success 页路径、AuthorizedSuccess、ZsButton/ZsImage，布局改造属实
+---
 # SuccessCard 图片水平居中且按钮贴底
 苏住房C(zhi2-mobile-shimin)的 `SuccessCard.vue` 需实现图片水平居中及按钮贴底布局。
 

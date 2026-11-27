@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:43:49+08:00
+verdict_note: 园区物管2.0 zs-table-column.vue 实存 hasEffectiveCustomSlot/isMeasurableFlexSlot/measureSlotContentWidth/isFlexColumn，列宽塌陷修复描述完全吻合。
+---
 # 公共组件 zs-table-column 列宽塌陷修复
 园区物管2.0 公共组件 `zs-table-column` 在 `v-for`+`v-if` 场景下误判自定义列导致列宽塌陷，已在组件内修复，所有使用页受益。
 ## 问题根因

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:18:06+08:00
+verdict_note: 苏住房C 含 p-x-32/px-32/goodProject/uno.config，UnoCSS 水平内边距短横线类名属实。
+---
 # 苏住房C UnoCSS 水平内边距短横线类名
 苏住房C 移动端 UnoCSS 水平内边距需用短横线分段写法 `p-x-32`，写错为 `px-32` 不报错但静默不生效。
 

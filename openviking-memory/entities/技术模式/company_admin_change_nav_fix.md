@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:48:50+08:00
+verdict_note: ruoyi.js-377 buildNavigationByFilePath、companyAdminChange、resolveChangeId、busCode 均在，企业变更跳转修复属实。
+---
 # 企业管理变更跳转失败修复
 苏州市房地产监测V3 修复企业管理变更（companyAdminChange）发起变更后跳转报错问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:50:49+08:00
+verdict_note: 核对苏住房G：RegionTreeLayout、regionBankAuth 命中，树表错位回退方案与描述一致。
+---
 # 隐藏切换按钮顺手改表格致树表错位
 苏住房G的regionBankAuth列表页仅要求隐藏平铺/树状切换按钮，但改动引入:tableKey与fill-height导致列错位与空白。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏住房G
-
 
 <!-- MEMORY_FIELDS
 {

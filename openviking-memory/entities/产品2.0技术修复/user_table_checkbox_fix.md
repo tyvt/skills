@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:47:56+08:00
+verdict_note: 产品2.0 userTable.vue 用 zs-select-column+isSelectable，无 bizState=='0' 的v-if，selectUserDialog 存在，勾选列始终显示修复属实。
+---
 # 通知对象选择弹窗勾选框丢失修复
 产品2.0 项目修复 msg/notice/components/userTable.vue 勾选列不渲染的 bug。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

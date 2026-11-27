@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:22:09+08:00
+verdict_note: 苏住房C 源码命中 @/store/menu 导入与 loadMenu/tabBar，动态import致undefined的场景对应代码存在。
+---
 # 小程序动态import编译成字符串致store为undefined
 苏住房C分包改造时把静态import的store改动态import，uni-app编译到mp-weixin后变成路径字符串，解构出undefined。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:17:49+08:00
+verdict_note: 苏住房C echarts-uniapp/scroll-view/balancePublicity/年度预算 全命中，canvas 空白修复描述属实
+---
 # 小程序canvas放入scroll-view必空白
 苏住房C小程序中，EchartsUniapp底层canvas在微信小程序属原生组件，不能在scroll-view内正常渲染，导致年度预算页图表空白。
 ## 根因

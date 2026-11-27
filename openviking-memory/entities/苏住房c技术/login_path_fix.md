@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:43:43+08:00
+verdict_note: 实机核对：苏住房C pages.json 仅含 pages/login（4处），无 pages_main/login；src/utils/index.js 无 PAGES.login。记忆称已统一迁移到 /pages_main/login/index，与代码现状不符。
+---
 # 登录页分包迁移路径修复
 苏住房C 登录页分包迁移后旧路径跳转导致 page not found，已统一改为新路径。
 

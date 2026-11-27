@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:45:21+08:00
+verdict_note: noticeChange/detail.vue 含 TransactionDetailTable 与 () => import 异步注册，ES6 简写未导入的修复属实。
+---
 # 组件未导入简写变量致ReferenceError
 苏州市房地产监测V3 中 noticeChange/detail.vue 因使用 ES6 简写组件未导入变量，模块加载时抛出 ReferenceError，已改为异步懒加载修复。
 

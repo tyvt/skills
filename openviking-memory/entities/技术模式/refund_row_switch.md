@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:49:23+08:00
+verdict_note: refundDetailTable.vue 命中 currentMaintenanceObjectId(3-4)，切换行数据刷新修复属实
+---
 # 返还明细弹窗切换行数据不刷新修复
 惠山G 项目 zhi1-web-admin 中资金返还明细弹窗（`zs-dialog` 设 `modal="false"` 不挡表格），点开第 2 条后不关弹窗直接点第 1 条时，`visible` 一直为 `true`，`@open` 不再触发，表单与明细表停留第 2 条数据。
 

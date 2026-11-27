@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:11:58+08:00
+verdict_note: 物业手持B端 FilterPopup.vue(1)/filter.scss(1)命中，重置图标模板文件存在。
+---
 # 筛选重置图标缺失模板补全
 巡检筛选重置图标不显示因 `FilterPopup.vue` 模板未正确渲染图标节点，需恢复重置图标元素声明。
 ## 问题根因

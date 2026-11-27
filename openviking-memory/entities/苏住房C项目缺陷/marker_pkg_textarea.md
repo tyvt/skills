@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:19:32+08:00
+verdict_note: resolveStaticUrl 与 location-red 命中，addAlone.vue/form2.scss/ZsTextarea.vue 均存在
+---
 # 跨包 marker 图片引用失败及 textarea 塌陷
 在移动项目 Su Housing C 中，通过 @/static 跨包引用的 location-red.png 导致小程序 500 错误，且 form2.scss 中的水平 flex 导致 ZsTextarea 高度塌陷。
 

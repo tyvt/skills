@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:53:48+08:00
+verdict_note: 苏住房G vite.config.js-425 使用 env.VITE_LAUNCH_EDITOR !== "false" 门控中间件，与记忆一致。
+---
 # vite_launch_editor
 苏房 zhi2-web-admin 自建 launch-editor 中间件受两个 env 开关控制，导致 Vue DevTools「在编辑器中打开」失效。
 ## 问题现象

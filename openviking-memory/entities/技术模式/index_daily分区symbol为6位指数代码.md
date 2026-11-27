@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:49:39+08:00
+verdict_note: 核对 fund：export_to_parquet.py 命中 DEFAULT_INDEX_SYMBOLS、INDEX_ORDER_BOOK_IDS，6位指数代码规范一致。
+---
 # index_daily 分区 symbol 为 6 位指数代码，非 RQAlpha 后缀格式
 导出到 index_daily 分区的 symbol 列存 6 位指数代码，不可误用 RQAlpha 后缀格式。
 

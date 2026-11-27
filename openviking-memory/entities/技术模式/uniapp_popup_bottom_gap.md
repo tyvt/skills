@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:54:03+08:00
+verdict_note: 泰兴小程序 App.vue 含 env(safe-area-inset-bottom) 作用于弹窗容器，底部空隙根因与代码一致。
+---
 # 底部弹窗距底空隙因 addGlobalClass 穿透与 padding
 项目多处底部弹出弹窗距页面底部有空隙，根因是 uni-app 注入 addGlobalClass 且 App.vue 在弹窗最外层容器加了安全区内边距。
 

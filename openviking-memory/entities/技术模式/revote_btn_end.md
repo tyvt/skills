@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:47:42+08:00
+verdict_note: 太仓G ownerDecision/detail.vue 含 showRevote 与 decisionState 判断，重新发起表决按钮按状态显隐属实。
+---
 # Revote Btn End Only
 重新发起表决按钮原未校验表决状态，致未开始态误显示。
 

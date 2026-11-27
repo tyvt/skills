@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:49:37+08:00
+verdict_note: 泰兴小程序 decision/detail.vue 命中 options.q(2)、urlToObj(4)、decisionId，与扫码 decisionId 解析修复一致。
+---
 # 扫码进入表决详情 decisionId 解析修复
 泰兴小程序扫普通链接二维码进入表决详情时 `decisionId` 为 undefined 的问题已修复。
 

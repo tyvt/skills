@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:16:50+08:00
+verdict_note: 苏州市房地产监测V3 ruoyi.js 命中 getRouterPathByFilePath、buildNavigationByFilePath、routeMatchesFilePath，属实
+---
 # 路由文件路径匹配未比对component
 `getRouterPathByFilePath` 因未比对 `component` 字段导致工具函数失效。
 
@@ -15,7 +20,6 @@
 - 验证证据：src=苏州市房地产监测V3-rest/044.md
 - 涉及文件：zhi2-web-admin/src/utils/ruoyi.js、src/views/presale/permit/components/detail.vue 等
 - 所属项目：苏州市房地产监测V3；来源会话：91b53615-9131-4fec-94ff-01cc463a59ef；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

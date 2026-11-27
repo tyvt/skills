@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:10:21+08:00
+verdict_note: 多项目 DecisionRangeTable.vue 命中 doLayout() 方法，与记忆'切换后调doLayout重置'修复一致。
+---
 # el-table列变未doLayout致切换后表体空
 optionDecision/detail.vue 切到「投票信息」tab 时表格列增多，未执行 doLayout() 且缺 pageNum 重置，致表体高度为 0 行不显示。
 

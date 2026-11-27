@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:42:24+08:00
+verdict_note: agencyBasicInfoContent.js 等实存；DetailTemplate/displayValue/formatFixedDecimal/unit-万元/dot-2/type-amount 命中，万元单位规范属实。
+---
 # 统一资本登记与万单位值组件
 
 在苏州市房地产监测V3项目中，资本登记的显示规范已统一为使用万单位的值组件（万元）。

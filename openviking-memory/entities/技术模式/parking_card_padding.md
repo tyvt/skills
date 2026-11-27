@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:47:13+08:00
+verdict_note: 产品2.0 operatingAssets.vue含parking-total-card，停车位卡片padding修复属实。
+---
 # 停车位概要卡片
 operatingAssets.vue 组件在停车位卡片中因缺少 padding 导致间距不一致。
 
@@ -17,7 +22,6 @@ operatingAssets.vue 组件在停车位卡片中因缺少 padding 导致间距不
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：870b5b21-223f-480d-b1ef-f92c770baf5b
-
 
 <!-- MEMORY_FIELDS
 {

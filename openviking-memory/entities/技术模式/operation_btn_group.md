@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:44:53+08:00
+verdict_note: 苏州市房地产监测V3 OperationBtnGroup/index.vue-373/378/381 emitStateChange 实测存在
+---
 # 操作按钮组统一 emitStateChange 刷新
 苏州市房地产监测V3的 OperationBtnGroup 组件新增 emitStateChange，统一提交/审核后的刷新事件，避免逐页重复绑定。
 

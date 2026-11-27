@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T08:18:01+08:00
+verdict_note: 源码 h5Context.js 不存在，serializeQueryParams/encodeZsParam 仅见于构建产物与记忆归档，无法证实。
+---
 # H5端GET query单键编码致业务参数错位
 苏住房C H5 端 serializeQueryParams 对单 key/value 编码后整体 base64，致服务端拿到百分号串而非明文中文。
 

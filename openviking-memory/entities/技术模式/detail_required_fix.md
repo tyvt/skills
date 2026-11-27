@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:45:09+08:00
+verdict_note: 苏州V3 personnelCertificate/detail.vue 的 contentInfo 字段无 required-true 而 rules 保留 required，查看态星号移除描述与代码一致。
+---
 # 详情页必填星号移除修复
 苏州市房地产监测V3 中详情查看态不再显示必填星号，从 3 个文件的 DetailTemplate 移除 `required: true`。
 

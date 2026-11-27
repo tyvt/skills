@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:18:21+08:00
+verdict_note: 苏住房C ZsPopup.vue 命中 popup-container，宽度约束属实
+---
 # 苏住房C弹窗ZsPopup左右留白约束
 苏住房C认证失败等弹窗因ZsPopup缺少视口相对宽度约束贴边，需在公共组件加max-width与margin居中。
 

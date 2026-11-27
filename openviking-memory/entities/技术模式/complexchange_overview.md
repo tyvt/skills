@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:24:16+08:00
+verdict_note: 园区物管2.0 complexChange/detail.vue 存在且与 complex/detail.vue 一同命中 complexChange
+---
 # complexChange概览对齐complex页
 园区物管2.0 资产概览页 complexChange/detail.vue 区域概览样式需对齐 complex/detail.vue。
 

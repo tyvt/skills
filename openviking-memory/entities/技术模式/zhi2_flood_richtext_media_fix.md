@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:18:25+08:00
+verdict_note: 苏住房防汛C端 richText.ts/portalData.ts 命中；formatRichTextContent/VITE_MEDIA_BASE_URL/szfweb/resolveMedia 均命中，媒体路径补全属实。
+---
 # 苏住房防汛C端门户富文本媒体路径修复
 门户H5富文本详情页图片相对路径补全完整域名的修复方案与验证记录。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:18:55+08:00
+verdict_note: fund/ 下 backtest_html.py、backtest_trade_signals.py、index_meta.py 均命中，回测图表功能文件齐备。
+---
 # 回测html图表功能需求
 HTML 回测折线图需支持起止日期筛选、横轴粒度切换与全量指数下拉排序。
 ## 功能要求

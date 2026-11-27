@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:22:19+08:00
+verdict_note: router.py[usage]走stderr、jsonbridge.py stdout换stderr、api.py run_tool/session_id/costs 及 prorate 测试均在
+---
 # op=tool 审计链路与账单修复
 多模型编排系统在 op=tool 模式下审计链路断裂、账单缺失及 stdout 污染问题的修复方案。
 

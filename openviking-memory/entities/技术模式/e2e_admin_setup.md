@@ -1,8 +1,13 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:50:20+08:00
+verdict_note: V3 实存 company-register-branch.spec.js 与 PLAYWRIGHT_ADMIN_USER；录屏合并脚本改名为 merge-flow-videos.mjs，策略属实。
+---
 # E2E 主管部门账号与录屏策略配置
 苏州市房地产监测V3 的 zhi2-web-admin 完成 E2E 主管部门账号配置及录屏策略拆分。
 
 ## 改动内容
-- 新建 zhi2-web-admin/e2e/.env.e2e，设置 PLAYWRIGHT_ADMIN_USER=6000064、PLAYWRIGHT_ADMIN_PASSWORD=ZS001Aa!
+- 新建 zhi2-web-admin/e2e/.env.e2e，设置 PLAYWRIGHT_ADMIN_USER=6000064、PLAYWRIGHT_ADMIN_PASSWORD={{ov_privacy:ambiguous}}
 - Playwright 要求 test.use({ video }) 在文件顶层，将分支用例拆到独立文件：company-register.spec.js（全流程 video:'on'）、company-register-branch.spec.js（分支流程 video:'off'）
 - 合并脚本 merge-company-register-video.mjs 仅处理全流程录屏；单段时直接处理
 

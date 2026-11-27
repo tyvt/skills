@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:12:33+08:00
+verdict_note: BuildingUnitLazyTree.vue 命中；listFy/listNofenye/listUnitinfo 在 src/api/lpgl/unitinfo.js，loadNode 命中，共享懒加载树描述属实。
+---
 # Building Unit Lazy Tree Component
 The 苏州市房地产监测V3 project extracted the duplicated building-unit left tree from contract refund and payment dialogs into a shared lazy-loading component BuildingUnitLazyTree.vue.
 
@@ -18,7 +23,6 @@ The 苏州市房地产监测V3 project extracted the duplicated building-unit le
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：85cb61cc-a222-4e94-9f77-255ce248f02c
-
 
 <!-- MEMORY_FIELDS
 {

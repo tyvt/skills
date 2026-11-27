@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:46:56+08:00
+verdict_note: 核对苏州市房地产监测V3：agencyPersonnel index/detail 组件路径命中，模块结构描述一致。
+---
 # 经纪机构管理人员模块代码结构
 苏州市房地产监测V3 项目梳理了「经纪机构管理」模块下机构人员（`agencyPersonnel`）的列表与详情组件结构。
 

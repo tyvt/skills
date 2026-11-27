@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:19:23+08:00
+verdict_note: 产品2.0 4文件命中（ListTemplate.js/listMixins.js 等），少字段弹窗规则属实。
+---
 # 产品2.0 少字段详情改弹窗
 产品2.0 中字段数少于等于 6 的子维护页改用 zs-dialog 弹窗承载，列表保留操作列。
 

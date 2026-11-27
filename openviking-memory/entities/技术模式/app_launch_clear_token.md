@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:18:50+08:00
+verdict_note: 全库 App.vue 命中 onLaunch + userStore.clear() 在惠山二期H5/惠山小程序（第28行），冷启动清空登录态机制属实。
+---
 # 应用冷启动清空登录态
 在 Pinia 持久化 token 的前提下，通过 stores/user.js 新增 clear() 并在 App.vue 的 onLaunch 调用，实现每次打开应用都重新登录。
 

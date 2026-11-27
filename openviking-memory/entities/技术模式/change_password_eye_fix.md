@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:46:52+08:00
+verdict_note: staff/pages/profile/change-password.vue-21/22 命中 type="text" 与 -password="!visible.oldPassword"，小眼睛清空修复属实。
+---
 # 修改密码页小眼睛切换清空密码修复
 泰兴小程序「我的 → 修改密码」页点击小眼睛切换显示/隐藏时密码被清空，已修复。
 

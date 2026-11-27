@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:48:22+08:00
+verdict_note: 无锡市区小程序嵌入H5 实存 accountFundDetail、sharedFunds.js、DetailsTab.vue，路径修复描述一致。
+---
 # 共有资金明细接口路径含statistics段
 getAccountFundDetail 请求路径须为 POST /benefit/app/accountStatistics/statistics/accountFundDetail，旧路径少 /statistics 会 404。
 

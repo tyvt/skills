@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:17:44+08:00
+verdict_note: 产品2.0 存在 urlList/handlePictureCardPreview/resolveServerAssetUrl 多图预览匹配逻辑，与描述一致
+---
 # ImageUpload 多图预览错位
 园区物管2.0 公共组件 ImageUpload 新增态连续上传多图后，点击缩略图预览总是打开第一张。
 

@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T10:12:51+08:00
+verdict_note: 源码无 groupRecordRows/buildRecordList 函数，且路径为 pages_owner/elect 而非 pages_vote/elect，姓名聚合修复描述与现状不符。
+---
 # 选举结果分组漏姓名bug
 苏住房C小程序投票模块 DecisionResult.vue 合并分组时丢失选举人姓名，修复后改为聚合姓名并新增 buildRecordList。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:18:50+08:00
+verdict_note: V3 仓 zs-select/SingleSelect.vue 已无 applyPopperStyle 代码，仅保留 visible-change 透传(L2)，L54 注释明确下拉交回 Popper.js，与最终修复一致。
+---
 # 禅道 Bug 6173
 苏州市房地产监测V3 价格备案申请维护户室时页面抖动缺陷，根因为 SingleSelect.vue 自定义定位与 Element UI Popper.js 双定位机制冲突，经三次修复最终解决。
 

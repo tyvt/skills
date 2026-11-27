@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:15:48+08:00
+verdict_note: 苏州市房地产监测V3 location-cascader.vue 中 syncSelectedPathFromProps、defaultValue、region 命中，级联回显修复属实。
+---
 # 地区级联选择器与机构详情区划回显修复
 苏州市房地产监测V3 修复了 location-cascader 组件未传 region prop 时的报警，并完善机构详情区划回显。
 
@@ -16,7 +21,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

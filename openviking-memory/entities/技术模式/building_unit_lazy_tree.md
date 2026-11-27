@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:30:33+08:00
+verdict_note: 苏州V3 views/components/BuildingUnitLazyTree.vue 存在，listNofenye/listUnitinfo/no-units 与 ContractDialog/BuildingDialog 接入可查，描述属实。
+---
 # BuildingUnitLazyTree 公共组件
 苏州市房地产监测V3 新增「楼幢 + 单元」左树公共组件 `views/components/BuildingUnitLazyTree.vue`。
 

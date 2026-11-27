@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:15:58+08:00
+verdict_note: 苏住房C ExpenseList.vue 含 import { ref } from，重复导入 ref 的 ESLint 修复属实。
+---
 # ExpenseList.vue 重复导入ref修复
 苏住房C 项目中 zhi2-mobile-shimin 的 ExpenseList.vue 因从 vue 重复导入 ref 触发 ESLint 报错，已删除多余导入并可重新提交。
 

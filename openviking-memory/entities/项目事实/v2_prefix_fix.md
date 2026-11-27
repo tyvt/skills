@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:50:12+08:00
+verdict_note: 门户命中 portalApiRewrite 与 /api/v2.0 前缀，v2 网关前缀对齐修复属实。entryNetwork 与本条无关。
+---
 # 门户 v2 API 网关前缀对齐 /api/v2.0
 门户及子模块发现类似问题后，统一将 v2 API 网关前缀对齐为 /api/v2.0 并创建分支提交（未 push）。
 
@@ -16,7 +21,6 @@
 ## 验证与归属
 - 所属项目：门户
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

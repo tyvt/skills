@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:46:11+08:00
+verdict_note: 产品2.0 Navbar.vue 无 goHome，home/index.vue 仍调用 toggleSideBar；记忆所述「移除 toggleSideBar 并加 goHome」修复在现有代码中不存在。
+---
 # Home Index Vue Calls toggleSideBar
 The `home/index.vue` `created` hook called `toggleSideBar`, collapsing the default expanded sidebar.
 
@@ -17,7 +22,6 @@ The `home/index.vue` `created` hook called `toggleSideBar`, collapsing the defau
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：7306b6f9-4bed-4195-ab23-cda67731b6e0
-
 
 <!-- MEMORY_FIELDS
 {

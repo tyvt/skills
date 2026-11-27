@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:44:03+08:00
+verdict_note: 门户 zhi2-web-admin 含 CreditPages.vue、agency-credit、统一社会信用代码列，仓库关系与信用公示页描述属实。
+---
 # zhi2-web-admin
 房地产综合服务平台门户前端代码仓库，由苏州房产团队维护。
 

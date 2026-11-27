@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:17:09+08:00
+verdict_note: 含resolveChangeDetailTarget与jgcyrybg，机构变更跳转类型区分属实。
+---
 # 机构变更列表跳转未区分类型致400
 苏州市房地产监测V3 中 `companyChangeManage/index.vue` 的 `navigateToChangeDetail` 未依类型区分路由，致从业人员信息带变更单ID调备案detail出400。
 

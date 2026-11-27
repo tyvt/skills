@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:59:52+08:00
+verdict_note: 监测V3 contract/index.vue 含 contractType 与 /cash 判定，ContractOperationActions.vue 共用组件存在，描述属实
+---
 # Contract 2016 component judges pre-sale by /cash and reuses shared component
 In Suzhou Real Estate Monitoring V3, `contract/index.vue` was changed to judge pre-sale by route `/cash` and extracted a shared operation component for both branches.
 

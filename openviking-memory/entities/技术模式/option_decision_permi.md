@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:11:41+08:00
+verdict_note: 太仓G zhi1-web-admin/src/views/estate/optionDecision/detail.vue 命中 estate-optionDecision 前缀与 updateActivation，权限前缀兼容属实。
+---
 # 选项表决详情权限前缀错致按钮不显示
 太仓G端 optionDecision/detail.vue 按钮权限前缀写死 ownerDecision 致部分按钮缺失，需兼容 optionDecision 前缀。
 

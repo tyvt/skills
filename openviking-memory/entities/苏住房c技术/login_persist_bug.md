@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:17:22+08:00
+verdict_note: 苏住房C 源码命中 setStorageSync 持久化，登录态跨条件编译修复属实。
+---
 # uni-app小程序登录态不持久
 苏住房C小程序登录后关闭重开回到未登录，Pinia持久化被条件编译裁剪导致小程序端不执行。
 

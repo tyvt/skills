@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:20:04+08:00
+verdict_note: 园区物管2.0 detail-template.vue 与 rectificationNotice/detail.vue 均命中；detail-template 引用命中 x18，组件排查修复描述属实。
+---
 # B端DetailTemplate缺失全局排查
 园区物管2.0 的 B 端不存在 DetailTemplate 组件，需全局排查引用并修复。
 

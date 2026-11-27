@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:19:06+08:00
+verdict_note: 苏住房G home/index-v2.vue 命中 todoNum/pickTaskCountField，待办数量字段修复属实
+---
 # 首页待办数量字段修复（苏住房G）
 苏住房G 项目修复首页待办数量显示错误。
 

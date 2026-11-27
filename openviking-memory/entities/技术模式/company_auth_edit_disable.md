@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:15:22+08:00
+verdict_note: 苏住房G companyRecordAuth命中(9)，企业授权编辑页禁用企业名称目标存在。
+---
 # 企业授权编辑禁用企业名称
 苏住房G项目修复行业管理-用户及授权-企业授权编辑页企业名称可误修改问题。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:49:37+08:00
+verdict_note: 苏州市房地产监测V3 staffManagement/components/detail.vue 含 showAppendixSection 与 organType 判断，隐藏要件上传属实。
+---
 # 开发企业从业人员详情页隐藏要件上传模块
 苏州市房地产监测V3 中开发企业（organType==='01'）从业人员详情页不需要件上传模块，需按条件隐藏。
 

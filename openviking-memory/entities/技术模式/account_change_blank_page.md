@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:20:29+08:00
+verdict_note: 无锡市区G pubRegulatoryAccount/detail.vue 与 pubRegAccountChange/detail.vue 命中；getRouterPathByFilePath/getOldDetail/accountId 均命中，空白页修复属实。
+---
 # 开户变更按钮跳转空白页修复
 无锡市区G项目zhi2-web-admin中，开户申请详情页「变更」按钮因路由参数缺失跳转空白页，已改用文件路径拼新增页并携带accountId修复。
 
@@ -20,7 +25,6 @@
 - 所属项目：无锡市区G
 - 验证证据：extracted source=cursor project=无锡市区G
 - 来源会话：be9a1d85-fae7-46fb-9f25-1f3d40a49c4d
-
 
 <!-- MEMORY_FIELDS
 {

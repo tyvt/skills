@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:15:46+08:00
+verdict_note: 存在 SupervisionAddDialog.vue 与 regulatorStandard/regulatoryStandard 字段映射及 priceRecordId 处理，与描述一致
+---
 # 监管项目备案子表弹窗修复
 苏州市房地产监测V3 项目修复了监管项目备案子表弹窗 `SupervisionAddDialog.vue` 点确定不消失的问题。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
-
 
 <!-- MEMORY_FIELDS
 {

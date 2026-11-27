@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:12:20+08:00
+verdict_note: ParcelDialog.vue 命中，el-row gutter=32 + el-col v-bind=detailColHalf 两列布局、detailColHalf=DETAIL_COL_HALF 均在源码；zs-form 布局约束描述属实。
+---
 - 在对话框 (zs-dialog) 中，全局样式 `zs-form > .el-col { width: 100% }` 或 `.form-box .zs-form > .el-col` 会将两列布局压缩为单列布局；保持 `el-row`/`el-col` 在 `zs-form` 内部以避免覆盖。
 - `ParcelDialog.vue` 使用 `el-row :gutter="32"` 和 `el-col :span="12"` 实现两列布局，包裹 8 个字段；标签 `label-position="left"` 通过 scoped CSS 设置宽度 120px，不使用 `label-width`；控件 `width: 100%` 并使用 `:deep` 处理日期回退；地图区域保持全宽。
 - 使用 `zs-form` 时，定义 `zs-size="mini"`、`label-position="left"` 和 `label-width="120px"`，并清理冗余数据。
@@ -7,7 +12,6 @@
 - 所属项目：苏州市房地产监测V3
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：e55d472c-5d5c-48cc-be69-456859ec148f
-
 
 <!-- MEMORY_FIELDS
 {

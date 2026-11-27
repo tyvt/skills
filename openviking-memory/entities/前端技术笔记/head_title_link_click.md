@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:50:26+08:00
+verdict_note: 核对产品2.0/苏州V3：HeadTitle/index、handleLinkClick、getIconUrl 命中，标题点击行为描述一致。
+---
 # HeadTitle组件链接点击跳转改造
 产品2.0 中 HeadTitle 组件支持 `item.type === 'link'` 可点击跳转，并按 link 类型执行不同路由逻辑。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=2-0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T21:17:33+08:00
+verdict_note: 园区物管2.0 assetPanorama/index.vue-273 存在 parseAssetCategories，subCategory 解析逻辑在 index.vue/mock.js 可查，描述属实。
+---
 # 资产全景经营资源子分类解析适配
 园区物管2.0 资产全景页 `assetPanorama/index.vue` 已根据新接口结构更新 `operatingResources` 的解析逻辑。
 
@@ -17,7 +21,6 @@
 - 按示例数据，环形图显示 `count > 0` 的 4 项：广告位(4)、快递柜/驿站(1)、其他场地(2)、临时摊位(1)，合计 8，与 `data.count` 一致。
 - 涉及文件：zhi2-web-admin/src/views/benefit/dataSandbox/assetPanorama/index.vue、src/api/benefit/assetPanorama.js、assetPanorama/mock.js
 - 所属项目：园区物管2.0；来源会话：c124ec6d-cfdd-4039-bf13-b501e1b22a3a；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

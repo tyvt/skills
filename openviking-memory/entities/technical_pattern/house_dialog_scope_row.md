@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:44:45+08:00
+verdict_note: HouseSelectDialog.vue 实存；#default={scope}/scope.row/normalizeBuilding/normalizeHouse/buildCode/buildNo/zs-table-column 命中，插槽约定属实。
+---
 # 房屋弹窗表格scope.row插槽约定
 苏州市房地产监测V3 的 HouseSelectDialog.vue 楼幢号等列改用 `#default="{ scope }"` 与 `scope.row` 以遵循 `zs-table-column` 插槽约定，避免渲染报错。
 

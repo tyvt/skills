@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:14:16+08:00
+verdict_note: fund/scripts/factor_builder.py 命中 roe_volatility，回看窗口描述属实
+---
 # roe_volatility 与 roe_volatility_ratio 回看窗口不同
 投资推送项目中 `roe_volatility` 因子与 `roe_volatility_ratio` 风控指标使用不同年限的 ROE 回看窗口，询问「用了几年 ROE」时须先分清路径。
 

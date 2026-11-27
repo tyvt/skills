@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T02:27:43+08:00
+verdict_note: normalizeLegacyPageUrl 与 utils/route-map.js 全仓源码不存在；苏住房C house/index.vue 仍使用 goto(`TypeChoose?...`) 相对路径。所述修复未在代码中体现，描述与现状不符。
+---
 # relative path normalized to slash causes page not found
 The "Add" button in `pages_owner/house/index.vue` used relative path `TypeChoose?...`; `normalizeLegacyPageUrl` in `utils/route-map.js` only prepends a leading slash for non-`/` paths, resolving to `/TypeChoose` and causing `navigateTo:fail page not found`.
 
@@ -19,7 +24,6 @@ The "Add" button in `pages_owner/house/index.vue` used relative path `TypeChoose
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
 - 来源会话：d7258436-2f74-40b3-a7d1-bb994d1239c1
-
 
 <!-- MEMORY_FIELDS
 {

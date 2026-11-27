@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:49:12+08:00
+verdict_note: 苏住房G largeScreen/utils.js与home/index-v2.vue含fetchCityRegionTabOptions/regionOptionsFetchSeq，动态区域Tab修复属实。
+---
 # 区域Tab动态配置筛选模式
 苏住房G首页/大屏区域Tab禁止前端写死，须由platformConfig.region推导市级编码并异步拉取行政区划，加请求序号防竞态。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:01:30+08:00
+verdict_note: 苏州市房地产监测V3 utils/apiV3Normalize.js 实存 normalizeV3ApiUrl，flowConfig/ConfigDialog 可查，与两段路径补 /add 描述一致。
+---
 # V3拦截器把编辑POST补成/add导致打到新增接口
 流程配置弹窗点编辑保存时，Network 出现 POST /flowable/flowConfig/add 而非更新接口，表现为「编辑当成新增」。
 
@@ -23,7 +28,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

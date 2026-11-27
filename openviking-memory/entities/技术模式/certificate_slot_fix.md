@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:54:39+08:00
+verdict_note: projectEmbeddedCertificateList.js 存在且用 slot-scope 解构，证书操作列修复属实
+---
 # 证书管理操作列报错修复
 苏州市房地产监测V3 中证书管理操作列点击查看/编辑报 `certificateType` 未定义，已修复。
 

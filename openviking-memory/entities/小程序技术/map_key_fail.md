@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:50:42+08:00
+verdict_note: 苏住房C命中 ZsMap/manifest.json/腾讯地图/unionBank，地图 Key 与 AppID 绑定结论属实。
+---
 # 渲染层腾讯地图Key鉴权失败因AppID未绑定
 苏住房C移动端渲染层报“当前产品鉴权失败”为腾讯地图Key未与小程序AppID绑定所致，非业务代码错误。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:50:12+08:00
+verdict_note: skills/dsh/orchestrator-gate 实存 blockBuildLint（DESIGN.md、lib/index.js），降本规范记忆与现状一致。
+---
 # dsh-token-policy
 DSH 会话降本规范，规定重活必须经由 orchestrate 编排器执行。
 
@@ -11,7 +16,6 @@ DSH 会话降本规范，规定重活必须经由 orchestrate 编排器执行。
 - 由 dsh-orchestrator 插件提供 `orchestrate` 入口工具
 - 实际强制由 dsh-orchestrator-gate 插件（ctx.tools.guard 预执行拦截）落地
 - 与 dsh-cost-meter、dsh-token-guard 共同组成降本体系
-
 
 <!-- MEMORY_FIELDS
 {

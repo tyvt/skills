@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:53:28+08:00
+verdict_note: 物业手持B端 record/add.vue 仍含 scroll-view 与 max-height-55vh，无 step-form-body；描述的去内层滚动修复在现有代码中不存在。
+---
 # 巡检记录添加页滚动条遮盖文字
 物业手持B端工作台巡检记录添加/详情页因嵌套滚动导致滚动条遮盖文字，已改为弹性布局并去除内层滚动。
 

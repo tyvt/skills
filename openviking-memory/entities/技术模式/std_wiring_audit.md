@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:01:11+08:00
+verdict_note: 苏住房G e2e/std-evaluation 及 flowApi.js 实存 buildBusinessApi、rectificationApi，与沿调用链核查描述一致。
+---
 # 提交/审批接线判定须沿调用链核查（std-evaluation）
 不能因模块api文件无submit/approval方法就判定功能未接线，实际走通用OperationBtnGroup + flowApi.buildBusinessApi拼接路径。
 

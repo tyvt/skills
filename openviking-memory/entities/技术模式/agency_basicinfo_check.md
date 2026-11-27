@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:14:59+08:00
+verdict_note: 苏州市房地产监测V3 中 AgencyBasicInfoDetail.vue 存在，formMode/detailMixins/companyRecord 命中，基本信息校验改造属实。
+---
 # 机构基本信息接口调用排查结论
 苏州市房地产监测V3 排查确认经纪/租赁机构侧「机构基本信息」页面不存在开发企业侧的接口未调用问题。
 

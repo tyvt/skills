@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T15:45:34+08:00
+verdict_note: 苏住房C ZsImage.vue 无 subpackage 属性；pages_guard/index/index.vue 的 ZsImage 亦未传 subpackage，记忆所述给 ZsImage 补 subpackage 的修复与现状不符。
+---
 # 分包页面图标背景图不显示bug
 云守护首页梯形背景图与上传「+」号在分包页空白，根因为ZsImage未补subpackage属性致静态资源404。
 

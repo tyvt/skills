@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:31:12+08:00
+verdict_note: 太仓G estate/sortDecison/detail.vue、maintainDecision/detail.vue 有「提前结束」按钮及 delay 相关逻辑，无延期隐藏按钮描述属实。
+---
 # 无延期状态下隐藏的提前结束按钮
 在常规决策详情页 (generalDecision/detail.vue) 中，提前结束按钮在延期状态下不显示。
 
@@ -17,7 +22,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=太仓G
 - 来源会话：5498a264-de28-46af-8525-e64606a2220e
-
 
 <!-- MEMORY_FIELDS
 {

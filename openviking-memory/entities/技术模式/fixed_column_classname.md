@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:44:16+08:00
+verdict_note: 产品2.0 zs-operate-column.vue-6-7 用 class-name/label-class-name + 全局样式，与记忆通道一致
+---
 # el-table 固定列单元格样式走 class-name + 非 scoped
 要改 el-table 固定列（如 zs-operate-column，fixed="right"）单元格背景/样式，必须走「列级 class-name + 非 scoped 全局样式」通道。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:48:15+08:00
+verdict_note: 核对苏住房G：largeScreen 命中 normalizeRegionData、getShortRegionName，地区名匹配描述一致。
+---
 # 区域名完整路径与短名称匹配失败
 苏住房G大屏/统计页因接口返回完整行政区划路径而前端用短名称做严格匹配，导致统计卡片被静默过滤成空数组显示「暂无数据」。
 

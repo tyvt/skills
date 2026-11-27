@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:48:12+08:00
+verdict_note: assetLeaseApply/houseTable.vue 未命中 pager-count 与去 sizes 的分页器修复，具体改动未印证。
+---
 # 弹窗窄栏分页器折行修复
 园区公共收益项目中，房屋关联弹窗左侧窄栏内 el-pagination 因 layout 含 sizes 或页码过多导致 jumper 折行的修复模式。
 

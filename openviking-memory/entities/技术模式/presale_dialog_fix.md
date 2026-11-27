@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:49:59+08:00
+verdict_note: PresaleSelectBuildingDialog.vue 含 resolveBuildingList，配合 zs-select-dialog 布局修复属实
+---
 # 预售选择楼幢弹窗布局修复
 苏州市房地产监测V3 项目修复预售/现售「选择楼幢」弹窗（presale-select-building-dialog）使用 zs-select-dialog 导致的大块空白问题。
 

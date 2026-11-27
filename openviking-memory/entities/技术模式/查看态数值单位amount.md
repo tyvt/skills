@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:55:53+08:00
+verdict_note: 产品2.0 detail-template.vue 实存 getAmountDisplay 与 landArea，金额单位交 amount 处理属实。
+---
 # 查看态数值单位amount
 产品2.0 查看态模板字符串手拼单位会让 undefined 变成「undefined㎡」，数值字段必须走 type:'amount' + unit。
 
@@ -23,7 +28,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:22:39+08:00
+verdict_note: 园区公共收益 assetPositionSubTable.vue/subTableMixins.js/ruoyi.js 存在并命中 assetPosition
+---
 # 资产部位详情同路由跳转无反应且路由名误判
 园区公共收益项目(zhi2-web-admin)中 assetPositionSubTable.vue 部位名称 router.push 至当前 PubHousePartDetail 路由无反应，且操作列隐藏逻辑误判 currentRoute。
 

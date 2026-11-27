@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:13:27+08:00
+verdict_note: 淮安物管 pubRegulatoryAccount/detail.vue 与 propertyAccount/detail.vue 均为 this.form.regulatoryBankCode = row.bankCode，修正属实。
+---
 # 通过 branchCode 错误分配的监管银行代码
 
 在 淮安物管 项目中，监管银行代码被错误地使用 `bankBranchCode` 而非 `bankCode` 进行赋值，与后端的预期不符。
@@ -21,7 +26,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=淮安物管
 - 来源会话：e057ae2f-2107-42b9-9657-ffd0a073d835
-
 
 <!-- MEMORY_FIELDS
 {

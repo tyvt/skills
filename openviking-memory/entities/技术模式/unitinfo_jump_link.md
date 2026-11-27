@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:49:12+08:00
+verdict_note: 苏州市房地产监测V3 unitinfo/index.vue 含 handleViewBuilding 与 getRouterPathByFilePath，项目/楼幢跳转修复属实。
+---
 # 单元管理列表项目与楼幢跳转
 苏州市房地产监测V3 中单元管理列表（unitinfo/index.vue）的项目名称与楼幢号改为跳转链接，分别跳转到项目详情与楼幢详情页。
 

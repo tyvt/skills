@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:32:52+08:00
+verdict_note: 门户 zhi2-web-admin/src/utils/portalLayout.js 存在 shouldShowLayoutSidebar 与 isPortalSuperAdmin，判定规则在源，描述属实。
+---
 # 门户管理侧栏按 G/B 端与超管判定
 登录后左侧管理侧栏是否显示由 showLayoutSidebar（指向 shouldShowLayoutSidebar）控制，须按 G/B 端与超管综合判定，而非仅超管可见。
 
@@ -20,7 +25,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

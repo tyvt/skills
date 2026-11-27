@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:15:34+08:00
+verdict_note: 昆山市民 H5 存在 wxLogin 与 getInfoByCode 登录 code 去重逻辑，与描述一致
+---
 # 鹿路通 H5 登录 code 一次性去重 Bug
 昆物通嵌入鹿路通后 H5 登录 code 一次性与并发重复调用的根因与四类去重策略。
 

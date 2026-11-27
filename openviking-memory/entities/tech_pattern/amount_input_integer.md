@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:55:09+08:00
+verdict_note: 产品2.0 detail.vue 使用 <amount-input -dot="0">，与记忆所述整数金额输入改造一致。
+---
 # Amount Input Integer Constraint
 Number inputs in zhi2-web-admin views were switched from el-input/zs-input with v-money:0 to amount-input with :dot="0" to enforce integer entry.
 
@@ -19,7 +24,6 @@ Number inputs in zhi2-web-admin views were switched from el-input/zs-input with 
 - 所属项目：产品2.0
 - 验证证据：extracted source=cursor project=产品2.0
 - 来源会话：d7c7c5d4-1f13-462a-8aeb-c77645611399
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:52:38+08:00
+verdict_note: 产品2.0 src/views/benefit/mapOverview 目录存在，地图弹窗轮播 SVG 高亮描述属实
+---
 # 地图弹窗轮播SVG高亮对应区
 园区物管2.0 地图概览页轮播到某区时，ECharts geo 注册的 SVG 对应区需高亮。
 

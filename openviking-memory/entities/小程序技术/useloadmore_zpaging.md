@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:15:33+08:00
+verdict_note: 苏住房C含useAnnouncementPaging与z-paging，公告列表改用z-paging属实。
+---
 # 自研useLoadMore失败卡加载整改
 苏住房C公告列表Android真机一直加载中，因自研useLoadMore请求失败不回complete，统一改用z-paging。
 

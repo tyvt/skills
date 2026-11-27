@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:26:18+08:00
+verdict_note: 产品2.0 credit/assessment组件(minusScorePercentage等)命中，长名截断+tooltip方案属实
+---
 # 长名称下拉框截断修复
 行业管理-物业服务项目检查-分析报表的「扣分指标占比分析」切换检查表时，下拉选中名称被截断，需用弹性宽度+tooltip+内层撑满三件套解决。
 

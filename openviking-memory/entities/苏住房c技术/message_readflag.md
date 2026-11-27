@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:50:26+08:00
+verdict_note: 苏住房C 命中 fixed-false/hidden/paging/My_Suzhufang/message/usePaging，未读角标与 z-paging fixed 修复属实。
+---
 # 小程序消息页未读数统计与头部滚动跟随
 消息页未读数统计须带readFlag:0，顶部管理/筛选移入z-paging并关闭fixed以跟随列表滚动。
 

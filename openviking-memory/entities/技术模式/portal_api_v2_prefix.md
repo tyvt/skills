@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T11:51:38+08:00
+verdict_note: 门户命中 portalApiRewrite/api/v2.0/listTree/sign.js，v2 网关前缀三处对齐属实。
+---
 # 门户 v2 网关前缀 /api/v2.0 三处对齐
 门户 monorepo 中部分接口缺 `/api` 前缀或走旧网关致 404，需父仓 env/nginx 与子模块 rewrite/sign 同步修改。
 
@@ -31,7 +36,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=门户
-
 
 <!-- MEMORY_FIELDS
 {

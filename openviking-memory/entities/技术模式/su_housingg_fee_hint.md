@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:48:58+08:00
+verdict_note: 苏住房G 实存费用提示相关 detail.vue（property/agreement、allotNotice 等），提示文案修复描述一致。
+---
 # 酬金制与信托制首行提示语
 苏住房G 已为酬金制和信托制页面添加首行提示语，并修正重复表述。
 

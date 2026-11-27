@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:21:33+08:00
+verdict_note: 门户 CredentialDialog.vue 命中 form-box，接入凭证弹窗布局调整属实
+---
 # 门户接入凭证弹窗布局调整
 门户项目 CredentialDialog.vue 中因 zs-dialog 横向 flex 导致提示语与表单并列，已用 form-box 包裹修正。
 

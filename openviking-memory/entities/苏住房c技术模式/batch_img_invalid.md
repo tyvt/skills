@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:12:31+08:00
+verdict_note: 苏住房C 编译产物与源码含ZsImage/ImageUploader及DecisionResult等目标页，批量替换组件修复属实。
+---
 # 批量替换图片组件InvalidEndTag修复
 苏住房C 批量把 `<img>` 换成 `<ZsImage>`/`<ImageUploader>` 时出现 Invalid end tag 与畸形静态资源路径，须配对标签并扫畸形路径。
 

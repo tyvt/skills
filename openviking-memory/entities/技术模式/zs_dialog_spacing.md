@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:16:58+08:00
+verdict_note: 苏州V3 含 BuildingUnitLazyTree/building-unit-lazy-tree/dialog-left，zs-dialog 双重间距修复属实。
+---
 # zs-dialog 样式优先级平局导致双重间距
 在苏州市房地产监测V3中，`zs-dialog` 的全局样式 `.dialog-left` (`margin-right:20px;padding:20px`) 与新的组件样式优先级平局且未生效，导致对话框左侧面板出现双重间距。
 

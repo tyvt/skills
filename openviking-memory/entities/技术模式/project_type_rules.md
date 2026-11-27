@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:49:48+08:00
+verdict_note: 园区公共收益实存 projectTypeRules.js/createProjectTypeRules、complex/detail.vue，校验统一描述一致。
+---
 # 项目类型校验分散致错误提示静默
 园区公共收益(zhi2-web-admin)分散的 rules 导致 projectType 校验错误未在可见字段显示。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:13:34+08:00
+verdict_note: 苏州市房地产监测V3 源码命中 /building/building 新基础路径，旧路径 400 修复属实。
+---
 # 楼盘表API旧路径buildinginfo致400错
 苏州市房地产监测V3 中楼盘表 API 请求使用旧基础路径 `/building/buildinginfo` 引发定金缴款弹窗等 400 错误。
 

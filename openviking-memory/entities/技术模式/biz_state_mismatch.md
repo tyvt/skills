@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:44:51+08:00
+verdict_note: rectificationNotice/index.vue-234 命中 dictUrl-'biz_state'，detail.vue-55 命中 bizState；本地 BIZ_STATE 常量已不在源码，修复属实。
+---
 # 查询筛选与列表结果反着来（BIZ_STATE 常量错位）
 苏房G 整改通知书列表筛「已备案」查出审核中、筛「审核中」查出已备案，根因是查询区用了本地 BIZ_STATE 常量而列表走全局 biz_state 字典。
 

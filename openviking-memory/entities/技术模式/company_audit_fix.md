@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:43:18+08:00
+verdict_note: 苏州市房地产监测V3 实存 DeveloperBasicInfoDetail.vue、attachmentDraw.vue、detailMixins.js 等，描述一致。
+---
 # 企业基本信息审核流程未传变更ID致查单失败
 在苏州市房地产监测V3中，企业基本信息审核流程未传变更单ID与busCode导致查不到变更单，已修复。
 

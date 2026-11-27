@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:16:52+08:00
+verdict_note: 苏州V3 命中 zs-input-number/step-strictly/precision/fillAndSavePlan，step 推导修复属实
+---
 # 容积率小数输入修复
 苏州市房地产监测V3 中 `zs-input-number` 组件未传 `step` 时按 `precision` 自动推导，解决容积率等小数字段无法输入问题。
 

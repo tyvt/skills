@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T14:10:03+08:00
+verdict_note: 门户命中 layoutVariant/index-new.vue、homeDataMixin.js、resolveHomeLayoutVariant，三角色布局编排属实；审查 BLOCK 为当时状态记录。
+---
 # 首页三角色布局变体
 门户首页 index-new.vue 作为编排器，按 layoutVariant（admin/developer/broker）渲染不同角色布局，数据逻辑抽至 homeDataMixin.js。
 

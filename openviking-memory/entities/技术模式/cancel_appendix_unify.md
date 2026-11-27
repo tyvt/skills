@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:14:48+08:00
+verdict_note: 含AppendixPackageSection/COMPANY_CANCEL_APPENDIX_BUS_CODE/jgzx，注销材料要件组件统一属实。
+---
 # 机构注销材料上传组件统一
 苏州市房地产监测V3 机构注销管理的「注销材料」上传从通用 `FileUpload` 换成机构模块统一的要件组件 `AppendixPackageSection`。
 

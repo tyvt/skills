@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:20:36+08:00
+verdict_note: statisticsMap/index.vue 命中 normalizeProjectList/project_marker_geom，GL地图点位根因修复属实
+---
 # 腾讯 GL 地图点位不显示根因与排查
 园区物管2.0 腾讯位置服务 GL 地图（MultiMarker/MultiLabel）点位不显示的四类根因与排查套路。
 

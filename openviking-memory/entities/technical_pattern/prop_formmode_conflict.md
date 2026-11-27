@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:18:45+08:00
+verdict_note: 苏州V3 含 PermitInfoPanel.vue、formMode、formComponents，prop 与全局 mixin 同名冲突修复所涉文件存在。
+---
 # 组件prop不可与全局mixin的formMode同名
 苏州市房地产监测V3 中 PermitInfoPanel.vue 的 formMode prop 与 main.js 全局 mixin 注入的 formMode computed 同名冲突。
 

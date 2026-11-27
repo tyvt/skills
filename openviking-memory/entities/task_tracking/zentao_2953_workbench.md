@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:17:41+08:00
+verdict_note: D-/plan 含禅道2953/HANDOFF-CHAIN/1548/ownerDecisionVote 交接文档，任务追踪记录属实。
+---
 # ZenTao 2953 Workbench Entry Task
 ZenTao 2953 / story 1548 defined four requirements for workbench shortcuts and H5 handoff behavior in the Property Handheld B Terminal and H5 repos.
 

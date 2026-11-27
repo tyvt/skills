@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:21:44+08:00
+verdict_note: ProjectDialog 命中 zs-table-column//building/project/page，价格备案弹窗修复属实
+---
 # 价格备案开发项目弹窗修复
 产品2.0 项目修复价格备案「开发项目」选择弹窗问题，改动在 components/ProjectDialog.vue。
 
@@ -18,7 +23,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

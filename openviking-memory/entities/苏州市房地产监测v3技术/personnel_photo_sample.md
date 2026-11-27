@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:59:02+08:00
+verdict_note: 苏州市房地产监测V3 AgencyPersonnelDetail.vue 等实存 PersonnelPhotoField，证件照示例组件与描述一致。
+---
 # PersonnelPhotoField证件照示例
 苏州市房地产监测V3的PersonnelPhotoField.vue默认展示证件照示例图并铺满180×270框。
 

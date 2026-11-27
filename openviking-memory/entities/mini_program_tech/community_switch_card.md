@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:14:11+08:00
+verdict_note: 小程序 home.vue 有 community-card/showCommunitySwitch，portal-user.js 有 syncPortalHouseSelection/houseList，属实。
+---
 # Community Switch Card
 home.vue adds community-card between carousel and menu; shows switch entry when houseList.length > 1, calls syncPortalHouseSelection to update houseId/project and write snapshot.
 ## Behavior
@@ -15,7 +20,6 @@ home.vue adds community-card between carousel and menu; shows switch entry when 
 - 所属项目：小程序
 - 验证证据：extracted source=cursor project=小程序
 - 来源会话：afb09671-9f86-4f6b-bab5-1a2b4c3931ef
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:18:56+08:00
+verdict_note: 苏住房C 编译产物含 ZsButton，卡片 slot 内改用 ZsButton 规避安卓 tap 失效的套路逻辑自洽，无反证。
+---
 # 安卓分包卡片slot内view点击无响应
 苏住房C 安卓微信小程序中列表卡片 slot 内的普通 view @tap 经常收不到点击，需统一改用 ZsButton + @click.stop。
 

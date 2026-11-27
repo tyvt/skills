@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:16:11+08:00
+verdict_note: record/components/CandidateDialog.vue 命中；appointmentStartDate/appointmentEndDate/sourceType 均命中，日期区间显示修复属实。
+---
 # 已备案物管会委员信息任职起止日期修复
 园区公共收益项目已备案物管会详情页（`sourceType == '1'`）查看委员信息时，任职起止日期仅显示开始日期的问题修复。
 

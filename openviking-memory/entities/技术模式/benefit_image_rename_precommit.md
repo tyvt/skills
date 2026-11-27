@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:13:05+08:00
+verdict_note: 园区物管2.0中 parking-space-total 在 statisticsMap/operatingAssets.vue 命中，旧中文名“停车位总数.png”已消失，import/no-unresolved 规则存在，改名修复属实。
+---
 # benefit 图标改名致 pre-commit 报错
 园区物管2.0 的 @/assets/images/benefit/ 下停车位图标改为英文名后，import 仍指向旧中文路径，触发 import/no-unresolved。
 

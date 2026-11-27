@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:44:09+08:00
+verdict_note: 多文件出现 administrativeAreaOptions/economicRegionOptions 重命名，regionOptions 冲突修复属实
+---
 # regionOptions 与 area Mixin 的命名冲突
 在 Suzhou Real Estate Monitoring V3 项目中，本地的 `data` `regionOptions` 与 mixin `area` (通过 `detailMixins`) 中的 computed `regionOptions` 冲突，导致 Vue 警告和 prop 污染。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:16:28+08:00
+verdict_note: 园区公共收益 complexBuildingAuth(3)/BuildingDialogAuth(2)/tableTrCount(4)命中，表格样式约定属实。
+---
 - Building auth detail table (complexBuildingAuth/detail.vue, BuildingDialogAuth.vue) should wrap dialog-right to reuse the global dialog style (index.scss).
 - Remove custom row-height/font-size/border overrides; selected row uses zs-table built-in selected-row.
 - Fixed height of 8 rows (tableTrCount) with 48px row height; only keep the transfer-layout styles.
@@ -7,7 +12,6 @@
 - 所属项目：园区公共收益
 - 验证证据：extracted source=cursor project=园区公共收益
 - 来源会话：2f2222a6-6625-4a0d-b9a5-d2cce60498f7
-
 
 <!-- MEMORY_FIELDS
 {

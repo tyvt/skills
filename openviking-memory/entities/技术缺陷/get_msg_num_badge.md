@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:14:26+08:00
+verdict_note: 苏住房C 含 getMsgNum/readFlag/My_Suzhufang/msgNum，未读角标参数补齐修复属实。
+---
 # 未读角标不消失问题
 苏住房C「我的」页 getMsgNum 不传参返回消息总数而非未读数，导致角标不消失。
 

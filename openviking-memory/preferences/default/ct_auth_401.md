@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T15:46:55+08:00
+verdict_note: 小程序 wygl-wxxcx-dev-slh/utils/portal-user.js 实存 requestCtAuth 与 handleCtAuthUnauthorized，与记忆 401 统一处理一致。
+---
 - 在 `utils/portal-user.js` 新增 `requestCtAuth`：CT 认证 API 统一请求封装，当请求携带 `Authorization` 且返回 HTTP 401 时自动触发登出逻辑
 - `handleCtAuthUnauthorized` 401 处理逻辑：调用 `clearPortalStorage()` 清空门户 token（`__ew_external_webview_ct_token__`）与用户快照（`__ew_external_webview_portal__`），提示「登录已过期，请重新登录」，广播 `portal-auth-expired` 事件让各页面同步清空内存中的 `pageToken`
 - 排除微信登录接口 `/wechat/login`：返回 401 时不触发，避免首次登录失败误提示「登录已过期」
@@ -7,7 +11,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=小程序
-
 
 <!-- MEMORY_FIELDS
 {

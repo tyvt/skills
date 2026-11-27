@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:55:43+08:00
+verdict_note: 苏住房防汛C端 upload.ts 含 zhi2-dev 前缀与 ensureServerUrl，图片路径修复属实
+---
 # Flood Check Image Mobile Display Fix
 Completed 2026-11-26 defect fix for the Suzhou Housing flood-control C-end H5, where flood mid-check site photos did not display on mobile; verified, committed and pushed to dev.
 

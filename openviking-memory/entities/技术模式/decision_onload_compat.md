@@ -7,8 +7,10 @@ valid_until: null
 source_of_truth: unknown
 gov_checked_at: 2026-11-18
 gov_note: 代码修复事实，commit基线存在，无新证据
+audit_status: invalid
+last_checked: 2026-11-27T21:16:56+08:00
+verdict_note: 泰兴小程序 decision/detail.vue-254 onLoad 为 options.id || urlToObj(decodeURIComponent(options.q)).decisionId，并非记忆所述 options.id||query.id||query.decisionId，取值表达式与现状不符。
 ---
-
 # 决策页onLoad兼容id与decisionId
 泰兴小程序 decision/detail.vue 的 onLoad 兼容普通链接与二维码场景的取值逻辑。
 ## 问题根因

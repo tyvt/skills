@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:14:36+08:00
+verdict_note: 泰兴G 命中 electDetailUrl、qrcodeUrl、VoteQrcodeDialog，appURL 已无，环境变量化属实
+---
 # 业主自治二维码地址环境变量化
 泰兴G（zhi2-web-admin）将两类业主自治二维码地址抽成独立环境变量（完整地址），替换所有 appURL 拼接使用点。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:10:55+08:00
+verdict_note: 产品2.0 OperationBtnGroup含busCode prop回退router.meta.busCode，显式bus覆盖审核编码的架构属实。
+---
 # zs-approval 审核按钮业务编码覆盖
 产品2.0 中企业注册详情页的审核按钮因 zs-approval 只从路由 meta.busCode 取编码而缺失，需通过 bus prop 显式覆盖（属 bug 类修复）。
 
@@ -19,7 +24,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

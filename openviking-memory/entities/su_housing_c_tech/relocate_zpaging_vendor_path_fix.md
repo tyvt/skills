@@ -1,4 +1,8 @@
-
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:47:09+08:00
+verdict_note: relocate-z-paging.mjs 全工作区不存在，脚本修复无代码证据。
+---
 # 分包 z-paging require 路径未更新修复
 苏住房C构建脚本 relocate-z-paging.mjs 复制 z-paging 到分包后，未更新 common/vendor.js 的 require 路径，导致分包内路径错误。
 
@@ -17,7 +21,6 @@
 - 验证证据：extracted source=cursor project=苏住房C
 - 涉及文件：scripts/relocate-z-paging.mjs、z-paging.js、pages_transaction/common/vendor.js、common/vendor.js
 - 所属项目：苏住房C（zhi2-mobile-shimin）；来源会话ID：498170bd-f084-43ab-8e01-034612613ebd；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

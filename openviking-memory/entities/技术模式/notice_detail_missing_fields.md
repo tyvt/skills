@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:48:27+08:00
+verdict_note: 命中 moduleName/businessName-notice/primaryKey-allotNoticeId/moduleName-prefund/operation-btn-group 与 unblock/notice/detail.vue，缺失字段修复属实。
+---
 # 通知详情中缺少CRUD字段导致Vue警告和API错误
 在 Suzhou Real Estate Monitoring V3 项目中，supervision/unblock/notice 的 detail.vue 未在 data() 中声明字段，导致在 mixin form.js 中出现绑定警告和 API 拼接错误。
 
@@ -17,7 +22,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 来源会话：f35d14e1-f0a5-4fa4-b44d-947275ba1b5c
-
 
 <!-- MEMORY_FIELDS
 {

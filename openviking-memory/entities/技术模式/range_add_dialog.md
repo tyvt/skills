@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:15:12+08:00
+verdict_note: 太仓G decisionCommon 源码命中 RangeHouseDialog 与 batchAdd，选择户室批量新增方案属实。
+---
 # 一般表决详情新增决策范围弹窗错误修复
 太仓G 一般表决详情页点击「新增」误用完整版 DecisionRangeTable 打开表单弹窗并调接口导致异常，已修复为对齐昆山打开「选择户室」弹窗。
 

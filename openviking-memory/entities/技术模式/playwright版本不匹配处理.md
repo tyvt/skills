@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:19:27+08:00
+verdict_note: 会话经验类记忆，描述Playwright包/浏览器版本junction处理，无幻觉/隐私/垃圾，package.json与spec路径可归属
+---
 # playwright版本不匹配处理
 在 nginx 部署站点跑 Playwright 用例时，包版本与浏览器版本不匹配会导致浏览器起不来。
 ## 根因

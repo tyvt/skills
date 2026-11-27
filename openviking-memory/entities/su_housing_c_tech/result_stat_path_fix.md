@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T12:27:01+08:00
+verdict_note: ResultStatistics.vue-256 现为绝对URL https-//szf.szzfcjj.cn-8888/.../flag-szf.svg，非记忆所述相对路径 ./../static/...；描述与现状证据不符。
+---
 # ResultStatistics 资源路径与SVG修复
 苏住房C `ResultStatistics.vue` 因路径多写一级且 SVG 为空导致资源加载失败，已修复。
 

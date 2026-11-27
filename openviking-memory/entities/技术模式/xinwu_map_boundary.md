@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:16:34+08:00
+verdict_note: 产品2.0 存在 benefit/statisticsMap 模块与 tencentDistrictBoundary 区划边界，与描述一致
+---
 # 新吴区地图边界坐标更新
 `benefit/statisticsMap` 模块 `map.js` 已替换为官方高精度区划边界。
 

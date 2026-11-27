@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T19:15:26+08:00
+verdict_note: 泰兴小程序 src/api/system.js 中 listPayablePaymentChannel 及 /system/paymentChannel/listPayablePaymentChannel 命中，支付渠道接口修复属实。
+---
 # 收银台支付方式仅出银联支付因接口调用错误
 员工端收银台弹层仅显示「银联支付」一种支付方式，根因是员工端与业主端调用了不同的支付渠道接口。
 ## 问题根因
@@ -11,7 +15,6 @@
 - 涉及文件：src/staff/api/cashier.js、src/api/system.js、src/staff/pages/cashier/result.vue
 - 来源会话ID：54c23926-7b8a-40d1-a6aa-2e3dcc903484
 - 代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

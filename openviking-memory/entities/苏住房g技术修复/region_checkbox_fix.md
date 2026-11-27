@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:49:22+08:00
+verdict_note: 苏住房G element-ui.scss 含 .el-checkbox__label color-#000000，复选框字体颜色全局修复属实
+---
 # 行政区域银行授权复选框字体颜色全局修复（苏住房G）
 苏住房G 项目在全局样式 element-ui.scss 中为 el-checkbox 补充与 el-radio 一致的文字颜色，修复复选框文字偏淡问题。
 

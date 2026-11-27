@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T20:16:59+08:00
+verdict_note: 产品2.0含buildCreateOrderPayload与paymentChannelId，createFromBill请求体规范属实。
+---
 # createFromBill 请求体参数规范
 `createFromBill` 接口按文档仅应传以下参数，当前代码已实现一致。
 

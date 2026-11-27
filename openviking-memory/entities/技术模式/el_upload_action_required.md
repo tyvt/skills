@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:27:15+08:00
+verdict_note: 产品2.0 certificatesDialog.vue(-http-request)与userAvatar.vue命中，el-upload action必填描述属实
+---
 # el-upload 必须传 action 属性
 Element UI 的 `el-upload` 在使用自定义上传时仍需必填 `action`，否则控制台报 `Missing required prop: "action"` 警告。
 ## 问题根因

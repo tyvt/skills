@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:23:08+08:00
+verdict_note: 苏州市房地产监测V3 命中 mapProjectDisplayFields/cashsaleConstants/handlePermitSelect，回填修复属实。
+---
 # 预售转现售详情回填总幢数总户数修复
 苏州市房地产监测V3 完成预售转现售详情回填总幢数/总户数的实现，修复详情与选证、选项目逻辑不一致问题。
 

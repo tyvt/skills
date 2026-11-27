@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T03:53:27+08:00
+verdict_note: 实机核对：门户 zhi2-web-admin home/config/homeLayout.js 存在且按 functionCode 组织板块、从 terminalUser.js 导入；记忆所述移除「二选一/原因2」客户端互斥、按接口权限展示与现状一致（代码中无该互斥残留）。
+---
 # 门户首页业务流菜单以接口权限为准
 门户 B 端/经纪首页展示业务板块菜单应完全依据接口返回的板块权限与菜单配置，不在客户端叠加互斥隐藏逻辑。
 

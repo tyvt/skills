@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:47:44+08:00
+verdict_note: 园区物管2.0 chartConstants.js含buildDistrictPieLegendOption与roundRect，饼图图例加宽修复属实。
+---
 # 饼图图例图标宽度调整
 园区物管2.0 数据沙盘 fundPanorama 饼图图例图标过窄显压缩，已改为圆角条并加宽。
 

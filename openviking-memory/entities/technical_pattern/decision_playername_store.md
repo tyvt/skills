@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:43:03+08:00
+verdict_note: i淮安公版 decision/form.vue-83 decisionPlayerName- userStore.realName，user.js-63 realName getter 实存，提交赋值描述属实。
+---
 # Decision PlayerName Store
 Submit logic for decision/elect forms assigns decisionPlayerName from userStore.realName.
 
@@ -17,7 +22,6 @@ Submit logic for decision/elect forms assigns decisionPlayerName from userStore.
 - 所属项目：i淮安公版
 - 验证证据：extracted source=cursor project=i淮安公版
 - 来源会话：b9a67129-a3c8-45ef-a049-365dbe342883
-
 
 <!-- MEMORY_FIELDS
 {

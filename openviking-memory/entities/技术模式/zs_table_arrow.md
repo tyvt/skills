@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T08:16:42+08:00
+verdict_note: zs-table/column 含 zs-table-column-cell、inline-block，样式修复属实。
+---
 # zs-table树表块级div致箭头换行
 zs-table-column 使用块级 div.zs-table-column-cell 包裹内容，导致树形表展开箭头换行至文字上方，已通过样式调整为同行。
 

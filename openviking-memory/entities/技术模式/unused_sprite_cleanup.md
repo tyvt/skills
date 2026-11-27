@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T14:10:45+08:00
+verdict_note: 记忆称已整链清理 sprite，但园区物管2.0 zhi2-web-admin/vite.config.js 中 generateSpritePlugin 仍定义且仍 require scripts/generate-sprite.cjs，清理未落地，描述与现状不符。
+---
 # 未消费 sprite 生成链路整链清理
 园区物管2.0 构建自动生成 sprite.svg 反复出现在 git diff 的排查与清理套路。
 

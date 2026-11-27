@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T00:41:17+08:00
+verdict_note: 记忆所称 scripts/relocate-datetime-picker.mjs 及 patchVendorRequiresInDir 在苏住房C scripts 目录均不存在
+---
 # 分包日期组件vendor路径修正
 苏住房C小程序分包页面使用ZsDatePicker依赖uni-datetime-picker，构建后require指向不存在的分包vendor.js。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:45:26+08:00
+verdict_note: 在苏州市房地产监测V3仓源码命中核心符号(18/19)appendix,buildinginfo,certificate,changedetail，涉及文件存在，描述与现状一致，判有效。
+---
 # 附件上传全局化传label自套外壳
 `StandaloneAppendixField` 传入 `label` 时自动套用宫格外壳与标题条，脱离证书专用组件依赖，已全局样式接入。
 

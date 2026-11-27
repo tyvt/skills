@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:54:07+08:00
+verdict_note: 门户/产品2.0 zs-table.vue 实存 fixedViewportRows、displayRows、getBaseTableHeight、effectiveTableHeight，与记忆描述一致。
+---
 # zs-table 固定可视行高与内部滚动
 zs-table 通过 `fixedViewportRows` + `tableTr` 固定表体可视高度，超出时在表体内滚动、表头固定。
 
@@ -16,7 +21,6 @@ zs-table 通过 `fixedViewportRows` + `tableTr` 固定表体可视高度，超�
 - 验证：2026-11-05 `npm run build` 通过（exit 0，仅有既有 Sass/SVG/chunk 警告），产物输出 `D:\repository\门户\dist`
 - Git：子模块 zhi2-web-admin 提交 6de408a1e（推送 9e980b57b..6de408a1e），父仓库 门户 提交 8ba2986，分支 develop/v2.6.2-portal
 - 未纳入 zhi2-web-admin-wt-payfund/（其他任务 worktree）
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:45:11+08:00
+verdict_note: 项目知识记忆：version.json/returnRawResponse/LEASE_CHANGE_FLOW_BUS_CODE/common-errors.md 等命中，子模块提交流程与仓库结构属实。
+---
 # zhi2-web-admin
 房地产综合服务平台门户，主仓 `苏州市房地产监测V3`（`D:\repository\苏州市房地产监测V3\`）的 git 子模块，路径 `D:\repository\门户\zhi2-web-admin`。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:49:48+08:00
+verdict_note: 园区物管2.0 assetPanorama/fundPanorama 及 createEmptyPanoramaCards/cloneMockCards 均存在，mock 解耦属实。
+---
 # mock_init_decouple
 园区物管2.0 数据沙盘/大屏页在 USE_MOCK_DATA=false 时仍因 data() 初始化 cloneMockCards() 导致首屏闪 mock 的修复模式。
 

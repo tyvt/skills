@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:11:05+08:00
+verdict_note: 园区公共收益 ConfigDialog(3)/-label.sync(14)命中；onFlowChange已移除正符合"改用-label.sync"的修复后状态。
+---
 # 园区公共收益 工作流配置弹窗流程名修复
 园区公共收益项目 ConfigDialog.vue 的 onFlowChange 因 flowOptions 映射为字典格式导致找不到项报错，已改用 zs-select 的 :label.sync 修复。
 

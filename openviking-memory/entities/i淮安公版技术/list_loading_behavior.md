@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-28T01:16:30+08:00
+verdict_note: 记忆称 i淮安公版 home.vue 用 onCategoryChange/serachPoi/listLoading/facilityList 控制加载态；全仓四符号均 0 处且无 home.vue（仅 App.vue + pages/），描述与现状不符。
+---
 # i淮安公版 列表加载态行为
 i淮安公版首页分类切换与首次进入的 loading 展示行为约定。
 
@@ -13,7 +18,6 @@ i淮安公版首页分类切换与首次进入的 loading 展示行为约定。
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=i淮安公版
-
 
 <!-- MEMORY_FIELDS
 {

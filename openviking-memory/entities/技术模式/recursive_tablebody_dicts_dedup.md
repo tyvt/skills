@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:14:27+08:00
+verdict_note: AnnexContainer/TableBody.vue/FileListDialog.vue 命中；ensureFileTypeOptions 命中 FileListDialog.vue，FILE_TYPE/sys_yes_no/getDicts 命中，去重方案属实。
+---
 # 递归附件 TableBody 重复拉字典需模块级 Promise 去重
 太仓G端维修资金要件 AnnexContainer 递归 TableBody 每层 created 重复 getDicts，多实例对话框宜模块级缓存去重。
 

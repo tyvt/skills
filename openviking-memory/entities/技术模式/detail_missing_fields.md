@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:12:22+08:00
+verdict_note: 苏州V3 guarantee/detail.vue 命中 useMoneyApplyId/primaryKey/prefund，补字段属实
+---
 # detail.vue 中缺失字段导致 Vue 警告和请求错误
 在项目 苏州市房地产监测V3 中，`guarantee/detail.vue` 的 `data()` 缺少字段，导致 Vue 警告和详情请求拼接错误。
 

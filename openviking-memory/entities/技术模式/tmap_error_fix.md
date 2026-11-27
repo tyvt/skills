@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:51:13+08:00
+verdict_note: ZsTencentMap/index.vue-21 命中 mapLoader.js，mapLoader.js-6 命中 window.TMap 单例，MultiPolygon 命中，实例校验修复属实。
+---
 # 腾讯地图TMap.Map实例校验报错修复
 园区物管2.0 腾讯地图 GL 组件创建 `MultiPolygon`/`MultiMarker`/`MultiLabel` 时「所传入参数并非 TMap.Map 的实例」报错的修复。
 

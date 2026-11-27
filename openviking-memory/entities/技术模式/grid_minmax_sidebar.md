@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:48:53+08:00
+verdict_note: 门户 home 命中 minmax/HomeLayoutSidebar/HomeLayoutAdmin/HomeBizSection/HomeUserCard/homeLayout.js，栅格侧栏布局属实。
+---
 # 窄屏网格右列minmax死宽致侧栏盖主区
 窄屏两栏网格使用 minmax(280px,1fr) 使右列不可变窄且 overflow:visible，右侧栏绘制于主内容上方。
 ## 问题根因

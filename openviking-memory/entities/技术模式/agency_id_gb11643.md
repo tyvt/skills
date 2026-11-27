@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T09:43:34+08:00
+verdict_note: 核对苏州市房地产监测V3：idCard.js 命中 isValidIdNumber，身份证国标 GB11643 校验逻辑属实。
+---
 # 身份证校验按GB11643算校验码非前端bug
 AgencyPersonnelDetail.vue 中身份证校验使用 isValidIdNumber 按国标 GB 11643 计算第18位校验码，校验位不符提示为预期行为。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:43:29+08:00
+verdict_note: dsh/langgraph-orchestrator/config.yaml-178 max_tokens-8192、pwsh 4096、L221 1024，与记忆的差异化配置一致
+---
 # DSH 编排器 reasoning 模型 max_tokens 过低导致 502
 DSH 编排器给 reasoning 模型设置过低 max_tokens 时会触发 502 empty reply，这是 2026-11-12 定位并修复的根因 bug。
 

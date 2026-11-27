@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:17:47+08:00
+verdict_note: 太仓G 命中 VoteRangeDialog、线下投票、表决意见，弹框误带remark修复对应文件存在。
+---
 # 线下投票弹框误显决策范围remark为表决意见
 太仓G端一般表决详情点「线下投票录入」时，弹框把整行决策范围数据复制进表单，范围记录的 `remark` 字段被误当作「表决意见」显示。
 

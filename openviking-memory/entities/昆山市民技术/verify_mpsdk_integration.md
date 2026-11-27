@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T05:46:37+08:00
+verdict_note: 昆山市民项目 useTencentFaceVerify.js 与 verify_mpsdk 目录本地均不存在，仅记忆文件自证，无代码证据。
+---
 # 腾讯人脸核身 SDK 集成与冗余清理
 昆山市民小程序已移除重复的云核身 SDK 副本，保留实际运行目录与调用封装，调用 init 方法初始化。
 
@@ -14,7 +19,6 @@
 - 来源会话ID：d204db33-771f-44d5-97bb-400ec850e59f
 - 代码基线：none
 - 验证证据：extracted source=cursor project=昆山市民
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T21:51:00+08:00
+verdict_note: zhi2-mobile-shimin utils/index.js 含 resolveFullMediaUrl、formatRichTextContent，属实
+---
 # 富文本rich-text相对路径图片必空白
 苏住房C小程序rich-text组件直接渲染含相对路径图片的HTML会静默空白，因微信不补全域名。
 

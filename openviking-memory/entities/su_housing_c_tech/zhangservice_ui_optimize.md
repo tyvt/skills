@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:21:55+08:00
+verdict_note: MenuSection.vue/Community_Suzhufang.vue 存在并命中 icon-list/Community_Suzhufang
+---
 # 掌服务页面UI与交互优化
 苏住房C【掌服务】页面完成整页滚动、搜索吸顶及多项UI优化。
 
@@ -17,7 +22,6 @@
 ## 验证与归属
 - 所属项目：苏住房C
 - 验证证据：extracted source=cursor project=苏住房C
-
 
 <!-- MEMORY_FIELDS
 {

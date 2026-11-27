@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:17:43+08:00
+verdict_note: 苏州市房地产监测V3 detail-form.scss 源码命中 section-field--wide，三列网格防错位属实。
+---
 # 两列地址字段避免网格错位
 在编辑状态下，字段"项目坐落"在 `el-row` 内占据了16列，留下8列给其余部分，并将"统一社会信用代码"推到了不对齐的第三列。
 

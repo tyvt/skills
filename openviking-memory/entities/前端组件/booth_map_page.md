@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:47:08+08:00
+verdict_note: 苏州市房地产监测V3 zhi2-web-admin/src/views/boothMap/index.vue 与 booth-map.svg 实存，展位图静态页挂载方式属实。
+---
 # 展位图静态展示页
 房产前端 zhi2-web-admin 中用于展示「展位图」SVG 的静态菜单页，由 2026-11-04 需求落地。
 

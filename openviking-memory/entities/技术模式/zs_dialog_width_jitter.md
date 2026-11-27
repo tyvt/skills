@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-28T01:14:36+08:00
+verdict_note: 苏州V3 zs-dialog.vue 含 scrollbar-gutter/applyScrollableBody/overflowY/---webkit-scrollbar，下拉弹窗宽度抖动二次修复属实。
+---
 # zs-dialog下拉弹窗宽度抖动
 楼幢维护编辑户室弹窗展开/收起「房屋类型」下拉时，弹窗内部宽度抖动约8px，根因为滚动条出现消失挤压内容盒。
 
@@ -18,7 +22,6 @@
 - 二次验证（助手）：npm run build exit 0，产物含 overflowY="scroll"；本地后端 /api 502 无法登录故未做真实站点点测，eslint 因主工作区 eslint-rules 目录既有破损无法运行，提交用 --no-verify 跳过 hook
 - 涉及文件：zhi2-web-admin/src/components/zs-dialog/zs-dialog.vue
 - 所属项目：苏州市房地产监测V3；代码基线 0d306c0f9（初版）/ 4c4f7e8aa（二次修复）
-
 
 <!-- MEMORY_FIELDS
 {

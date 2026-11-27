@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T07:11:52+08:00
+verdict_note: 园区物管2.0 fundPanorama/index.vue 源码命中设计稿量算 designMeasuredH 与 scale( 双比例缩放，核心证据一致。
+---
 # 大屏数据沙盒页 transform 双比例缩放
 数据沙盒类页面用 transform: scale 适配视口时，只缩 X 会导致纵向溢出，需拆 layoutScaleX/Y 且 Y=min(1, 视口/设计高)。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:45:17+08:00
+verdict_note: C-/Program Files/Python310/python3.exe 实存，苏州市房地产监测V3 settings.json 存在，别名重定向修复属实。
+---
 # 系统别名重定向python3致Agent弹微软商店
 Windows 应用执行别名将 `python3` 重定向至微软商店 stub，致 Agent 调用异常，已通过硬链接与配置修复。
 

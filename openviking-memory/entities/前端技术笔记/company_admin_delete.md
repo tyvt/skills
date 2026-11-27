@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:44:38+08:00
+verdict_note: 产品2.0 operatorAuth/detail.vue 含 operatorAuthRangeTable、multiDeleteButton、isCompanyAdmin，企业管理员删除越权修复描述属实。
+---
 # 用户授权企业管理员删除按钮修复（operatorAuthRangeTable）
 产品2.0 的 zhi2-web-admin 中用户授权详情的物业管理区域子表，企业管理员账号下「删除」按钮越权可用问题已修复。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:19:18+08:00
+verdict_note: publishHouse/type.vue 命中 margin-top- 80rpx，ZsButton.vue 与 uno.config.ts 均在
+---
 # 自定义组件 ZsButton 上 margin/UnoCSS 间距类不生效
 苏住房C 小程序中写在 ZsButton 等自定义组件标签上的 margin（含 UnoCSS mt-80 原子类）不会作用到组件内部真实按钮节点，间距改了无效。
 

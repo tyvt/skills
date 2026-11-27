@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T23:13:46+08:00
+verdict_note: buildinginfo/components/houseTable.vue 的 queryParams 现仅含 buildingId/unitId，无 bizState-'2'，与记忆'已去掉该字段'一致；另 building/building 等同名表本就无该字段。
+---
 # 楼幢详情房屋子表误带 bizState 过滤修复
 苏州市房地产监测V3 的楼幢详情「房屋」子表 houseTable.vue 在 queryParams 固定带 bizState:'2'，导致只查已备案房屋，已改为去掉该字段。
 
@@ -14,7 +19,6 @@
 - 验证证据：extracted source=cursor project=苏州市房地产监测V3
 - 涉及文件：projectManagement/buildinginfo 下 houseTable.vue、table.js、detail.vue、HouseDialog.vue
 - 所属项目：苏州市房地产监测V3；来源会话ID：9a1689ee-8f4c-466c-8de7-f10950b6c863
-
 
 <!-- MEMORY_FIELDS
 {

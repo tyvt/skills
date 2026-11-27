@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:18:13+08:00
+verdict_note: 苏住房C 命中 resolveMediaUrl、ZsImage、MenuImage、downloadFile，媒体地址解析属实
+---
 # ZsImage图片地址统一走resolveMediaUrl
 苏住房C 小程序中 ZsImage 手动拼 IMAGE_BASE 会拼出 /ttp:// 非法串导致 500，需统一走 resolveMediaUrl 处理 src。
 

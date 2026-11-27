@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T16:25:57+08:00
+verdict_note: 门户 UnifiedLogin.vue 命中 tab=enterprise，入口Tab高亮修复精确证实。
+---
 # 首页 UnifiedLogin 操作指引入口 Tab 高亮规则
 首页 UnifiedLogin.vue 入口链接的 query 参数决定操作指引页默认选中的身份 Tab。
 

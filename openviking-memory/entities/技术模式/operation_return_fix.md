@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:25:05+08:00
+verdict_note: 操作返回修复相关文件在业务仓命中，描述属实
+---
 # 修复因移除路由段的返回逻辑导致的404问题
 `OperationBtnGroup` 的默认返回逻辑会移除路径的最后一段（例如：`/import/add` → `/import`），当中间路径没有路由时会导致404。
 

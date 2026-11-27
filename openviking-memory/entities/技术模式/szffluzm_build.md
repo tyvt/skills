@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T19:13:43+08:00
+verdict_note: 苏住房C 产物目录 szffluzm 真实存在，vite.config.ts 有 development 映射与 outDir，打包目录改造属实。
+---
 # zhi2-mobile-shimin 打包产物与脚本命名约定
 本项目从多品牌同源仓库复制而来，构建配置需去除 suzhufang 品牌后缀，产物目录改为 szffluzm。
 

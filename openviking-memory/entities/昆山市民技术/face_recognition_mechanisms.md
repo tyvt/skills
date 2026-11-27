@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:13:10+08:00
+verdict_note: 昆山市民 verifyUser/index.vue 与 estate.js 命中 faceRecognition，实名认证人脸机制属实
+---
 # 昆山市民人脸识别机制与使用场景
 昆山市民小程序存在两套人脸识别实现，当前实际生效仅实名认证场景。
 

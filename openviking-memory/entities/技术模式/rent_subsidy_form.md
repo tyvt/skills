@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T23:19:02+08:00
+verdict_note: 归属 project=0 为占位垃圾；iHome小程序 pages-rent/subsidy.vue 实为概览页+rentApplyTip 提示弹窗，'某某科技'预填、'所属单位'校验、showToast 申请成功全 MISS，描述与现状不符，属幻觉/测试垃圾。
+---
 # rent补贴页在线申请接入底部mock表单
 原在线申请跳转外部无法走通 mock，于 src/pages-rent/subsidy.vue 改为底部弹窗表单。
 

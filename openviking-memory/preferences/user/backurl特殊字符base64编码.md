@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:15:11+08:00
+verdict_note: backUrl 特殊字符走 Base64 编码的通用技术套路，逻辑自洽且无代码反证，非幻觉/测试垃圾。
+---
 - backUrl 含 #、?、& 等特殊字符时，直接拼接 query 会截断或解析错乱；采用 Base64 编码完整回跳地址后作 query 参数传递，第三方 atob 解码，避免 encodeURIComponent 与解析方式不匹配。
 
 <!-- MEMORY_FIELDS

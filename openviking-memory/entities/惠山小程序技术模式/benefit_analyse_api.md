@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:46:17+08:00
+verdict_note: 惠山小程序 benefitAnalysis.vue 实存 accountStatistics/analyse 请求，接口与字段描述一致。
+---
 # 收支分析页请求analyse接口
 收支分析页 benefitAnalysis.vue 通过 GET /v2.0/benefit/app/accountStatistics/analyse 获取收支数据。
 

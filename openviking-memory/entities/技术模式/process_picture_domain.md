@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:43:35+08:00
+verdict_note: 泰兴小程序 maintain-detail.vue 使用 IMAGE_BASE 拼域名，与按平台拼完整 URL 修复一致
+---
 # processPictureList未拼域名H5加载失败
 泰兴小程序 `processPictureList` 返回 `/zhi2/...` 相对路径直接传 `ImageGrid` 致 H5 图片加载失败，需按平台拼接完整 URL。
 

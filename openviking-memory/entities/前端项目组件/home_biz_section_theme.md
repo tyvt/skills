@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T13:48:41+08:00
+verdict_note: 门户 homeLayout.js 含 SECTION_THEMES/brokerAgency，HomeBizSection.vue 含 TAG_COLOR_BY_THEME/7B00D9，主题色配置属实。
+---
 # 门户首页业务板块主题色
 新增或改色首页业务板块时需同时改两处配置并保持同步，不要散落在 HomeBizSection 硬编码。
 ## 配置位置

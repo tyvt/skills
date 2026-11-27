@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:55:59+08:00
+verdict_note: candidateCollect 模块 CandidateDialog/CandidateTable.vue、identityFlag、businessType 在代码中实存，隐藏候选人类型逻辑属实。
+---
 # 泰兴G业主候选人征集隐藏候选人类型
 在泰兴G项目业委会候选人征集（businessType='0'）场景下，报名弹窗与列表隐藏「候选人类型」字段，并默认按「业主」处理。
 

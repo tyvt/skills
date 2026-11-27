@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T12:45:26+08:00
+verdict_note: 苏州V3 源码命中 AGENCY_PERSONNEL_APPENDIX_BUS_CODE(2)、jgcyryba(2)、resolvePersonnelAppendixBusCode(1)，与 busCode 修正一致。
+---
 # 机构附件中 busCode jgcyrybg 错误
 
 在项目 苏州市房地产监测V3 中，当请求代理机构人员登记附件（经纪机构备案）时，菜单错误地使用了变更代码 `jgcyrybg`，导致 `listAppendixPackage` 发送了错误的 busCode；正确的值是 `jgcyryba`。

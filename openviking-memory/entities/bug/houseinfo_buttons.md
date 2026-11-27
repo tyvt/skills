@@ -4,6 +4,9 @@ needs_review: true
 confidence: 0.3
 gov_checked_at: 2026-11-25
 gov_note: 高频 bug 实体·batch3·仅标记
+audit_status: invalid
+last_checked: 2026-11-27T06:11:17+08:00
+verdict_note: 12个 houseinfo/index.vue 均未命中 viewButton/editButton，记忆所述'按钮顺序改为[viewButton,editButton]'在当前代码零证据。
 ---
 # 户室管理列表操作列按钮顺序修复
 苏州市房地产监测V3 项目中，户室管理列表操作列按钮顺序与项目默认不一致的问题已修复。

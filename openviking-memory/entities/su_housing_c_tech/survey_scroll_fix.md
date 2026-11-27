@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T05:50:15+08:00
+verdict_note: pages-survey/index.vue 命中 survey-page 与 scroll-view，滚动修复在。
+---
 # 民意调查答题页滚动修复
 苏住房C（zhi2-mobile-shimin H5）民意调查答题页在小米/安卓WebView下无法上下滑动，已通过 height:100% 与原生 scroll-view 修复。
 

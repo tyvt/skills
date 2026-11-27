@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T10:44:42+08:00
+verdict_note: 在苏州市房地产监测V3仓源码命中核心符号(5/5)deptdialog,detaillayout,dolayout,subtablemixins，涉及文件存在，描述与现状一致，判有效。
+---
 # 部门列表去tableTr调用doLayout防留白
 苏州市房地产监测V3 中 dept/index.vue 与 DeptDialog.vue 删除重复「状态」列，去掉 tableTr='12' 使表格高度自适应，加载/展开后调用 doLayout() 避免操作列错位与右侧留白。
 

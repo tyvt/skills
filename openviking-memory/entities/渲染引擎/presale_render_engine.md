@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:49:33+08:00
+verdict_note: 全仓未找到 PresaleDocRenderEngine 类或 presale-permit-template.docx；虽见 Aspose 痕迹，但描述的核心渲染引擎无对应代码。
+---
 # PresaleDocRenderEngine
 苏州市房地产预售许可证文档渲染引擎。
 ## Description
@@ -9,7 +14,6 @@
 ## Relations
 - 渲染 presale-permit-template.docx 模板
 - 客测验证使用相同渲染路径独立出图确认修复
-
 
 <!-- MEMORY_FIELDS
 {

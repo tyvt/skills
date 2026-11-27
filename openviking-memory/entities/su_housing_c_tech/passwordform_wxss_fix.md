@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T23:20:56+08:00
+verdict_note: PasswordForm.vue 引入 form.scss 属实，但 form.scss 全文仅 22 行 -deep 规则，无 '> *'、无 #ifdef/#ifndef 条件编译、无 '> view'（全文 grep MISS）；'众小程序端改 > view' 的核心修复在当前源码无法证实，与现状证据不符。
+---
 # 密码表单WXSS通配符编译错误修复
 苏住房C小程序中 `PasswordForm.vue` 因引入 `form.scss` 使用子选择器 `> *` 触发微信WXSS不支持通配符报错，已通过条件编译修复。
 

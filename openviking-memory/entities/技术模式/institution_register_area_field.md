@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:50:58+08:00
+verdict_note: 苏州市房地产监测V3 company/institutionRegister/index.vue 实存 administrativeArea 与 formatRegion 优先读新字段，与记忆一致。
+---
 # 机构注册页地区字段替换为administrativeArea并兼容旧数据
 苏州市房地产监测V3 中机构注册页地区字段由 `provinceCityArea` 改为 `administrativeArea`，并兼容旧数据。
 

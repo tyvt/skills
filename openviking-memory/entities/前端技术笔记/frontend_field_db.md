@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T22:17:42+08:00
+verdict_note: 苏住房G worktrees 命中 supervisionBankBranchName，字段名以库表为准属实
+---
 # 前端字段名以数据库表结构为准
 修复字段时应查达梦 all_tab_columns 拿到真实列，砍掉前端自造的 ID/CODE 参数只留 NAME 列。
 
@@ -17,7 +22,6 @@
 - 验证：会话 session-07a67f50-976b-4f8b-9852-d834ed53c453（基线 6156653）最终结论「字段对齐交付」表
 - 涉及文件：上述三个 .vue 文件
 - 来源会话ID：session-07a67f50-976b-4f8b-9852-d834ed53c453；代码基线：6156653
-
 
 <!-- MEMORY_FIELDS
 {

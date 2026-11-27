@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T10:42:41+08:00
+verdict_note: 在泰兴小程序仓源码命中核心符号(8/10)complexcard,dictvalue,facility,facilitydefinitionid，涉及文件存在，描述与现状一致，判有效。
+---
 # 设施字典remark字段JSON解析报错修复
 泰兴小程序 index.vue 中 initDict 对字典 remark 字段直接 JSON.parse 导致非合法 JSON 报错，已新增安全解析修复。
 
@@ -15,7 +19,6 @@
 - 涉及文件：src/pages_facility/index.vue、facility.vue、src/api/maintenance.js、src/api/common.js、src/pages/index/components/complexCard.vue
 - 来源会话ID：4964cd0d-1bc1-4c43-810e-fb9b03694f6a
 - 代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T17:26:17+08:00
+verdict_note: 榆林G depositNotice/company/components/AddDialog.vue存在且用zs-table-column+prop、无固定width，与自适应列宽模式一致。
+---
 # ZS Table Column Width Pattern
 Writing a fixed width on zs-table-column bypasses the component's automatic column width calculation.
 ## Behavior
@@ -23,7 +28,6 @@ Writing a fixed width on zs-table-column bypasses the component's automatic colu
 - 所属项目：榆林G
 - 验证证据：extracted source=cursor project=榆林G
 - 来源会话：ca119077-96d7-4634-b180-497cbdf98617
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T02:44:41+08:00
+verdict_note: 产品2.0 实存 accountNameDialog.vue 复用 zs-select-dialog，账户拆分弹窗描述一致。
+---
 # 账户拆分选择账户弹窗样式统一
 产品2.0 账户拆分模块「选择账户」弹窗改为复用 `zs-select-dialog`，与「选择物业管理区域」弹窗样式交互一致。
 
@@ -17,7 +22,6 @@
 
 ## 验证与归属
 - 验证证据：extracted source=cursor project=产品2.0
-
 
 <!-- MEMORY_FIELDS
 {

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T15:09:46+08:00
+verdict_note: 苏州V3源码 variables.css/index.scss-295/detail-form.scss-178 均有 --detail-section-gap/--detail-block-gap，detail-from-container、basic-appendix-row 在 e2e 可定位，与描述一致
+---
 # 详情页间距全局统一
 苏州市房地产监测V3 项目完成详情页表单项与 Collapse 间距全局统一规范。
 

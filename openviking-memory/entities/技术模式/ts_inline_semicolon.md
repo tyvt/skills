@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T03:50:33+08:00
+verdict_note: 记忆所述「苏州市服务监管平台」在 D-/repository 不存在（exists=False），App.tsx 与 PARSE_ERROR 仅命中记忆归档；源仓不在工作区，无法证明有效。
+---
 # TypeScript 内联对象类型缺分号导致 Vite/oxc 解析失败
 苏州市服务监管平台项目中，Vite/oxc 编译 src/App.tsx 时出现 PARSE_ERROR，根因是单行内联对象类型成员之间缺少分号。
 

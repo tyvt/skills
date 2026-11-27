@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:26:51+08:00
+verdict_note: 产品2.0 yhwdgl.js含pageBankBranch、PaymentOutletDialog.vue命中，网点弹窗字段修复属实
+---
 # 缴款网点弹窗接口与字段对齐修复
 修复苏州市房地产监测V3中缴款网点弹窗缺少 /prefund/bankBranch/page 接口及字段不匹配问题。
 ## 新增API

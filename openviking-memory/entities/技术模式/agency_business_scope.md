@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T00:47:01+08:00
+verdict_note: 苏州V3 AgencyEntryNetworkSections.vue-136 el-checkbox-group 且字典 company_business_scenario 在 companyRecord.js 存在
+---
 # 企业入网认证页经纪机构新增业务范围复选块
 `AgencyEntryNetworkSections.vue` 为经纪机构在基本信息与机构管理员信息间增加「业务范围」区块，选项取自字典。
 

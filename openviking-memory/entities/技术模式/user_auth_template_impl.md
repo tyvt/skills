@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:40:31+08:00
+verdict_note: 园区物管2.0 autonomy/userAuth/detail.vue实存，含Headline+DetailTemplate+detailMixins，operation-btn-group设biz-state=0/showSubmit=false，与描述一致。
+---
 # 用户授权页按模板实现
 园区物管2.0 中 autonomy/userAuth 详情/新增/编辑页按 procedure/detail.vue 模板实现并复用既有混入。
 

@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T18:20:45+08:00
+verdict_note: PaymentBuildingDialog.vue、NodeDetailsDialog/Table 在建湖G/淮安存量房命中，zs-form全宽方案有据
+---
 # 全局样式挤压 zs-form 的直接子元素 el-col
 在 zs-dialog 中，全局样式 `.form-box .zs-form > .el-col` 仅对 zs-form 的直接子元素 el-col 强制设置 `width:100%`；原始结构 `zs-form > el-row > el-col` 未受影响，保持了多列布局。
 

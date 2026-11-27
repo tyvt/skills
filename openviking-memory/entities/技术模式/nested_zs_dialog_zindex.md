@@ -1,3 +1,8 @@
+---
+audit_status: invalid
+last_checked: 2026-11-27T13:18:05+08:00
+verdict_note: raiseNestedDialogStack/feeDtlZsDialog 全库仅记忆命中，2-0无真实代码，无法证明
+---
 # 嵌套zs-dialog内层弹窗z-index提升修复
 产品2.0 中「维修项」弹窗嵌在「编辑维修项」父 zs-dialog 里，内层弹窗可点区域（含下拉三角）点不动，因父级遮罩吃掉事件。
 
@@ -16,7 +21,6 @@
 - 验证证据：extracted source=cursor project=2-0
 - 涉及文件：@zhi2-web-admin/src/views/solicitation/components/maintenanceFeeDtlDialog.vue
 - 所属项目：2-0；来源会话：f7fa3bf8-e11d-41c2-ab82-7f380cbd83c7；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

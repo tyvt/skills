@@ -1,4 +1,8 @@
-
+---
+audit_status: valid
+last_checked: 2026-11-27T03:49:46+08:00
+verdict_note: 实机核对：惠山二期H5 operationReport.js(117) navigateToOperationReportPreview、pages.json(766) operationReport/preview 路由、newHome.vue(36/108) handleOperationReport 改调均在；描述属实。
+---
 # 经营报告PDF预览由preview.vue路由承载
 惠山二期H5 中经营报告 PDF 预览由新增 `src/pages_benefit/operationReport/preview.vue` 承载，H5 用 iframe 内嵌预览，小程序调系统预览。
 
@@ -22,7 +26,6 @@
 ## 验证与归属
 - 验证证据：extracted source=cursor project=惠山二期H5
 - 来源会话ID：d398aaa2-b1af-439d-a4a4-9dda41fd6e89；代码基线：none
-
 
 <!-- MEMORY_FIELDS
 {

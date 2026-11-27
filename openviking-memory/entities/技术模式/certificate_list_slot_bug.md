@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T04:12:09+08:00
+verdict_note: 苏州市房地产监测V3 certificateType(22)/ProjectCertificateTabs(4)/slot-scope(124)命中，插槽解构修复目标存在。
+---
 # 证书管理操作列插槽未解构致字段未定义
 苏州市房地产监测V3 中证书管理操作列插槽未使用 `slot-scope="{scope}"` 解构，点击查看/编辑时 `certificateType` 未定义。
 

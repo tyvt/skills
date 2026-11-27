@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-27T06:53:16+08:00
+verdict_note: 园区公共收益 实存 complexPhoto.js 与 ComplexPhotoUpload，四图位迁移属实。
+---
 # 物业区域四图位ComplexPhotoUpload迁移
 园区物管/公共收益分支迁移时，物业区域图从单图改为四槽位 ComplexPhotoUpload 并由 utils/complexPhoto.js 维护逗号串。
 

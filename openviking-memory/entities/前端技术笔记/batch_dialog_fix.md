@@ -1,3 +1,8 @@
+---
+audit_status: valid
+last_checked: 2026-11-28T01:45:42+08:00
+verdict_note: BatchApprovalDialog 实存；.batch-tip/batch-count/#f6a240/white-space-nowrap/zs-dialog 命中，批量审批弹窗样式修复属实。
+---
 # 待办任务批量审批弹窗样式修复
 修复园区公共收益项目待办任务批量审批弹窗的样式挤压与换行问题。
 
