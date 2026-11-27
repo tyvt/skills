@@ -296,6 +296,31 @@ def _project_http_request(
                     )
                 )
 
+    for feedback_item in payload.get("retrieval_help_feedback") or []:
+        if not isinstance(feedback_item, dict):
+            continue
+        feedback_request_id = str(feedback_item.get("request_id") or "")
+        if not feedback_request_id:
+            continue
+        for feedback_uri in feedback_item.get("uris") or []:
+            uri = str(feedback_uri or "")
+            if not uri.startswith("viking://"):
+                continue
+            help_rows.append(
+                (
+                    feedback_request_id,
+                    audit_account,
+                    row_user or None,
+                    "feedback",
+                    uri,
+                    None,
+                    safe_int(feedback_item.get("adopted")),
+                    safe_int(feedback_item.get("reworked")),
+                    created_at,
+                    created_at,
+                )
+            )
+
     context_operation = context_write_operation_for_http(method, route, status_code)
     if context_operation:
         context_key = (audit_account, row_user, event_date, hour, context_operation)

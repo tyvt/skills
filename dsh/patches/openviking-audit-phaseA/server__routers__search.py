@@ -4,6 +4,7 @@
 
 import asyncio
 import math
+import re
 from typing import Any, Dict, List, Literal, Optional, Sequence, Union
 
 from fastapi import APIRouter, Depends, Request
@@ -579,6 +580,52 @@ async def search(
         result=result,
         telemetry=execution.telemetry,
     ).model_dump(exclude_none=True)
+
+
+class RetrievalHelpFeedbackItem(BaseModel):
+    request_id: str
+    uris: list[str] = Field(default_factory=list)
+    adopted: int = 0
+    reworked: int = 0
+
+
+class RetrievalHelpFeedbackRequest(BaseModel):
+    items: list[RetrievalHelpFeedbackItem] = Field(default_factory=list)
+
+
+_HELP_FEEDBACK_REQUEST_ID = re.compile(r"[A-Za-z0-9._:/-]{1,128}")
+_MAX_HELP_FEEDBACK_ITEMS = 100
+_MAX_HELP_FEEDBACK_URIS = 50
+
+
+@router.post("/help-feedback")
+async def help_feedback(
+    request: RetrievalHelpFeedbackRequest,
+    http_request: Request,
+    _ctx: RequestContext = Depends(get_request_context),
+):
+    """Record adoption/rework signals for previously returned retrieval URIs."""
+    accepted: list[dict[str, Any]] = []
+    for item in request.items[:_MAX_HELP_FEEDBACK_ITEMS]:
+        request_id = str(item.request_id or "")
+        if not _HELP_FEEDBACK_REQUEST_ID.fullmatch(request_id):
+            continue
+        uris = [
+            uri for uri in item.uris
+            if isinstance(uri, str) and uri.startswith("viking://")
+        ][:_MAX_HELP_FEEDBACK_URIS]
+        if not uris:
+            continue
+        accepted.append(
+            {
+                "request_id": request_id,
+                "uris": uris,
+                "adopted": 1 if item.adopted else 0,
+                "reworked": 1 if item.reworked else 0,
+            }
+        )
+    http_request.state.retrieval_help_feedback = accepted
+    return Response(status="ok", result={"accepted": len(accepted)}).model_dump(exclude_none=True)
 
 
 @router.post("/recall", deprecated=True)

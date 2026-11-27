@@ -707,6 +707,7 @@ def apply_http_metrics_finalize(
             result_count=getattr(request.state, "retrieval_result_count", None),
             result_uris=getattr(request.state, "retrieval_result_uris", None),
             result_scores=getattr(request.state, "retrieval_result_scores", None),
+            help_feedback=getattr(request.state, "retrieval_help_feedback", None),
             caller=getattr(request.state, "ov_caller", None),
             error_code=captured_error.code if include_error and captured_error else None,
             error_message=captured_error.message if include_error and captured_error else None,

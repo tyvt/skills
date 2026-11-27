@@ -41,6 +41,7 @@ class HttpRequestLifecycleDataSource(EventMetricDataSource):
         result_count: int | None = None,
         result_uris: list[str] | None = None,
         result_scores: list[float | None] | None = None,
+        help_feedback: list[dict[str, Any]] | None = None,
         error_code: str | None = None,
         error_message: str | None = None,
         error_details: dict[str, Any] | None = None,
@@ -73,6 +74,17 @@ class HttpRequestLifecycleDataSource(EventMetricDataSource):
         if result_scores:
             payload["retrieval_result_scores"] = [
                 None if s is None else float(s) for s in result_scores
+            ]
+        if help_feedback:
+            payload["retrieval_help_feedback"] = [
+                {
+                    "request_id": str(item.get("request_id") or ""),
+                    "uris": [str(u) for u in (item.get("uris") or []) if u],
+                    "adopted": int(item.get("adopted") or 0),
+                    "reworked": int(item.get("reworked") or 0),
+                }
+                for item in help_feedback
+                if isinstance(item, dict)
             ]
         if error_code is not None:
             payload["error_code"] = str(error_code)
