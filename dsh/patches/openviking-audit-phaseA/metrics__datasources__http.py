@@ -39,6 +39,8 @@ class HttpRequestLifecycleDataSource(EventMetricDataSource):
         url_path: str | None = None,
         caller: str | None = None,
         result_count: int | None = None,
+        result_uris: list[str] | None = None,
+        result_scores: list[float | None] | None = None,
         error_code: str | None = None,
         error_message: str | None = None,
         error_details: dict[str, Any] | None = None,
@@ -66,6 +68,12 @@ class HttpRequestLifecycleDataSource(EventMetricDataSource):
             payload["url_path"] = str(url_path)
         if result_count is not None:
             payload["result_count"] = max(int(result_count), 0)
+        if result_uris:
+            payload["retrieval_result_uris"] = [str(u) for u in result_uris if u]
+        if result_scores:
+            payload["retrieval_result_scores"] = [
+                None if s is None else float(s) for s in result_scores
+            ]
         if error_code is not None:
             payload["error_code"] = str(error_code)
         if error_message is not None:

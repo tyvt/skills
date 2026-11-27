@@ -40,6 +40,7 @@ class UsageAuditProjection:
     token_rows: dict[tuple, int] = field(default_factory=dict)
     retrieval_rows: dict[tuple, tuple[int, int]] = field(default_factory=dict)
     context_rows: dict[tuple, int] = field(default_factory=dict)
+    help_rows: list[tuple] = field(default_factory=list)
     audit_rows: list[tuple] = field(default_factory=list)
     touched_audit_accounts: set[str] = field(default_factory=set)
 
@@ -79,6 +80,7 @@ def project_events(
     token_rows: defaultdict[tuple, int] = defaultdict(int)
     retrieval_rows: defaultdict[tuple, tuple[int, int]] = defaultdict(lambda: (0, 0))
     context_rows: defaultdict[tuple, int] = defaultdict(int)
+    help_rows: list[tuple] = []
     audit_rows: list[tuple] = []
     touched_audit_accounts: set[str] = set()
 
@@ -144,6 +146,7 @@ def project_events(
                 created_at=created_at,
                 retrieval_rows=retrieval_rows,
                 context_rows=context_rows,
+                help_rows=help_rows,
                 audit_rows=audit_rows,
                 touched_audit_accounts=touched_audit_accounts,
             )
@@ -152,6 +155,7 @@ def project_events(
         token_rows=dict(token_rows),
         retrieval_rows=dict(retrieval_rows),
         context_rows=dict(context_rows),
+        help_rows=help_rows,
         audit_rows=audit_rows,
         touched_audit_accounts=touched_audit_accounts,
     )
@@ -215,6 +219,7 @@ def _project_http_request(
     created_at: str,
     retrieval_rows: defaultdict[tuple, tuple[int, int]],
     context_rows: defaultdict[tuple, int],
+    help_rows: list[tuple],
     audit_rows: list[tuple],
     touched_audit_accounts: set[str],
 ) -> None:
@@ -262,6 +267,34 @@ def _project_http_request(
         prev_count, prev_results = retrieval_rows[retrieval_key]
         result_count = max(safe_int(payload.get("result_count")), 0) if status == "success" else 0
         retrieval_rows[retrieval_key] = (prev_count + 1, prev_results + result_count)
+        if status == "success":
+            request_id = str(payload.get("request_id") or event.request_id or "")
+            uris = payload.get("retrieval_result_uris") or []
+            scores = payload.get("retrieval_result_scores") or []
+            for index, uri_value in enumerate(uris):
+                uri = str(uri_value or "")
+                if not uri.startswith("viking://"):
+                    continue
+                score = None
+                if index < len(scores) and scores[index] is not None:
+                    try:
+                        score = float(scores[index])
+                    except (TypeError, ValueError):
+                        score = None
+                help_rows.append(
+                    (
+                        request_id,
+                        audit_account,
+                        row_user or None,
+                        retrieval_operation,
+                        uri,
+                        score,
+                        0,
+                        0,
+                        created_at,
+                        created_at,
+                    )
+                )
 
     context_operation = context_write_operation_for_http(method, route, status_code)
     if context_operation:

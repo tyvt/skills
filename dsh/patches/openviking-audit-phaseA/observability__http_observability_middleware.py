@@ -705,6 +705,8 @@ def apply_http_metrics_finalize(
             user_id=root_attrs.user_id,
             url_path=root_attrs.url_path,
             result_count=getattr(request.state, "retrieval_result_count", None),
+            result_uris=getattr(request.state, "retrieval_result_uris", None),
+            result_scores=getattr(request.state, "retrieval_result_scores", None),
             caller=getattr(request.state, "ov_caller", None),
             error_code=captured_error.code if include_error and captured_error else None,
             error_message=captured_error.message if include_error and captured_error else None,

@@ -103,12 +103,21 @@ class SQLiteUsageAuditStore:
         if current == 5:
             SQLiteUsageAuditStore._migrate_v5_to_v6_sync(conn)
             current = 6
+        if current == 6:
+            SQLiteUsageAuditStore._migrate_v6_to_v7_sync(conn)
+            return
         if current != SCHEMA_VERSION:
             raise RuntimeError(
                 f"No usage/audit schema migration path from version {current} to {SCHEMA_VERSION}"
             )
         for table in RESET_ON_SCHEMA_UPGRADE_TABLES:
             conn.execute(f"DROP TABLE IF EXISTS {table}")
+
+    @staticmethod
+    def _migrate_v6_to_v7_sync(conn: sqlite3.Connection) -> None:
+        # Additive migration: SQLITE_SCHEMA creates retrieval_help_audit below.
+        # Returning early also preserves existing v6 usage/audit rows.
+        return
 
     @staticmethod
     def _migrate_v4_to_v5_sync(conn: sqlite3.Connection) -> None:
@@ -200,6 +209,7 @@ class SQLiteUsageAuditStore:
         try:
             self._write_token_rows(conn, projection.token_rows, updated_at)
             self._write_retrieval_rows(conn, projection.retrieval_rows, updated_at)
+            self._write_retrieval_help_rows(conn, projection.help_rows, updated_at)
             self._write_context_rows(conn, projection.context_rows, updated_at)
             self._write_audit_rows(conn, projection.audit_rows)
             self._trim_usage_rows(conn, self._usage_max_dates(projection))
@@ -251,6 +261,26 @@ class SQLiteUsageAuditStore:
                 (*key, count, result_count, updated_at)
                 for key, (count, result_count) in rows.items()
             ],
+        )
+
+    @staticmethod
+    def _write_retrieval_help_rows(conn, rows: list[tuple], updated_at: str) -> None:
+        if not rows:
+            return
+        conn.executemany(
+            """
+            INSERT INTO retrieval_help_audit (
+                request_id, account_id, user_id, operation, uri, score,
+                adopted, reworked, created_at, updated_at
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT (request_id, uri) DO UPDATE SET
+                score = COALESCE(excluded.score, retrieval_help_audit.score),
+                adopted = MAX(retrieval_help_audit.adopted, excluded.adopted),
+                reworked = MAX(retrieval_help_audit.reworked, excluded.reworked),
+                updated_at = excluded.updated_at
+            """,
+            [tuple(row) for row in rows],
         )
 
     @staticmethod

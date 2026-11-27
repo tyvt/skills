@@ -11,7 +11,7 @@ serve any region. Token and retrieval rollups are hour-grained so cross-tz
 # Stored on the `_schema_meta` row. Version 4 has an explicit additive migration;
 # unhandled newer transitions fail closed, while older incompatible snapshots
 # continue to use the reset path.
-SCHEMA_VERSION = 6
+SCHEMA_VERSION = 7
 
 SQLITE_SCHEMA = """
 CREATE TABLE IF NOT EXISTS _schema_meta (
@@ -54,6 +54,24 @@ CREATE TABLE IF NOT EXISTS usage_retrieval_hourly (
 );
 CREATE INDEX IF NOT EXISTS idx_usage_retrieval_account_date
     ON usage_retrieval_hourly(account_id, date_utc, hour_utc);
+
+CREATE TABLE IF NOT EXISTS retrieval_help_audit (
+    request_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    user_id TEXT,
+    operation TEXT NOT NULL,
+    uri TEXT NOT NULL,
+    score REAL,
+    adopted INTEGER NOT NULL DEFAULT 0,
+    reworked INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    PRIMARY KEY (request_id, uri)
+);
+CREATE INDEX IF NOT EXISTS idx_retrieval_help_account_created
+    ON retrieval_help_audit(account_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_retrieval_help_uri
+    ON retrieval_help_audit(uri, created_at DESC);
 
 CREATE TABLE IF NOT EXISTS usage_context_write_bucket (
     account_id TEXT NOT NULL,
